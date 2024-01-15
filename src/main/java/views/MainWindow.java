@@ -40,6 +40,10 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import jnafilechooser.api.JnaFileChooser;
 import java.lang.String;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.SwingUtilities;
 
@@ -467,7 +471,6 @@ public class MainWindow extends javax.swing.JFrame {
         if (fileChooser.showOpenDialog(this)) {
             new Thread(new Runnable() {
                 public void run() {
-                    //openFileProgressDialogue = new OpenFileProgressDialogue(mainWindow, false);
                     openFileProgressDialogue.show();
                 }
             }).start();
@@ -494,23 +497,29 @@ public class MainWindow extends javax.swing.JFrame {
             Thread vmfReaderThread = new Thread(new Runnable() {
                 public void run() {
                     try {
-                        var bufferedReader = new BufferedReader(new FileReader(filePath));
                         long startTime = System.nanoTime();
-                        String readLine = bufferedReader.readLine();
-                        vmfContent = readLine + "\n";
                         openFileProgressDialogue.setFileText("Reading " + fileName);
                         
-                        while (bufferedReader.ready()) {
-                            readLine = bufferedReader.readLine();
-                            if (readLine.contains("entity")) {
-                                iNumEnts++;
-                            }
-                            
-                            vmfContent += readLine + "\n";       
-                            openFileProgressDialogue.setStatusText(readLine);
-                        }
+                        List<String> readVmfList = Files.readAllLines(Paths.get(filePath), Charset.forName("ISO-8859-1"));
+                        //List<String> readVmfList = Files.readAllLines(Paths.get(filePath));
+                        vmfContent = String.join("\n", readVmfList);
+                        openFileProgressDialogue.setStatusText("This part shouldn't take long");
                         
-                        bufferedReader.close();
+                        //for (String line : readVmfList) {
+                            //
+                        //}
+                        
+//                        while (bufferedReader.ready()) {
+//                            readLine = bufferedReader.readLine();
+//                            if (readLine.contains("entity")) {
+//                                iNumEnts++;
+//                            }
+//                            
+//                            vmfContent += readLine + "\n";       
+//                            openFileProgressDialogue.setStatusText(readLine);
+//                        }
+//                        
+//                        bufferedReader.close();
                         long endTime = System.nanoTime() - startTime;
                         double timeToRead = endTime / 1_000_000_000.;
                         
