@@ -12,6 +12,16 @@
             <version>3.2.1</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>jna</groupId>
+            <artifactId>swing-jnafilechooser</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>jna</groupId>
+            <artifactId>jna-5.5.0</artifactId>
+            <version>5.5.5</version>
+        </dependency>
     </dependencies>
 
     <properties>
