@@ -11,7 +11,7 @@ import javax.swing.ImageIcon;
  * @author Alejandro
  */
 public class OpenFileProgressDialogue extends javax.swing.JDialog {
-    private final ImageIcon ICON_MADOWALK = new ImageIcon("src/images/madoWalk.gif");
+    private final ImageIcon ICON_MADOWALK = new ImageIcon(MainWindow.class.getResource("/images/madoWalk.gif"));
 
     public OpenFileProgressDialogue(java.awt.Frame parent, boolean modal) {
         super(parent, modal);

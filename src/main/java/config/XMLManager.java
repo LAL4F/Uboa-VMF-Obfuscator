@@ -21,7 +21,7 @@ public class XMLManager {
     private static Document loadXML(){
         Document document = null;
         try{
-            File archivo = new File("src/main/java/resources/settings.xml");
+            File archivo = new File("settings.xml");
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
             DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
             document = documentBuilder.parse(archivo);
@@ -51,7 +51,7 @@ public class XMLManager {
         Document document = loadXML();
         
         if (document == null) {
-            System.err.println("Error al cargar color primario");
+            System.err.println("Error loading XML config");
            return null;
         }
         
@@ -75,6 +75,7 @@ public class XMLManager {
         Document document = loadXML();
         
         if (document == null) {
+            System.err.println("Error loading XML config");
            return false;
         }
         

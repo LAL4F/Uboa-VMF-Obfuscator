@@ -12,7 +12,7 @@ import javax.swing.ImageIcon;
  * @author Alejandro
  */
 public class AboutDialogue extends javax.swing.JDialog {
-    private final ImageIcon ICON_MADOSPIN = new ImageIcon("src/images/madoSpin.gif");
+    private final ImageIcon ICON_MADOSPIN = new ImageIcon(MainWindow.class.getResource("/images/madoSpin.gif"));
     
     public AboutDialogue(java.awt.Frame parent, boolean modal) {
         super(parent, modal);

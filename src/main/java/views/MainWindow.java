@@ -4,28 +4,16 @@
  */
 package views;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatIntelliJLaf;
-import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import config.XMLManager;
 import java.awt.Desktop;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.AudioInputStream;
@@ -34,28 +22,24 @@ import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import jnafilechooser.api.JnaFileChooser;
-import java.lang.String;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import javax.swing.SwingUtilities;
 
 /**
  *
  * @author Alejo
  */
 public class MainWindow extends javax.swing.JFrame {
-    private final ImageIcon ICON_OPENFILE = new ImageIcon("src/images/ico20_openFile.png");
-    private final ImageIcon ICON_SAVE = new ImageIcon("src/images/ico20_saveFile.png");
-    private final ImageIcon ICON_SAVEAS = new ImageIcon("src/images/ico20_saveFileAs.png");
-    private final ImageIcon APPIMAGE = new ImageIcon("src/images/appicon.png");
+    private final ImageIcon ICON_OPENFILE = new ImageIcon(MainWindow.class.getResource("/images/ico20_openFile.png"));
+    private final ImageIcon ICON_SAVE = new ImageIcon(MainWindow.class.getResource("/images/ico20_saveFile.png"));
+    private final ImageIcon ICON_SAVEAS = new ImageIcon(MainWindow.class.getResource("/images/ico20_saveFileAs.png"));
+    private final ImageIcon APPIMAGE = new ImageIcon(MainWindow.class.getResource("/images/appicon.png"));
     
     private String filePath, fileName, vmfContent;
 
@@ -531,7 +515,7 @@ public class MainWindow extends javax.swing.JFrame {
                         textArea.append("\nNumber of entities: " + iNumEnts);
                         setFileLoaded(true);
                         openFileProgressDialogue.setVisible(false);
-                        if (menuOption_playSounds.isSelected()) {playSound("src/snd/success.wav");}
+                        if (menuOption_playSounds.isSelected()) playSound("src/snd/success.wav");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -560,7 +544,7 @@ public class MainWindow extends javax.swing.JFrame {
             bufferedWriter.write(vmfContent);
             bufferedWriter.close();
             System.out.println(fileNameNoExtension + "_obf.vmf");
-            if (menuOption_playSounds.isSelected()) {playSound("src/snd/success2.wav");}
+            if (menuOption_playSounds.isSelected()) playSound("/snd/success2.wav");
             
             JOptionPane.showMessageDialog(this, "Success!\n"
                     + "For your safety, the input VMF has not been overridden.\n"
@@ -601,7 +585,7 @@ public class MainWindow extends javax.swing.JFrame {
                 bufferedWriter.close();
                 
                 System.out.println(fileToWrite.getPath());
-                if (menuOption_playSounds.isSelected()) {playSound("src/snd/success2.wav");}
+                if (menuOption_playSounds.isSelected()) playSound("/snd/success2.wav");
 
                 JOptionPane.showMessageDialog(this, "Success!" , "Uboa - Success", 1);
 
@@ -674,7 +658,7 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         try {
-            Desktop.getDesktop().open(new File("src/manual.pdf"));
+            Desktop.getDesktop().open(new File("pdf/manual.pdf"));
         } catch (IOException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
