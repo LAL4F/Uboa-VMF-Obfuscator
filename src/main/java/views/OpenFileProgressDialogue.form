@@ -51,9 +51,9 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="gif" pref="244" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
-                      <Component id="lb_fileName" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
-                      <Component id="lb_status" min="-2" max="-2" attributes="0"/>
+                      <Component id="lb_fileName" min="-2" pref="21" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="lb_status" min="-2" pref="20" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -74,14 +74,8 @@
     <Component class="javax.swing.JLabel" name="gif">
     </Component>
     <Component class="javax.swing.JLabel" name="lb_status">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="jLabel2"/>
-      </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lb_fileName">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="jLabel2"/>
-      </Properties>
     </Component>
   </SubComponents>
 </Form>

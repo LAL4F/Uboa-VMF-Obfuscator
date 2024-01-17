@@ -8,12 +8,15 @@ import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import config.XMLManager;
 import java.awt.Desktop;
+import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.AudioInputStream;
@@ -27,9 +30,12 @@ import javax.swing.UIManager;
 import jnafilechooser.api.JnaFileChooser;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import javax.swing.JCheckBox;
 
 /**
  *
@@ -143,7 +149,7 @@ public class MainWindow extends javax.swing.JFrame {
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         menu_help = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        menuOption_openManual = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
 
         jMenuItem4.setText("jMenuItem4");
@@ -390,14 +396,14 @@ public class MainWindow extends javax.swing.JFrame {
 
         menu_help.setText("Help");
 
-        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F1, 0));
-        jMenuItem1.setText("User Manual");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        menuOption_openManual.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F1, 0));
+        menuOption_openManual.setText("User Manual");
+        menuOption_openManual.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                menuOption_openManualActionPerformed(evt);
             }
         });
-        menu_help.add(jMenuItem1);
+        menu_help.add(menuOption_openManual);
 
         jMenuItem6.setText("About...");
         jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
@@ -485,7 +491,6 @@ public class MainWindow extends javax.swing.JFrame {
                         openFileProgressDialogue.setFileText("Reading " + fileName);
                         
                         List<String> readVmfList = Files.readAllLines(Paths.get(filePath), Charset.forName("ISO-8859-1"));
-                        //List<String> readVmfList = Files.readAllLines(Paths.get(filePath));
                         vmfContent = String.join("\n", readVmfList);
                         openFileProgressDialogue.setStatusText("This part shouldn't take long");
                         
@@ -493,17 +498,6 @@ public class MainWindow extends javax.swing.JFrame {
                             //
                         //}
                         
-//                        while (bufferedReader.ready()) {
-//                            readLine = bufferedReader.readLine();
-//                            if (readLine.contains("entity")) {
-//                                iNumEnts++;
-//                            }
-//                            
-//                            vmfContent += readLine + "\n";       
-//                            openFileProgressDialogue.setStatusText(readLine);
-//                        }
-//                        
-//                        bufferedReader.close();
                         long endTime = System.nanoTime() - startTime;
                         double timeToRead = endTime / 1_000_000_000.;
                         
@@ -515,7 +509,7 @@ public class MainWindow extends javax.swing.JFrame {
                         textArea.append("\nNumber of entities: " + iNumEnts);
                         setFileLoaded(true);
                         openFileProgressDialogue.setVisible(false);
-                        if (menuOption_playSounds.isSelected()) playSound("src/snd/success.wav");
+                        if (menuOption_playSounds.isSelected()) playSound("/snd/success.wav");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -543,13 +537,15 @@ public class MainWindow extends javax.swing.JFrame {
             
             bufferedWriter.write(vmfContent);
             bufferedWriter.close();
-            System.out.println(fileNameNoExtension + "_obf.vmf");
             if (menuOption_playSounds.isSelected()) playSound("/snd/success2.wav");
+            JCheckBox checkbox = new JCheckBox("Do not show save messages ever again");
+            Object[] params = {"Success!\nFor your safety, the input VMF has not been overridden. \nA copy of the VMF has been saved with the name of " + fileNameNoExtension + "_obf.vmf\n", "\n", checkbox};
             
-            JOptionPane.showMessageDialog(this, "Success!\n"
-                    + "For your safety, the input VMF has not been overridden.\n"
-                    + "A copy of the VMF has been saved with the name of " + fileNameNoExtension + "_obf.vmf" , "Uboa - Success", 1);
-
+            JOptionPane.showMessageDialog(this, params, "Uboa - Success", 1);
+            if (checkbox.isSelected()) {
+                System.out.println("Never show again");
+            }
+            
         } catch (IOException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -584,10 +580,15 @@ public class MainWindow extends javax.swing.JFrame {
                 bufferedWriter.write(vmfContent);
                 bufferedWriter.close();
                 
-                System.out.println(fileToWrite.getPath());
                 if (menuOption_playSounds.isSelected()) playSound("/snd/success2.wav");
 
-                JOptionPane.showMessageDialog(this, "Success!" , "Uboa - Success", 1);
+            JCheckBox checkbox = new JCheckBox("Do not show save messages ever again");
+            Object[] params = {"Success!", "\n", checkbox};
+            
+            JOptionPane.showMessageDialog(this, params, "Uboa - Success", 1);
+            if (checkbox.isSelected()) {
+                System.out.println("Never show again");
+            }
 
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
@@ -656,13 +657,23 @@ public class MainWindow extends javax.swing.JFrame {
         lb_info.setText("Logic and point entities will have their targetname randomized");
     }//GEN-LAST:event_rb_eNameObfuscation_randomizeMouseEntered
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void menuOption_openManualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuOption_openManualActionPerformed
         try {
-            Desktop.getDesktop().open(new File("pdf/manual.pdf"));
+            //Why does this have to be so complicated
+            //I guess it's one thing to open a file directly from the filesystem (as in an IDE) 
+            //than referencing one that's packed away in a jar file
+            
+            //the manual pdf must be read into an input stream of bytes, then a temp file
+            //is rebuilt using the stream and opened by the OS
+            InputStream inputStream = MainWindow.class.getResourceAsStream("/pdf/manual.pdf");
+            File file = new File("/temp/manualStream.pdf");
+            Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            
+            Desktop.getDesktop().open(file);
         } catch (IOException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_menuOption_openManualActionPerformed
 
     private void rb_eNameObfuscation_randomizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_eNameObfuscation_randomizeActionPerformed
         setRandomEntNameParametersEditable(true);
@@ -702,13 +713,18 @@ public class MainWindow extends javax.swing.JFrame {
     }
 
     void playSound(String soundFile) {
-        AudioInputStream audioIn = null;
         try {
-            File f = new File("./" + soundFile);
-            audioIn = AudioSystem.getAudioInputStream(f.toURI().toURL());
+            InputStream audioSrc = MainWindow.class.getResourceAsStream(soundFile);
+            InputStream bufferedAudioInput = new BufferedInputStream(audioSrc);
+            //File f = new File(sndURL.toURI());
+            
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(bufferedAudioInput);
+            
             Clip clip = AudioSystem.getClip();
             clip.open(audioIn);
             clip.start();
+            clip.drain();
+            audioIn.close();
         } catch (MalformedURLException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UnsupportedAudioFileException ex) {
@@ -717,12 +733,6 @@ public class MainWindow extends javax.swing.JFrame {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         } catch (LineUnavailableException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                audioIn.close();
-            } catch (IOException ex) {
-                Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -733,7 +743,6 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
@@ -746,6 +755,7 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuOption_closeFile;
     private javax.swing.JMenuItem menuOption_exit;
     private javax.swing.JMenuItem menuOption_open;
+    private javax.swing.JMenuItem menuOption_openManual;
     private javax.swing.JCheckBoxMenuItem menuOption_playSounds;
     private javax.swing.JMenuItem menuOption_preferences;
     private javax.swing.JMenuItem menuOption_save;

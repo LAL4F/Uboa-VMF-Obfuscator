@@ -21,6 +21,7 @@ public class XMLManager {
     private static Document loadXML(){
         Document document = null;
         try{
+            //File archivo = new File("src/main/java/resources/settings.xml");
             File archivo = new File("settings.xml");
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
             DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
@@ -37,7 +38,8 @@ public class XMLManager {
         try{
             Transformer transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new File("src/main/java/config/StyleXML.xsl")));
 
-            Result output =new StreamResult(new File("src/main/java/resources/settings.xml"));
+            //Result output =new StreamResult(new File("src/main/java/resources/settings.xml")); 
+            Result output =new StreamResult(new File("settings.xml"));
             Source input = new DOMSource(document);
             transformer.transform(input, output);
             return true;
