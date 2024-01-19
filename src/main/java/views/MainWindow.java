@@ -30,6 +30,7 @@ import javax.swing.UIManager;
 import jnafilechooser.api.JnaFileChooser;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -42,10 +43,10 @@ import javax.swing.JCheckBox;
  * @author Alejo
  */
 public class MainWindow extends javax.swing.JFrame {
-    private final ImageIcon ICON_OPENFILE = new ImageIcon(MainWindow.class.getResource("/images/ico20_openFile.png"));
-    private final ImageIcon ICON_SAVE = new ImageIcon(MainWindow.class.getResource("/images/ico20_saveFile.png"));
-    private final ImageIcon ICON_SAVEAS = new ImageIcon(MainWindow.class.getResource("/images/ico20_saveFileAs.png"));
-    private final ImageIcon APPIMAGE = new ImageIcon(MainWindow.class.getResource("/images/appicon.png"));
+    public final ImageIcon ICON_OPENFILE = new ImageIcon(MainWindow.class.getResource("/images/ico20_openFile.png"));
+    public final ImageIcon ICON_SAVE = new ImageIcon(MainWindow.class.getResource("/images/ico20_saveFile.png"));
+    public final ImageIcon ICON_SAVEAS = new ImageIcon(MainWindow.class.getResource("/images/ico20_saveFileAs.png"));
+    public final ImageIcon APPIMAGE = new ImageIcon(MainWindow.class.getResource("/images/appicon.png"));
     
     private String filePath, fileName, vmfContent;
 
@@ -55,6 +56,7 @@ public class MainWindow extends javax.swing.JFrame {
     
     private OpenFileProgressDialogue openFileProgressDialogue;
     private AboutDialogue aboutDialogue;
+    private ConfigWindow configWindow;
     
     private MainWindow mainWindow = this;
     
@@ -85,7 +87,7 @@ public class MainWindow extends javax.swing.JFrame {
     }
     
     private void loadConfig() {
-        menuOption_playSounds.setSelected(XMLManager.isSoundEnabled());
+        //menuOption_playSounds.setSelected(XMLManager.isSoundEnabled());
     }
     
     private void setupRadioButtons() {
@@ -557,7 +559,8 @@ public class MainWindow extends javax.swing.JFrame {
 
     
     private void menuOption_preferencesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuOption_preferencesActionPerformed
-        // TODO add your handling code here:
+        configWindow = new ConfigWindow(this);
+        configWindow.show();
     }//GEN-LAST:event_menuOption_preferencesActionPerformed
 
     private void saveAs() {
@@ -659,19 +662,29 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void menuOption_openManualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuOption_openManualActionPerformed
         try {
-            //Why does this have to be so complicated
-            //I guess it's one thing to open a file directly from the filesystem (as in an IDE) 
-            //than referencing one that's packed away in a jar file
-            
             //the manual pdf must be read into an input stream of bytes, then a temp file
             //is rebuilt using the stream and opened by the OS
+            
+            //as for the path of the temp file, it must be the same folder as the jar file
+            //back home the path of the temp file could be something like /temp/manual.pdf, which is ideal
+            //but on my school laptop it just doesnt work and throws a NoSuchFileException
+            //this is so sad I feel like crying
+            
             InputStream inputStream = MainWindow.class.getResourceAsStream("/pdf/manual.pdf");
-            File file = new File("/temp/manualStream.pdf");
+            File file = new File("manual.pdf");
             Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
             
             Desktop.getDesktop().open(file);
+        } catch (NoSuchFileException ex) {
+            JCheckBox checkbox = new JCheckBox("Do not show exception messages ever again");
+            Object[] params = {"Ah fiddlesticks, what now?!","Got NoSuchFileException", "\n", checkbox};
+            
+            JOptionPane.showMessageDialog(this, params, "Uboa - Exception", 1);
+            if (checkbox.isSelected()) {
+                System.out.println("Never show again");
+            }
         } catch (IOException ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex); 
         }
     }//GEN-LAST:event_menuOption_openManualActionPerformed
 
@@ -714,10 +727,10 @@ public class MainWindow extends javax.swing.JFrame {
 
     void playSound(String soundFile) {
         try {
+            //Took a while to figure out how to play sounds inside a .jar file but it's here
             InputStream audioSrc = MainWindow.class.getResourceAsStream(soundFile);
             InputStream bufferedAudioInput = new BufferedInputStream(audioSrc);
-            //File f = new File(sndURL.toURI());
-            
+
             AudioInputStream audioIn = AudioSystem.getAudioInputStream(bufferedAudioInput);
             
             Clip clip = AudioSystem.getClip();
