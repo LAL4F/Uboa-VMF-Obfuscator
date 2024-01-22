@@ -37,18 +37,23 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JCheckBox;
+import javax.swing.LookAndFeel;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 /**
  *
  * @author Alejo
  */
 public class MainWindow extends javax.swing.JFrame {
-    public final ImageIcon ICON_OPENFILE = new ImageIcon(MainWindow.class.getResource("/images/ico20_openFile.png"));
-    public final ImageIcon ICON_SAVE = new ImageIcon(MainWindow.class.getResource("/images/ico20_saveFile.png"));
-    public final ImageIcon ICON_SAVEAS = new ImageIcon(MainWindow.class.getResource("/images/ico20_saveFileAs.png"));
+    private final ImageIcon ICON_OPENFILE = new ImageIcon(MainWindow.class.getResource("/images/ico20_openFile.png"));
+    private final ImageIcon ICON_SAVE = new ImageIcon(MainWindow.class.getResource("/images/ico20_saveFile.png"));
+    private final ImageIcon ICON_SAVEAS = new ImageIcon(MainWindow.class.getResource("/images/ico20_saveFileAs.png"));
     public final ImageIcon APPIMAGE = new ImageIcon(MainWindow.class.getResource("/images/appicon.png"));
     
+    private final String CHARSET = "ISO-8859-1";
+    
     private String filePath, fileName, vmfContent;
+    
 
     private int iNumEnts;
     
@@ -76,7 +81,7 @@ public class MainWindow extends javax.swing.JFrame {
         
         textArea.setText("Welcome to Uboa VMF Obfuscator. Load a VMF file to begin.");
         lb_info.setText("Hover over objects to see relevant information");
-
+        lb_charset.setText(CHARSET);
         
     }
     
@@ -135,6 +140,8 @@ public class MainWindow extends javax.swing.JFrame {
         comboBox_rndEntNameLabel = new javax.swing.JLabel();
         lb_info = new javax.swing.JLabel();
         bt_beginObfuscate = new javax.swing.JButton();
+        lb_filelength = new javax.swing.JLabel();
+        lb_charset = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         menu_file = new javax.swing.JMenu();
         menuOption_open = new javax.swing.JMenuItem();
@@ -144,9 +151,9 @@ public class MainWindow extends javax.swing.JFrame {
         menuOption_closeFile = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         menuOption_exit = new javax.swing.JMenuItem();
+        menu_edit = new javax.swing.JMenu();
         jMenu3 = new javax.swing.JMenu();
         menuOption_preferences = new javax.swing.JMenuItem();
-        menuOption_playSounds = new javax.swing.JCheckBoxMenuItem();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem2 = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
@@ -314,6 +321,12 @@ public class MainWindow extends javax.swing.JFrame {
         bt_beginObfuscate.setText("Obfuscate");
         bt_beginObfuscate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
+        lb_filelength.setText("length: 0 | lines: 0");
+        lb_filelength.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        lb_charset.setText("Charset");
+        lb_charset.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
         menu_file.setText("File");
 
         menuOption_open.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_DOWN_MASK));
@@ -365,6 +378,9 @@ public class MainWindow extends javax.swing.JFrame {
 
         jMenuBar1.add(menu_file);
 
+        menu_edit.setText("Edit");
+        jMenuBar1.add(menu_edit);
+
         jMenu3.setText("Settings");
 
         menuOption_preferences.setText("Preferences...");
@@ -374,15 +390,6 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
         jMenu3.add(menuOption_preferences);
-
-        menuOption_playSounds.setSelected(true);
-        menuOption_playSounds.setText("Play Sounds");
-        menuOption_playSounds.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuOption_playSoundsActionPerformed(evt);
-            }
-        });
-        jMenu3.add(menuOption_playSounds);
 
         jMenu1.setText("Languages");
 
@@ -430,9 +437,14 @@ public class MainWindow extends javax.swing.JFrame {
                     .addComponent(textAreaScrollPane)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(bt_beginObfuscate)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(lb_info, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(bt_beginObfuscate)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lb_info, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lb_filelength, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lb_charset, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -447,7 +459,10 @@ public class MainWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(textAreaScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lb_info)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lb_info)
+                    .addComponent(lb_filelength)
+                    .addComponent(lb_charset))
                 .addContainerGap())
         );
 
@@ -455,10 +470,10 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void openFile() {
-        clearProgram();
+        //clearProgram();
         
         JnaFileChooser fileChooser = new JnaFileChooser();
-        fileChooser.addFilter("Valve Map File (.vmf)", "vmf");
+        fileChooser.addFilter("Valve Map File (.vmf)", "vmf", "vmx");
 
         if (fileChooser.showOpenDialog(this)) {
             new Thread(new Runnable() {
@@ -490,15 +505,26 @@ public class MainWindow extends javax.swing.JFrame {
                 public void run() {
                     try {
                         long startTime = System.nanoTime();
+                        
+                        List<String> readVmfList = Files.readAllLines(Paths.get(filePath), Charset.forName(CHARSET));
+                        int totalLines = readVmfList.size();
+                        int beginEntitySection = readVmfList.indexOf("entity");
+                        
+                        List<String> solidSection = readVmfList.subList(0, beginEntitySection);
+                        //List<String> entitySection = readVmfList.subList(beginEntitySection, readVmfList.size());
+                        
+                        vmfContent = String.join("\n", solidSection);
+                        
                         openFileProgressDialogue.setFileText("Reading " + fileName);
-                        
-                        List<String> readVmfList = Files.readAllLines(Paths.get(filePath), Charset.forName("ISO-8859-1"));
-                        vmfContent = String.join("\n", readVmfList);
-                        openFileProgressDialogue.setStatusText("This part shouldn't take long");
-                        
-                        //for (String line : readVmfList) {
-                            //
-                        //}
+                        openFileProgressDialogue.setProgressBarMin(beginEntitySection);
+                        openFileProgressDialogue.setProgressBarMax(totalLines);
+
+                        for (int i = beginEntitySection; i < readVmfList.size(); i++) {
+                            vmfContent += readVmfList.get(i);
+                            openFileProgressDialogue.setStatusText("Line " + i + " of " + totalLines);
+                            openFileProgressDialogue.setProgressBarValue(i);
+                            openFileProgressDialogue.appendTextArea(readVmfList.get(i));     
+                        }
                         
                         long endTime = System.nanoTime() - startTime;
                         double timeToRead = endTime / 1_000_000_000.;
@@ -511,7 +537,8 @@ public class MainWindow extends javax.swing.JFrame {
                         textArea.append("\nNumber of entities: " + iNumEnts);
                         setFileLoaded(true);
                         openFileProgressDialogue.setVisible(false);
-                        if (menuOption_playSounds.isSelected()) playSound("/snd/success.wav");
+                        lb_filelength.setText("length: " + vmfContent.length() + " | lines: " + totalLines);
+                        //if (menuOption_playSounds.isSelected()) playSound("/snd/success.wav");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -539,7 +566,7 @@ public class MainWindow extends javax.swing.JFrame {
             
             bufferedWriter.write(vmfContent);
             bufferedWriter.close();
-            if (menuOption_playSounds.isSelected()) playSound("/snd/success2.wav");
+            //if (menuOption_playSounds.isSelected()) playSound("/snd/success2.wav");
             JCheckBox checkbox = new JCheckBox("Do not show save messages ever again");
             Object[] params = {"Success!\nFor your safety, the input VMF has not been overridden. \nA copy of the VMF has been saved with the name of " + fileNameNoExtension + "_obf.vmf\n", "\n", checkbox};
             
@@ -555,8 +582,6 @@ public class MainWindow extends javax.swing.JFrame {
     private void menuOption_saveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuOption_saveActionPerformed
         saveFile();
     }//GEN-LAST:event_menuOption_saveActionPerformed
-    
-
     
     private void menuOption_preferencesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuOption_preferencesActionPerformed
         configWindow = new ConfigWindow(this);
@@ -583,7 +608,7 @@ public class MainWindow extends javax.swing.JFrame {
                 bufferedWriter.write(vmfContent);
                 bufferedWriter.close();
                 
-                if (menuOption_playSounds.isSelected()) playSound("/snd/success2.wav");
+                //if (menuOption_playSounds.isSelected()) playSound("/snd/success2.wav");
 
             JCheckBox checkbox = new JCheckBox("Do not show save messages ever again");
             Object[] params = {"Success!", "\n", checkbox};
@@ -618,6 +643,7 @@ public class MainWindow extends javax.swing.JFrame {
          
         textArea.setText("Welcome to Uboa VMF Obfuscator. Load a VMF file to begin.");
         lb_info.setText("Hover over objects to see relevant information");
+        lb_filelength.setText("length: 0 | lines: 0");
     }
     
     private void menuOption_closeFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuOption_closeFileActionPerformed
@@ -628,16 +654,12 @@ public class MainWindow extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_menuOption_exitActionPerformed
 
-    private void menuOption_playSoundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuOption_playSoundsActionPerformed
-        XMLManager.setSoundEnabled(menuOption_playSounds.isSelected());
-    }//GEN-LAST:event_menuOption_playSoundsActionPerformed
-
     private void rb_ePosObfuscation_noneMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_noneMouseEntered
         lb_info.setText("Position of logic entities will remain the same");
     }//GEN-LAST:event_rb_ePosObfuscation_noneMouseEntered
 
     private void rb_ePosObfuscation_overlapMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_overlapMouseEntered
-        lb_info.setText("All logic entities will be moved to the best suitable coordinates, based on the first entity found");
+        lb_info.setText("All logic entities will be moved to the best suitable coordinates");
     }//GEN-LAST:event_rb_ePosObfuscation_overlapMouseEntered
 
     private void rb_ePosObfuscation_randomizeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_randomizeMouseEntered
@@ -713,7 +735,7 @@ public class MainWindow extends javax.swing.JFrame {
     }
     public static void main(String args[]) {
         try {
-            UIManager.setLookAndFeel( new FlatMacDarkLaf());
+            UIManager.setLookAndFeel("com.formdev.flatlaf.themes.FlatMacDarkLaf");
         } catch( Exception ex ) {
             System.err.println( "Failed to initialize LaF" );
         }
@@ -764,15 +786,17 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
+    private javax.swing.JLabel lb_charset;
+    private javax.swing.JLabel lb_filelength;
     private javax.swing.JLabel lb_info;
     private javax.swing.JMenuItem menuOption_closeFile;
     private javax.swing.JMenuItem menuOption_exit;
     private javax.swing.JMenuItem menuOption_open;
     private javax.swing.JMenuItem menuOption_openManual;
-    private javax.swing.JCheckBoxMenuItem menuOption_playSounds;
     private javax.swing.JMenuItem menuOption_preferences;
     private javax.swing.JMenuItem menuOption_save;
     private javax.swing.JMenuItem menuOption_saveAs;
+    private javax.swing.JMenu menu_edit;
     private javax.swing.JMenu menu_file;
     private javax.swing.JMenu menu_help;
     private javax.swing.JRadioButton rb_eNameObfuscation_exchange;
