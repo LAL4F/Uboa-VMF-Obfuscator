@@ -9,7 +9,7 @@ import java.awt.Color;
 import javax.swing.JOptionPane;
 
 public class ConfigWindow extends javax.swing.JFrame {
-    private MainWindow parent;
+    public MainWindow parent;
     private CardLayout navigator;
     
     private Conf_AppearancePanel appearancePanel;

@@ -1,7 +1,7 @@
 package views;
 
 public class Conf_SoundPanel extends javax.swing.JPanel {
-    private ConfigWindow parent;
+    public ConfigWindow parent;
     
     public Conf_SoundPanel(ConfigWindow parent) {
         initComponents();
@@ -20,16 +20,16 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         jCheckBox4 = new javax.swing.JCheckBox();
         jCheckBox5 = new javax.swing.JCheckBox();
         jCheckBox6 = new javax.swing.JCheckBox();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
-        jTextField5 = new javax.swing.JTextField();
+        bt_openFileSnd = new javax.swing.JButton();
+        bt_analyzeFileSnd = new javax.swing.JButton();
+        bt_obfuscateFileSnd = new javax.swing.JButton();
+        bt_saveFileSnd = new javax.swing.JButton();
+        bt_exceptionSnd = new javax.swing.JButton();
+        tf_openFileSnd = new javax.swing.JTextField();
+        tf_analyzeFileSnd = new javax.swing.JTextField();
+        tf_obfuscateFileSnd = new javax.swing.JTextField();
+        tf_saveFileSnd = new javax.swing.JTextField();
+        tf_exceptionSnd = new javax.swing.JTextField();
         jButton6 = new javax.swing.JButton();
         jSlider1 = new javax.swing.JSlider();
         jLabel1 = new javax.swing.JLabel();
@@ -46,36 +46,41 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
 
         jCheckBox4.setText("Analyze file");
 
-        jCheckBox5.setText("On exceptions");
+        jCheckBox5.setText("On errors");
 
         jCheckBox6.setText("Obfuscate file");
 
-        jButton1.setText("...");
+        bt_openFileSnd.setText("...");
+        bt_openFileSnd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_openFileSndActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("...");
+        bt_analyzeFileSnd.setText("...");
 
-        jButton3.setText("...");
+        bt_obfuscateFileSnd.setText("...");
 
-        jButton4.setText("...");
+        bt_saveFileSnd.setText("...");
 
-        jButton5.setText("...");
+        bt_exceptionSnd.setText("...");
 
-        jTextField1.setText("jTextField1");
-        jTextField1.setEnabled(false);
+        tf_openFileSnd.setText("jTextField1");
+        tf_openFileSnd.setEnabled(false);
 
-        jTextField2.setText("jTextField2");
-        jTextField2.setEnabled(false);
+        tf_analyzeFileSnd.setText("jTextField2");
+        tf_analyzeFileSnd.setEnabled(false);
 
-        jTextField3.setText("jTextField3");
-        jTextField3.setEnabled(false);
+        tf_obfuscateFileSnd.setText("jTextField3");
+        tf_obfuscateFileSnd.setEnabled(false);
 
-        jTextField4.setText("jTextField4");
-        jTextField4.setEnabled(false);
+        tf_saveFileSnd.setText("jTextField4");
+        tf_saveFileSnd.setEnabled(false);
 
-        jTextField5.setText("jTextField5");
-        jTextField5.setEnabled(false);
+        tf_exceptionSnd.setText("jTextField5");
+        tf_exceptionSnd.setEnabled(false);
 
-        jButton6.setText("Sound test");
+        jButton6.setText("Reset");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -91,23 +96,23 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
                     .addComponent(jCheckBox6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField1)
-                    .addComponent(jTextField2)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jTextField5, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addComponent(tf_openFileSnd)
+                    .addComponent(tf_analyzeFileSnd)
+                    .addComponent(tf_obfuscateFileSnd, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(tf_saveFileSnd, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(tf_exceptionSnd, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(bt_obfuscateFileSnd)
+                            .addComponent(bt_saveFileSnd)
                             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton2))
-                            .addComponent(jButton3)
-                            .addComponent(jButton4))
+                                .addComponent(bt_openFileSnd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(bt_analyzeFileSnd)))
                         .addGap(145, 145, 145))
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jButton5)
+                        .addComponent(bt_exceptionSnd)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton6)
                         .addContainerGap())))
@@ -118,28 +123,28 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCheckBox2)
-                    .addComponent(jButton1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(bt_openFileSnd)
+                    .addComponent(tf_openFileSnd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCheckBox4)
-                    .addComponent(jButton2)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(bt_analyzeFileSnd)
+                    .addComponent(tf_analyzeFileSnd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCheckBox6)
-                    .addComponent(jButton3)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(bt_obfuscateFileSnd)
+                    .addComponent(tf_obfuscateFileSnd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCheckBox3)
-                    .addComponent(jButton4)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(bt_saveFileSnd)
+                    .addComponent(tf_saveFileSnd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCheckBox5)
-                    .addComponent(jButton5)
-                    .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bt_exceptionSnd)
+                    .addComponent(tf_exceptionSnd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton6))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -196,13 +201,21 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void bt_openFileSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_openFileSndActionPerformed
+        openSoundBrowser();
+    }//GEN-LAST:event_bt_openFileSndActionPerformed
+
+    private void openSoundBrowser() {
+        SoundBrowserDialogue soundBrowserDialogue = new SoundBrowserDialogue(this);
+        soundBrowserDialogue.show();
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
+    private javax.swing.JButton bt_analyzeFileSnd;
+    private javax.swing.JButton bt_exceptionSnd;
+    private javax.swing.JButton bt_obfuscateFileSnd;
+    private javax.swing.JButton bt_openFileSnd;
+    private javax.swing.JButton bt_saveFileSnd;
     private javax.swing.JButton jButton6;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
@@ -214,10 +227,10 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSlider jSlider1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
+    private javax.swing.JTextField tf_analyzeFileSnd;
+    private javax.swing.JTextField tf_exceptionSnd;
+    private javax.swing.JTextField tf_obfuscateFileSnd;
+    private javax.swing.JTextField tf_openFileSnd;
+    private javax.swing.JTextField tf_saveFileSnd;
     // End of variables declaration//GEN-END:variables
 }
