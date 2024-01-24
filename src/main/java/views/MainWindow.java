@@ -39,6 +39,7 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JCheckBox;
 import javax.swing.LookAndFeel;
 import javax.swing.plaf.metal.MetalLookAndFeel;
+import utils.SoundPlayer;
 
 /**
  *
@@ -92,7 +93,7 @@ public class MainWindow extends javax.swing.JFrame {
     }
     
     private void loadConfig() {
-        //menuOption_playSounds.setSelected(XMLManager.isSoundEnabled());
+       
     }
     
     private void setupRadioButtons() {
@@ -538,7 +539,7 @@ public class MainWindow extends javax.swing.JFrame {
                         setFileLoaded(true);
                         openFileProgressDialogue.setVisible(false);
                         lb_filelength.setText("length: " + vmfContent.length() + " | lines: " + totalLines);
-                        //if (menuOption_playSounds.isSelected()) playSound("/snd/success.wav");
+                        //if (menuOption_playSounds.isSelected()) SoundPlayer.playSound("/snd/success.wav");
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -566,7 +567,7 @@ public class MainWindow extends javax.swing.JFrame {
             
             bufferedWriter.write(vmfContent);
             bufferedWriter.close();
-            //if (menuOption_playSounds.isSelected()) playSound("/snd/success2.wav");
+            //SoundPlayer.playSound("/snd/success2.wav");
             JCheckBox checkbox = new JCheckBox("Do not show save messages ever again");
             Object[] params = {"Success!\nFor your safety, the input VMF has not been overridden. \nA copy of the VMF has been saved with the name of " + fileNameNoExtension + "_obf.vmf\n", "\n", checkbox};
             
@@ -608,7 +609,7 @@ public class MainWindow extends javax.swing.JFrame {
                 bufferedWriter.write(vmfContent);
                 bufferedWriter.close();
                 
-                //if (menuOption_playSounds.isSelected()) playSound("/snd/success2.wav");
+                //if (menuOption_playSounds.isSelected()) SoundPlayer.playSound("/snd/success2.wav");
 
             JCheckBox checkbox = new JCheckBox("Do not show save messages ever again");
             Object[] params = {"Success!", "\n", checkbox};
@@ -745,30 +746,6 @@ public class MainWindow extends javax.swing.JFrame {
                 new MainWindow().setVisible(true);
             }
         });
-    }
-
-    void playSound(String soundFile) {
-        try {
-            //Took a while to figure out how to play sounds inside a .jar file but it's here
-            InputStream audioSrc = MainWindow.class.getResourceAsStream(soundFile);
-            InputStream bufferedAudioInput = new BufferedInputStream(audioSrc);
-
-            AudioInputStream audioIn = AudioSystem.getAudioInputStream(bufferedAudioInput);
-            
-            Clip clip = AudioSystem.getClip();
-            clip.open(audioIn);
-            clip.start();
-            clip.drain();
-            audioIn.close();
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedAudioFileException ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (LineUnavailableException ex) {
-            Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bt_beginObfuscate;

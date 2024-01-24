@@ -51,11 +51,11 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jPanel2" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
-                          <Component id="jCheckBox1" min="-2" max="-2" attributes="0"/>
+                          <Component id="checkbox_allSounds" min="-2" max="-2" attributes="0"/>
                           <EmptySpace pref="52" max="32767" attributes="0"/>
                           <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="jSlider1" min="-2" max="-2" attributes="0"/>
+                          <Component id="masterVolumeSlider" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -66,9 +66,9 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jSlider1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="masterVolumeSlider" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jCheckBox1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="checkbox_allSounds" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
@@ -78,10 +78,13 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JCheckBox" name="jCheckBox1">
+        <Component class="javax.swing.JCheckBox" name="checkbox_allSounds">
           <Properties>
             <Property name="text" type="java.lang.String" value="Enable sounds"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkbox_allSoundsActionPerformed"/>
+          </Events>
         </Component>
         <Container class="javax.swing.JPanel" name="jPanel2">
           <Properties>
@@ -98,11 +101,11 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="jCheckBox5" alignment="0" max="32767" attributes="0"/>
-                          <Component id="jCheckBox3" alignment="0" max="32767" attributes="0"/>
-                          <Component id="jCheckBox4" alignment="0" max="32767" attributes="0"/>
-                          <Component id="jCheckBox2" alignment="0" max="32767" attributes="0"/>
-                          <Component id="jCheckBox6" max="32767" attributes="0"/>
+                          <Component id="checkbox_errorSounds" alignment="0" max="32767" attributes="0"/>
+                          <Component id="checkbox_saveFileSounds" alignment="0" max="32767" attributes="0"/>
+                          <Component id="checkbox_analyzeFileSounds" alignment="0" max="32767" attributes="0"/>
+                          <Component id="checkbox_openFileSounds" alignment="0" max="32767" attributes="0"/>
+                          <Component id="checkbox_obfuscateFileSounds" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -128,7 +131,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="bt_exceptionSnd" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="32767" attributes="0"/>
-                              <Component id="jButton6" min="-2" max="-2" attributes="0"/>
+                              <Component id="bt_resetAllSounds" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -140,34 +143,34 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jCheckBox2" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="checkbox_openFileSounds" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="bt_openFileSnd" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="tf_openFileSnd" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jCheckBox4" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="checkbox_analyzeFileSounds" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="bt_analyzeFileSnd" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="tf_analyzeFileSnd" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jCheckBox6" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="checkbox_obfuscateFileSounds" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="bt_obfuscateFileSnd" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="tf_obfuscateFileSnd" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jCheckBox3" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="checkbox_saveFileSounds" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="bt_saveFileSnd" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="tf_saveFileSnd" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
-                          <Component id="jCheckBox5" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="checkbox_errorSounds" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="bt_exceptionSnd" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="tf_exceptionSnd" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="jButton6" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="bt_resetAllSounds" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="32767" attributes="0"/>
                   </Group>
@@ -175,27 +178,27 @@
             </DimensionLayout>
           </Layout>
           <SubComponents>
-            <Component class="javax.swing.JCheckBox" name="jCheckBox2">
+            <Component class="javax.swing.JCheckBox" name="checkbox_openFileSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Open file"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JCheckBox" name="jCheckBox3">
+            <Component class="javax.swing.JCheckBox" name="checkbox_saveFileSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Save file"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JCheckBox" name="jCheckBox4">
+            <Component class="javax.swing.JCheckBox" name="checkbox_analyzeFileSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Analyze file"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JCheckBox" name="jCheckBox5">
+            <Component class="javax.swing.JCheckBox" name="checkbox_errorSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="On errors"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JCheckBox" name="jCheckBox6">
+            <Component class="javax.swing.JCheckBox" name="checkbox_obfuscateFileSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Obfuscate file"/>
               </Properties>
@@ -258,14 +261,14 @@
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
             </Component>
-            <Component class="javax.swing.JButton" name="jButton6">
+            <Component class="javax.swing.JButton" name="bt_resetAllSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Reset"/>
               </Properties>
             </Component>
           </SubComponents>
         </Container>
-        <Component class="javax.swing.JSlider" name="jSlider1">
+        <Component class="javax.swing.JSlider" name="masterVolumeSlider">
           <Properties>
             <Property name="majorTickSpacing" type="int" value="25"/>
             <Property name="minorTickSpacing" type="int" value="5"/>

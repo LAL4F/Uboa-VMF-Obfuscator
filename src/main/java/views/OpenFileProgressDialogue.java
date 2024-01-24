@@ -4,7 +4,10 @@
  */
 package views;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 public class OpenFileProgressDialogue extends javax.swing.JDialog {
     private final ImageIcon ICON_MADOWALK = new ImageIcon(MainWindow.class.getResource("/images/madoWalk.gif"));
@@ -15,6 +18,18 @@ public class OpenFileProgressDialogue extends javax.swing.JDialog {
         setLocationRelativeTo(null);
         
         gif.setIcon(ICON_MADOWALK);
+        
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (JOptionPane.showConfirmDialog(null,"Are you sure you need to close？", "Tip", JOptionPane.YES_NO_OPTION) == 0) {  
+                    System.out.println("yes ");
+                    dispose();  //close 
+                } else {
+                    System.out.println("no ");
+                } 
+            }
+       });
     }
     
     public void setFileText(String text) {
@@ -55,7 +70,7 @@ public class OpenFileProgressDialogue extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         textArea = new javax.swing.JTextArea();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Processing VMF");
         setResizable(false);
 

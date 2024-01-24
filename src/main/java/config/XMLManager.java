@@ -16,16 +16,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import views.MainWindow;
 
 public class XMLManager {
     private static Document loadXML(){
         Document document = null;
         try{
-            //File archivo = new File("src/main/java/resources/settings.xml");
-            File archivo = new File("settings.xml");
+            File file = new File(MainWindow.class.getResource("/config/settings.xml").toURI());
             DocumentBuilderFactory dbf = DocumentBuilderFactory.newDefaultInstance();
             DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
-            document = documentBuilder.parse(archivo);
+            document = documentBuilder.parse(file);
             
         }catch(Exception e){
             System.err.println("Error loading XML");
@@ -38,23 +38,22 @@ public class XMLManager {
         try{
             Transformer transformer = TransformerFactory.newInstance().newTransformer(new StreamSource(new File("src/main/java/config/StyleXML.xsl")));
 
-            //Result output =new StreamResult(new File("src/main/java/resources/settings.xml")); 
-            Result output =new StreamResult(new File("settings.xml"));
+            Result output = new StreamResult(new File(MainWindow.class.getResource("/config/settings.xml").toURI()));
             Source input = new DOMSource(document);
             transformer.transform(input, output);
             return true;
-        }catch(Exception e){
+        } catch(Exception e){
             System.err.println("Error saving XML");
-            return false;
         }
+        return false;
     }
     
-    public static Boolean isSoundEnabled() {
+    public static Boolean getShouldPlayAllSounds() {
         Document document = loadXML();
         
         if (document == null) {
             System.err.println("Error loading XML config");
-           return null;
+            return null;
         }
         
         try {
@@ -73,7 +72,7 @@ public class XMLManager {
 
     }
 
-    public static boolean setSoundEnabled(boolean option) {
+    public static boolean setShouldPlayAllSounds(boolean option) {
         Document document = loadXML();
         
         if (document == null) {

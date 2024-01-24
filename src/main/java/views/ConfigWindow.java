@@ -8,7 +8,7 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import javax.swing.JOptionPane;
 
-public class ConfigWindow extends javax.swing.JFrame {
+public class ConfigWindow extends javax.swing.JDialog {
     public MainWindow parent;
     private CardLayout navigator;
     
@@ -55,6 +55,7 @@ public class ConfigWindow extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Preferences");
+        setAlwaysOnTop(true);
         setMaximumSize(new java.awt.Dimension(600, 400));
         setMinimumSize(new java.awt.Dimension(600, 400));
         setResizable(false);
