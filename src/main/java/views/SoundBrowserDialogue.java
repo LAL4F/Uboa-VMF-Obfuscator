@@ -26,28 +26,52 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
     public SoundBrowserDialogue(Conf_SoundPanel parent) {
         this.parent = parent;
         initComponents();
+        setLocationRelativeTo(null);
         setIconImage(this.parent.parent.parent.APPIMAGE.getImage());
-        
-        Set<String> set = loadInternalSndFiles("C:\\Program Files (x86)\\Steam");
+
+        Set<String> externalSndSet = loadExternalSndFiles("C:\\Users\\Alejandro\\Music");
+//        Set<String> internalSndSet = loadInternalSndFiles();
+//        Set<Set<String>> allSndFileSet = Set.of(externalSndSet, internalSndSet);
         
         DefaultListModel<String> listModel = new DefaultListModel<>();
-        
-        for (String string : set) {
+
+//        for (Set<String> set : allSndFileSet) {
+//            for (String string : set) {
+//                listModel.addElement(string);
+//            }
+//        }
+
+        for (String string : externalSndSet) {
             listModel.addElement(string);
         }
-        
+
         sndList.setModel(listModel);
-        
-        
     }
 
-    private Set<String> loadInternalSndFiles(String dir) {
+    private Set<String> loadInternalSndFiles() {
         Set<String> fileSet = new HashSet<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(dir))) {
+        try {
+            DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(MainWindow.class.getResource("/snd").toURI()));
             for (Path path : stream) {
-                if (!Files.isDirectory(path)) {
-                    fileSet.add(path.getFileName()
-                        .toString());
+                if ((!Files.isDirectory(path)) && (path.getFileName().toString().contains(".wav"))) {
+                    fileSet.add(path.toString());
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(SoundBrowserDialogue.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(SoundBrowserDialogue.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return fileSet;
+    }
+    
+    private Set<String> loadExternalSndFiles(String dir) {
+        Set<String> fileSet = new HashSet<>();
+        try {
+            DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(dir));
+            for (Path path : stream) {
+                if ((!Files.isDirectory(path)) && (path.getFileName().toString().contains(".wav"))) {
+                    fileSet.add(path.getFileName().toString());
                 }
             }
         } catch (IOException ex) {
@@ -65,13 +89,34 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
         bt_select = new javax.swing.JButton();
         jSlider1 = new javax.swing.JSlider();
         jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        tf_fileName = new javax.swing.JTextField();
+        tf_fileNameFilter = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox<>();
+        jSeparator1 = new javax.swing.JSeparator();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        jPanel1 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Sound Browser");
+        setResizable(false);
 
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Sounds"));
+
+        sndList.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                sndListMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(sndList);
 
-        bt_select.setText("Select");
+        bt_select.setText("Refresh Sounds");
         bt_select.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_selectActionPerformed(evt);
@@ -80,7 +125,42 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
 
         jSlider1.setValue(100);
 
-        jLabel1.setText("Volume");
+        jLabel1.setText("Sound Volume:");
+
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel2.setText("Sound Name:");
+
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel3.setText("Filter:");
+
+        tf_fileName.setEditable(false);
+
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel4.setText("Search in:");
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "Internal", "Local" }));
+
+        jCheckBox1.setSelected(true);
+        jCheckBox1.setText("Autoplay Sounds");
+
+        jPanel1.setLayout(new java.awt.GridLayout(0, 3, 25, 25));
+
+        jButton1.setText("Ok");
+        jPanel1.add(jButton1);
+
+        jButton2.setText("Preview");
+        jPanel1.add(jButton2);
+
+        jButton3.setText("Stop");
+        jPanel1.add(jButton3);
+
+        jButton4.setText("Cancel");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton4);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -89,30 +169,69 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 255, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(19, 19, 19)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(bt_select))
-                            .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE))))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(tf_fileName)
+                                        .addComponent(tf_fileNameFilter, javax.swing.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE))
+                                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(bt_select)
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jCheckBox1)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel1)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(14, 14, 14)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 266, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 73, Short.MAX_VALUE)
-                .addComponent(bt_select)
-                .addContainerGap())
+                    .addComponent(jLabel2)
+                    .addComponent(tf_fileName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tf_fileNameFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel4)
+                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1)
+                            .addComponent(jCheckBox1))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(bt_select, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addGap(18, 18, 18))
         );
 
         pack();
@@ -121,6 +240,16 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
     private void bt_selectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_selectActionPerformed
         System.out.println(sndList.getSelectedValue());
     }//GEN-LAST:event_bt_selectActionPerformed
+
+    private void sndListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sndListMouseClicked
+        if (evt.getClickCount() == 2 && evt.getButton() == evt.BUTTON1) {
+            System.out.println("double clicked");
+        }
+    }//GEN-LAST:event_sndListMouseClicked
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        dispose();
+    }//GEN-LAST:event_jButton4ActionPerformed
 
 
     public static void main(String args[]) {
@@ -164,9 +293,22 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bt_select;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSlider jSlider1;
     private javax.swing.JList<String> sndList;
+    private javax.swing.JTextField tf_fileName;
+    private javax.swing.JTextField tf_fileNameFilter;
     // End of variables declaration//GEN-END:variables
 }
