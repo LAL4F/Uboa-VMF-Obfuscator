@@ -4,6 +4,10 @@
  */
 package views;
 
+import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import config.XMLManager;
@@ -38,7 +42,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JCheckBox;
 import javax.swing.LookAndFeel;
+import javax.swing.SwingUtilities;
 import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import utils.SoundPlayer;
 
 /**
@@ -54,7 +60,7 @@ public class MainWindow extends javax.swing.JFrame {
     private final String CHARSET = "ISO-8859-1";
     
     private String filePath, fileName, vmfContent;
-    
+    private boolean isAnalyzed = false;
 
     private int iNumEnts;
     
@@ -93,7 +99,9 @@ public class MainWindow extends javax.swing.JFrame {
     }
     
     private void loadConfig() {
-       
+        if (XMLManager.xmlExists()) {
+            System.out.println(XMLManager.getStringValue("enableSnd"));
+        }
     }
     
     private void setupRadioButtons() {
@@ -115,7 +123,7 @@ public class MainWindow extends javax.swing.JFrame {
         menuOption_save.setEnabled(state);
         menuOption_saveAs.setEnabled(state);
 
-        bt_beginObfuscate.setEnabled(state);
+        button_obfuscate.setEnabled(state);
     }
 
     @SuppressWarnings("unchecked")
@@ -140,9 +148,12 @@ public class MainWindow extends javax.swing.JFrame {
         comboBox_rndEntNameLength = new javax.swing.JSpinner();
         comboBox_rndEntNameLabel = new javax.swing.JLabel();
         lb_info = new javax.swing.JLabel();
-        bt_beginObfuscate = new javax.swing.JButton();
+        button_obfuscate = new javax.swing.JButton();
         lb_filelength = new javax.swing.JLabel();
         lb_charset = new javax.swing.JLabel();
+        button_analyze = new javax.swing.JButton();
+        checkbox_autoanalyze = new javax.swing.JCheckBox();
+        checkbox_autoobfuscate = new javax.swing.JCheckBox();
         jMenuBar1 = new javax.swing.JMenuBar();
         menu_file = new javax.swing.JMenu();
         menuOption_open = new javax.swing.JMenuItem();
@@ -278,6 +289,7 @@ public class MainWindow extends javax.swing.JFrame {
         });
 
         comboBox_rndEntNameChoices.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Letters", "Numbers", "Letters and numbers", "Symbols only??", "ALL of the above" }));
+        comboBox_rndEntNameChoices.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         comboBox_rndEntNameLength.setModel(new javax.swing.SpinnerNumberModel(5, 5, 20, 1));
 
@@ -319,14 +331,38 @@ public class MainWindow extends javax.swing.JFrame {
         lb_info.setText("Hover over objects to see relevant information");
         lb_info.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        bt_beginObfuscate.setText("Obfuscate");
-        bt_beginObfuscate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        button_obfuscate.setText("Obfuscate!");
+        button_obfuscate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         lb_filelength.setText("length: 0 | lines: 0");
         lb_filelength.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         lb_charset.setText("Charset");
         lb_charset.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        button_analyze.setText("Analyze");
+        button_analyze.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        button_analyze.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                button_analyzeActionPerformed(evt);
+            }
+        });
+
+        checkbox_autoanalyze.setText("Auto-analyze");
+        checkbox_autoanalyze.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        checkbox_autoanalyze.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                checkbox_autoanalyzeMouseEntered(evt);
+            }
+        });
+
+        checkbox_autoobfuscate.setText("Auto-obfuscate");
+        checkbox_autoobfuscate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        checkbox_autoobfuscate.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                checkbox_autoobfuscateMouseEntered(evt);
+            }
+        });
 
         menu_file.setText("File");
 
@@ -438,14 +474,20 @@ public class MainWindow extends javax.swing.JFrame {
                     .addComponent(textAreaScrollPane)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(bt_beginObfuscate)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lb_info, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lb_filelength, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(lb_info, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lb_charset, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(lb_filelength, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lb_charset, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(button_obfuscate, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(checkbox_autoobfuscate)
+                        .addGap(18, 18, 18)
+                        .addComponent(button_analyze)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(checkbox_autoanalyze)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -456,7 +498,11 @@ public class MainWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bt_beginObfuscate, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(button_obfuscate, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(button_analyze)
+                    .addComponent(checkbox_autoanalyze)
+                    .addComponent(checkbox_autoobfuscate))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(textAreaScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -642,6 +688,9 @@ public class MainWindow extends javax.swing.JFrame {
         fileName = "";
         vmfContent = "";
          
+        isAnalyzed = false;
+        selectedFile = null;
+        
         textArea.setText("Welcome to Uboa VMF Obfuscator. Load a VMF file to begin.");
         lb_info.setText("Hover over objects to see relevant information");
         lb_filelength.setText("length: 0 | lines: 0");
@@ -728,15 +777,95 @@ public class MainWindow extends javax.swing.JFrame {
         aboutDialogue.show();
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
+    private void checkbox_autoanalyzeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_checkbox_autoanalyzeMouseEntered
+        lb_info.setText("Automatically analyze on load file");
+    }//GEN-LAST:event_checkbox_autoanalyzeMouseEntered
+
+    private void checkbox_autoobfuscateMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_checkbox_autoobfuscateMouseEntered
+        lb_info.setText("Automatically obfuscate on finish analysis");
+    }//GEN-LAST:event_checkbox_autoobfuscateMouseEntered
+
+    private void button_analyzeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_analyzeActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_button_analyzeActionPerformed
+
     private void setRandomEntNameParametersEditable(boolean state) {
         comboBox_rndEntNameChoices.setEnabled(state);
         comboBox_rndEntNameLength.setEnabled(state);
         comboBox_rndEntNameLabel.setEnabled(state);
         
     }
-    public static void main(String args[]) {
+
+    public void restartApp() {
+        dispose();
+        SwingUtilities.invokeLater(() -> {
+            new MainWindow().setVisible(true);
+        });
+        String lookAndFeel = XMLManager.getStringValue("lookAndFeel");
+
         try {
-            UIManager.setLookAndFeel("com.formdev.flatlaf.themes.FlatMacDarkLaf");
+            switch (lookAndFeel) {
+                case "FlatMacDarkLaf":
+                    UIManager.setLookAndFeel( new FlatMacDarkLaf());
+                    break;
+                case "FlatMacLightLaf":
+                    UIManager.setLookAndFeel( new FlatMacLightLaf());
+                    break;
+                case "Metal":
+                    UIManager.setLookAndFeel( new MetalLookAndFeel());
+                    break;
+                case "Nimbus":
+                    UIManager.setLookAndFeel( new NimbusLookAndFeel());
+                    break;
+                case "Motif":
+                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+                    break;
+                case "Windows":
+                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+                    break;
+                case "Windows Classic":
+                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel");
+                    break;
+                default:
+                    UIManager.setLookAndFeel( new FlatMacDarkLaf());
+                    break;
+            } 
+        } catch( Exception ex ) {
+            System.err.println( "Failed to initialize LaF" );
+        }
+    }
+
+    public static void main(String args[]) {
+        String lookAndFeel = XMLManager.getStringValue("lookAndFeel");
+        System.out.println(lookAndFeel);
+        
+        try {
+            switch (lookAndFeel) {
+                case "FlatMacDarkLaf":
+                    UIManager.setLookAndFeel( new FlatMacDarkLaf());
+                    break;
+                case "FlatMacLightLaf":
+                    UIManager.setLookAndFeel( new FlatMacLightLaf());
+                    break;
+                case "Metal":
+                    UIManager.setLookAndFeel( new MetalLookAndFeel());
+                    break;
+                case "Nimbus":
+                    UIManager.setLookAndFeel( new NimbusLookAndFeel());
+                    break;
+                case "Motif":
+                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+                    break;
+                case "Windows":
+                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+                    break;
+                case "Windows Classic":
+                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel");
+                    break;
+                default:
+                    UIManager.setLookAndFeel( new FlatMacDarkLaf());
+                    break;
+            } 
         } catch( Exception ex ) {
             System.err.println( "Failed to initialize LaF" );
         }
@@ -748,7 +877,10 @@ public class MainWindow extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton bt_beginObfuscate;
+    private javax.swing.JButton button_analyze;
+    private javax.swing.JButton button_obfuscate;
+    private javax.swing.JCheckBox checkbox_autoanalyze;
+    private javax.swing.JCheckBox checkbox_autoobfuscate;
     private javax.swing.JComboBox<String> comboBox_rndEntNameChoices;
     private javax.swing.JLabel comboBox_rndEntNameLabel;
     private javax.swing.JSpinner comboBox_rndEntNameLength;

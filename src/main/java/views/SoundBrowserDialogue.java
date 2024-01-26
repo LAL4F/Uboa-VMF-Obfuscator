@@ -41,7 +41,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
     private Set<String> getInternalSndFiles() {
         Set<String> fileSet = new HashSet<>();
         try {
-            URI uri = getClass().getResource("/snd").toURI();
+            URI uri = getClass().getResource("/internalSnd").toURI();
 
             Map<String, String> env = new HashMap<>();
             String[] array = uri.toString().split("!");
@@ -106,6 +106,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Sound Browser");
+        setAlwaysOnTop(true);
         setResizable(false);
 
         jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Sounds"));
@@ -254,6 +255,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
     private void sndListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sndListMouseClicked
         if (evt.getClickCount() == 2 && evt.getButton() == evt.BUTTON1) {
             System.out.println("double clicked " + sndList.getSelectedValue());
+            dispose();
         }
     }//GEN-LAST:event_sndListMouseClicked
 
