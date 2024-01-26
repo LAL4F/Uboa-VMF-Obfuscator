@@ -49,7 +49,7 @@ public class MainWindow extends javax.swing.JFrame {
     private final ImageIcon ICON_OPENFILE = new ImageIcon(MainWindow.class.getResource("/images/ico20_openFile.png"));
     private final ImageIcon ICON_SAVE = new ImageIcon(MainWindow.class.getResource("/images/ico20_saveFile.png"));
     private final ImageIcon ICON_SAVEAS = new ImageIcon(MainWindow.class.getResource("/images/ico20_saveFileAs.png"));
-    public final ImageIcon APPIMAGE = new ImageIcon(MainWindow.class.getResource("/images/appicon.png"));
+    private final ImageIcon APPIMAGE = new ImageIcon(MainWindow.class.getResource("/images/appicon.png"));
     
     private final String CHARSET = "ISO-8859-1";
     
@@ -585,7 +585,7 @@ public class MainWindow extends javax.swing.JFrame {
     }//GEN-LAST:event_menuOption_saveActionPerformed
     
     private void menuOption_preferencesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuOption_preferencesActionPerformed
-        configWindow = new ConfigWindow(this);
+        configWindow = new ConfigWindow(this, false);
         configWindow.show();
     }//GEN-LAST:event_menuOption_preferencesActionPerformed
 

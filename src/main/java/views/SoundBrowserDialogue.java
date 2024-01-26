@@ -29,11 +29,11 @@ import javax.swing.JList;
 public class SoundBrowserDialogue extends javax.swing.JDialog {
     private Conf_SoundPanel parent;
     
-    public SoundBrowserDialogue(Conf_SoundPanel parent) {
-        this.parent = parent;
+    public SoundBrowserDialogue(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
+        
         initComponents();
         setLocationRelativeTo(null);
-        setIconImage(this.parent.parent.parent.APPIMAGE.getImage());
 
         refreshSounds();
     }
@@ -106,7 +106,6 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Sound Browser");
-        setAlwaysOnTop(true);
         setResizable(false);
 
         jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Sounds"));
@@ -331,18 +330,18 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
         //</editor-fold>
 
         /* Create and display the dialog */
-//        java.awt.EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//                SoundBrowserDialogue dialog = new SoundBrowserDialogue(new javax.swing.JFrame(), true);
-//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-//                    @Override
-//                    public void windowClosing(java.awt.event.WindowEvent e) {
-//                        System.exit(0);
-//                    }
-//                });
-//                dialog.setVisible(true);
-//            }
-//        });
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                SoundBrowserDialogue dialog = new SoundBrowserDialogue(new javax.swing.JFrame(), true);
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
+            }
+        });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

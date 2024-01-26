@@ -16,13 +16,13 @@ public class ConfigWindow extends javax.swing.JDialog {
     private Conf_PopupPanel popupPanel;
     private Conf_SoundPanel soundPanel;
     
-    public ConfigWindow(MainWindow parent) {
+    public ConfigWindow(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
         initComponents();
         setLocationRelativeTo(null);
         
-        setIconImage(parent.APPIMAGE.getImage());
+        this.parent = (MainWindow) parent;
         
-        this.parent = parent;
         loadPanels();
         navigate("appearancePanel");
     }
@@ -55,7 +55,6 @@ public class ConfigWindow extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Preferences");
-        setAlwaysOnTop(true);
         setMaximumSize(new java.awt.Dimension(600, 400));
         setMinimumSize(new java.awt.Dimension(600, 400));
         setResizable(false);
@@ -145,7 +144,14 @@ public class ConfigWindow extends javax.swing.JDialog {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ConfigWindow(null).setVisible(true);
+                ConfigWindow dialog = new ConfigWindow(new javax.swing.JFrame(), true);
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
             }
         });
     }

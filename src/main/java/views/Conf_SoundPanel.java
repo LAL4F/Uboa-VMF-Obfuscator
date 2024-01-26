@@ -226,7 +226,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_checkbox_allSoundsActionPerformed
 
     private void openSoundBrowser() {
-        SoundBrowserDialogue soundBrowserDialogue = new SoundBrowserDialogue(this);
+        SoundBrowserDialogue soundBrowserDialogue = new SoundBrowserDialogue(parent.parent, false);
         soundBrowserDialogue.show();
     }
 
