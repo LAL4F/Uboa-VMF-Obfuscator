@@ -182,26 +182,41 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Open file"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkbox_openFileSoundsActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="checkbox_saveFileSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Save file"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkbox_saveFileSoundsActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="checkbox_analyzeFileSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Analyze file"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkbox_analyzeFileSoundsActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="checkbox_errorSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="On errors"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkbox_errorSoundsActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JCheckBox" name="checkbox_obfuscateFileSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Obfuscate file"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkbox_obfuscateFileSoundsActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="bt_openFileSnd">
               <Properties>
@@ -274,6 +289,9 @@
             <Property name="minorTickSpacing" type="int" value="5"/>
             <Property name="value" type="int" value="100"/>
           </Properties>
+          <Events>
+            <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="masterVolumeSliderMouseReleased"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>

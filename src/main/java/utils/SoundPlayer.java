@@ -14,12 +14,20 @@ import java.util.logging.Logger;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import views.MainWindow;
 
-public class SoundPlayer {
+public class SoundPlayer  {
+    private static AudioInputStream audioIn;
+    private static Clip activeClip;
+    
+    private boolean isPlaybackCompleted;
+    
     private SoundType soundType;
+
     public enum SoundType {
         SND_OPENFILE,
         SND_ANALYZEFILE,
@@ -34,17 +42,28 @@ public class SoundPlayer {
         return false;
     }
     
+    public static void killAllSound() {
+        if (activeClip != null) {
+            activeClip.stop();
+        }
+    }
+    
     public static void playSoundInternal(String soundFile, SoundType soundType) {
         try {
             //Took a while to figure out how to play sounds inside a .jar file but it's here
             InputStream audioSrc = MainWindow.class.getResourceAsStream(soundFile);
             InputStream bufferedAudioInput = new BufferedInputStream(audioSrc);
+            
+            if (activeClip != null) {
+                activeClip.stop();
+            }
 
-            AudioInputStream audioIn = AudioSystem.getAudioInputStream(bufferedAudioInput);
+            audioIn = AudioSystem.getAudioInputStream(bufferedAudioInput);
             
             Clip clip = AudioSystem.getClip();
             clip.open(audioIn);
             clip.start();
+            activeClip = clip;
             clip.drain();
             audioIn.close();
         } catch (MalformedURLException ex) {
@@ -60,12 +79,16 @@ public class SoundPlayer {
     
     public static void playSoundExternal(String soundFile, SoundType soundType) {
         try {
-            AudioInputStream audioIn = AudioSystem.getAudioInputStream(new File(soundFile));
+            if (activeClip != null) {
+                activeClip.stop();
+            }
+            
+            audioIn = AudioSystem.getAudioInputStream(new File(soundFile));
             
             Clip clip = AudioSystem.getClip();
-            //clip.
             clip.open(audioIn);
             clip.start();
+            activeClip = clip;
             clip.drain();
             audioIn.close();
         } catch (MalformedURLException ex) {

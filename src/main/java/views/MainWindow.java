@@ -70,8 +70,6 @@ public class MainWindow extends javax.swing.JFrame {
     private AboutDialogue aboutDialogue;
     private ConfigWindow configWindow;
     
-    private MainWindow mainWindow = this;
-    
     public MainWindow() {
         initComponents();
         setIconImage(APPIMAGE.getImage());
@@ -99,9 +97,7 @@ public class MainWindow extends javax.swing.JFrame {
     }
     
     private void loadConfig() {
-        if (XMLManager.xmlExists()) {
-            System.out.println(XMLManager.getStringValue("enableSnd"));
-        }
+        //System.out.println(XMLManager.getStringValue("enableSnd"));
     }
     
     private void setupRadioButtons() {
@@ -123,7 +119,7 @@ public class MainWindow extends javax.swing.JFrame {
         menuOption_save.setEnabled(state);
         menuOption_saveAs.setEnabled(state);
 
-        button_obfuscate.setEnabled(state);
+        bt_obfuscate.setEnabled(state);
     }
 
     @SuppressWarnings("unchecked")
@@ -148,10 +144,10 @@ public class MainWindow extends javax.swing.JFrame {
         comboBox_rndEntNameLength = new javax.swing.JSpinner();
         comboBox_rndEntNameLabel = new javax.swing.JLabel();
         lb_info = new javax.swing.JLabel();
-        button_obfuscate = new javax.swing.JButton();
+        bt_obfuscate = new javax.swing.JButton();
         lb_filelength = new javax.swing.JLabel();
         lb_charset = new javax.swing.JLabel();
-        button_analyze = new javax.swing.JButton();
+        bt_analyze = new javax.swing.JButton();
         checkbox_autoanalyze = new javax.swing.JCheckBox();
         checkbox_autoobfuscate = new javax.swing.JCheckBox();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -179,6 +175,8 @@ public class MainWindow extends javax.swing.JFrame {
         setTitle("Uboa VMF Obfuscator");
         setMinimumSize(new java.awt.Dimension(720, 480));
         setResizable(false);
+
+        textAreaScrollPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Console"));
 
         textArea.setEditable(false);
         textArea.setColumns(20);
@@ -331,8 +329,8 @@ public class MainWindow extends javax.swing.JFrame {
         lb_info.setText("Hover over objects to see relevant information");
         lb_info.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        button_obfuscate.setText("Obfuscate!");
-        button_obfuscate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        bt_obfuscate.setText("Obfuscate!");
+        bt_obfuscate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
         lb_filelength.setText("length: 0 | lines: 0");
         lb_filelength.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -340,11 +338,12 @@ public class MainWindow extends javax.swing.JFrame {
         lb_charset.setText("Charset");
         lb_charset.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        button_analyze.setText("Analyze");
-        button_analyze.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        button_analyze.addActionListener(new java.awt.event.ActionListener() {
+        bt_analyze.setText("Analyze");
+        bt_analyze.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        bt_analyze.setEnabled(false);
+        bt_analyze.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                button_analyzeActionPerformed(evt);
+                bt_analyzeActionPerformed(evt);
             }
         });
 
@@ -480,11 +479,11 @@ public class MainWindow extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lb_charset, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(button_obfuscate, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(bt_obfuscate, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(checkbox_autoobfuscate)
                         .addGap(18, 18, 18)
-                        .addComponent(button_analyze)
+                        .addComponent(bt_analyze)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(checkbox_autoanalyze)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -499,12 +498,12 @@ public class MainWindow extends javax.swing.JFrame {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(button_obfuscate, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(button_analyze)
+                    .addComponent(bt_obfuscate)
+                    .addComponent(bt_analyze)
                     .addComponent(checkbox_autoanalyze)
                     .addComponent(checkbox_autoobfuscate))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(textAreaScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(textAreaScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lb_info)
@@ -785,9 +784,9 @@ public class MainWindow extends javax.swing.JFrame {
         lb_info.setText("Automatically obfuscate on finish analysis");
     }//GEN-LAST:event_checkbox_autoobfuscateMouseEntered
 
-    private void button_analyzeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_button_analyzeActionPerformed
+    private void bt_analyzeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_analyzeActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_button_analyzeActionPerformed
+    }//GEN-LAST:event_bt_analyzeActionPerformed
 
     private void setRandomEntNameParametersEditable(boolean state) {
         comboBox_rndEntNameChoices.setEnabled(state);
@@ -836,8 +835,11 @@ public class MainWindow extends javax.swing.JFrame {
     }
 
     public static void main(String args[]) {
+        if (!XMLManager.xmlExists()) {
+            System.out.println("Rebuilding XML");
+        }
+        
         String lookAndFeel = XMLManager.getStringValue("lookAndFeel");
-        System.out.println(lookAndFeel);
         
         try {
             switch (lookAndFeel) {
@@ -877,8 +879,8 @@ public class MainWindow extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton button_analyze;
-    private javax.swing.JButton button_obfuscate;
+    private javax.swing.JButton bt_analyze;
+    private javax.swing.JButton bt_obfuscate;
     private javax.swing.JCheckBox checkbox_autoanalyze;
     private javax.swing.JCheckBox checkbox_autoobfuscate;
     private javax.swing.JComboBox<String> comboBox_rndEntNameChoices;

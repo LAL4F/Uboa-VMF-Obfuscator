@@ -22,7 +22,7 @@ public class OpenFileProgressDialogue extends javax.swing.JDialog {
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                if (JOptionPane.showConfirmDialog(null,"Are you sure you need to close？", "Tip", JOptionPane.YES_NO_OPTION) == 0) {  
+                if (JOptionPane.showConfirmDialog(null,"Are you sure you need to cancel?", "Uboa - Close", JOptionPane.YES_NO_OPTION) == 0) {  
                     System.out.println("yes ");
                     dispose();  //close 
                 } else {

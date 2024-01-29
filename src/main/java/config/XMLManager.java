@@ -31,7 +31,7 @@ import views.MainWindow;
 
 public class XMLManager {
     public static boolean xmlExists() {
-        if ((!Files.exists(Path.of("./settings.xml"), LinkOption.NOFOLLOW_LINKS)) || (!Files.exists(Path.of("./StyleXML.xsl"), LinkOption.NOFOLLOW_LINKS))) {
+        if ((!Files.exists(Path.of("./settings.xml"), LinkOption.NOFOLLOW_LINKS)) || (!Files.exists(Path.of("./settings.xsl"), LinkOption.NOFOLLOW_LINKS))) {
             JOptionPane.showMessageDialog(null, "XML configuration file was not found. It will now be rebuilt.", "Config not found", 2);
             rebuildXML();
             return false;
@@ -50,8 +50,8 @@ public class XMLManager {
             
             bw.close();
             
-            byte[] xslBytes = MainWindow.class.getResourceAsStream("/backupConfig/StyleXML.xsl").readAllBytes();
-            bw = new BufferedWriter(new FileWriter("./StyleXML.xsl"));
+            byte[] xslBytes = MainWindow.class.getResourceAsStream("/backupConfig/settings.xsl").readAllBytes();
+            bw = new BufferedWriter(new FileWriter("./settings.xsl"));
             
             for (byte bytes : xslBytes) {
                 bw.write(bytes);   
@@ -74,7 +74,6 @@ public class XMLManager {
             
         }catch(Exception e){
             e.printStackTrace();
-        
         }
         return document;
     }  
@@ -85,7 +84,7 @@ public class XMLManager {
                     .newInstance()
                     .newTransformer(
                             new StreamSource(
-                                    new File("./StyleXML.xsl")
+                                    new File("./settings.xsl")
                             )
                     );
 

@@ -1,5 +1,7 @@
 package views;
 
+import config.XMLManager;
+
 public class Conf_SoundPanel extends javax.swing.JPanel {
     public ConfigWindow parent;
     
@@ -11,7 +13,20 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
     }
     
     private void loadConfig() {
+        checkbox_allSounds.setSelected(XMLManager.getBooleanValue("enableSnd"));
+        checkbox_analyzeFileSounds.setSelected(XMLManager.getBooleanValue("enableAnalyzeFileSnd"));
+        checkbox_errorSounds.setSelected(XMLManager.getBooleanValue("enableErrorSnd"));
+        checkbox_obfuscateFileSounds.setSelected(XMLManager.getBooleanValue("enableObfuscateFileSnd"));
+        checkbox_openFileSounds.setSelected(XMLManager.getBooleanValue("enableOpenFileSnd"));
+        checkbox_saveFileSounds.setSelected(XMLManager.getBooleanValue("enableSaveFileSnd"));
         
+        tf_analyzeFileSnd.setText(XMLManager.getStringValue("analyzeFileSnd"));
+        tf_exceptionSnd.setText(XMLManager.getStringValue("errorSnd"));
+        tf_obfuscateFileSnd.setText(XMLManager.getStringValue("obfuscateFileSnd"));
+        tf_openFileSnd.setText(XMLManager.getStringValue("openFileSnd"));
+        tf_saveFileSnd.setText(XMLManager.getStringValue("saveFileSnd"));
+        
+        masterVolumeSlider.setValue(XMLManager.getIntegerValue("masterVol"));
         setElementState(checkbox_allSounds.isSelected());
     }
     
@@ -53,14 +68,39 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Play Sound On..."));
 
         checkbox_openFileSounds.setText("Open file");
+        checkbox_openFileSounds.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkbox_openFileSoundsActionPerformed(evt);
+            }
+        });
 
         checkbox_saveFileSounds.setText("Save file");
+        checkbox_saveFileSounds.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkbox_saveFileSoundsActionPerformed(evt);
+            }
+        });
 
         checkbox_analyzeFileSounds.setText("Analyze file");
+        checkbox_analyzeFileSounds.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkbox_analyzeFileSoundsActionPerformed(evt);
+            }
+        });
 
         checkbox_errorSounds.setText("On errors");
+        checkbox_errorSounds.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkbox_errorSoundsActionPerformed(evt);
+            }
+        });
 
         checkbox_obfuscateFileSounds.setText("Obfuscate file");
+        checkbox_obfuscateFileSounds.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkbox_obfuscateFileSoundsActionPerformed(evt);
+            }
+        });
 
         bt_openFileSnd.setText("...");
         bt_openFileSnd.addActionListener(new java.awt.event.ActionListener() {
@@ -164,6 +204,11 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         masterVolumeSlider.setMajorTickSpacing(25);
         masterVolumeSlider.setMinorTickSpacing(5);
         masterVolumeSlider.setValue(100);
+        masterVolumeSlider.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                masterVolumeSliderMouseReleased(evt);
+            }
+        });
 
         jLabel1.setText("Master volume:");
 
@@ -218,12 +263,37 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_bt_openFileSndActionPerformed
 
     private void checkbox_allSoundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_allSoundsActionPerformed
+        XMLManager.setBooleanValue("enableSnd", checkbox_allSounds.isSelected());
         if (checkbox_allSounds.isSelected()) {
             setElementState(true);
         } else {
             setElementState(false);
         }
     }//GEN-LAST:event_checkbox_allSoundsActionPerformed
+
+    private void masterVolumeSliderMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_masterVolumeSliderMouseReleased
+        XMLManager.setIntegerValue("masterVol", masterVolumeSlider.getValue());
+    }//GEN-LAST:event_masterVolumeSliderMouseReleased
+
+    private void checkbox_openFileSoundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_openFileSoundsActionPerformed
+        XMLManager.setBooleanValue("enableOpenFileSnd", checkbox_openFileSounds.isSelected());
+    }//GEN-LAST:event_checkbox_openFileSoundsActionPerformed
+
+    private void checkbox_analyzeFileSoundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_analyzeFileSoundsActionPerformed
+        XMLManager.setBooleanValue("enableAnalyzeFileSnd", checkbox_analyzeFileSounds.isSelected());
+    }//GEN-LAST:event_checkbox_analyzeFileSoundsActionPerformed
+
+    private void checkbox_obfuscateFileSoundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_obfuscateFileSoundsActionPerformed
+        XMLManager.setBooleanValue("enableObfuscateFileSnd", checkbox_obfuscateFileSounds.isSelected());
+    }//GEN-LAST:event_checkbox_obfuscateFileSoundsActionPerformed
+
+    private void checkbox_saveFileSoundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_saveFileSoundsActionPerformed
+        XMLManager.setBooleanValue("enableSaveFileSnd", checkbox_saveFileSounds.isSelected());
+    }//GEN-LAST:event_checkbox_saveFileSoundsActionPerformed
+
+    private void checkbox_errorSoundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_errorSoundsActionPerformed
+        XMLManager.setBooleanValue("enableErrorSnd", checkbox_errorSounds.isSelected());
+    }//GEN-LAST:event_checkbox_errorSoundsActionPerformed
 
     private void openSoundBrowser() {
         SoundBrowserDialogue soundBrowserDialogue = new SoundBrowserDialogue(parent.parent, false);

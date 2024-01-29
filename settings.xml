@@ -1,38 +1,30 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<settings>
+<?xml version="1.0" encoding="UTF-8"?><settings>
     <!--Sounds-->
     <enableSnd value="true"/>
     <masterVol value="100"/>
-    
     <!--Open File-->
     <enableOpenFileSnd value="true"/>
     <openFileSnd value="/internalSnd/success.wav"/>
-    
     <!--Analyze File-->
     <enableAnalyzeFileSnd value="true"/>
     <analyzeFileSnd value="/internalSnd/success.wav"/>
-    
     <!--Obfuscate File-->
     <enableObfuscateFileSnd value="true"/>
     <obfuscateFileSnd value="/internalSnd/success2.wav"/>
-    
     <!--Save File-->
     <enableSaveFileSnd value="true"/>
     <saveFileSnd value="/internalSnd/success2.wav"/>
-    
     <!--Error-->
     <enableErrorSnd value="true"/>
     <errorSnd value="/internalSnd/success.wav"/>
-    
     <!--Sound chooser dialog-->
     <soundChooserFilter value=""/>
-    <soundChooserSearchIn value="0"/>  <!--Combobox index-->
+    <soundChooserSearchIn value="0"/>
+    <!--Combobox index-->
     <soundChooserAutoplay value="true"/>
     <soundChooserVol value="100"/>
-    
     <!--Appearance-->
     <lookAndFeel value="FlatMacDarkLaf"/>
-    
     <!--Appearance-->
     <autoAnalyze value="false"/>
     <autoObfuscate value="false"/>

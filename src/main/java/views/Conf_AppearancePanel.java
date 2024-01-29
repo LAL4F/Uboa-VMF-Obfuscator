@@ -1,25 +1,40 @@
 package views;
 
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import config.XMLManager;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 public class Conf_AppearancePanel extends javax.swing.JPanel {
     private ConfigWindow parent;
-    
+    private Map<String, String> lafDescriptionMap = new HashMap<String, String>();
+            
     public Conf_AppearancePanel(ConfigWindow parent) {
         initComponents();
         this.parent = parent;
+        
+        lafDescriptionMap.put("FlatMacDarkLaf", "Default Look And Feel for this application.\nCredits: www.formdev.com");
+        lafDescriptionMap.put("FlatMacLightLaf", "Light theme of the default Look And Feel for this application.\nCredits: www.formdev.com");
+        lafDescriptionMap.put("Metal", "The good old Java Look And Feel.\nIt is crossplatform, meaning it looks the same on all systems. \nYou can't go wrong with this one.");
+        lafDescriptionMap.put("Nimbus", "Nimbus is a cross-platform Look And Feel.\nIt uses Java 2D vector graphics to draw the user interface, so the UI can be crisply rendered at any resolution.");
+        lafDescriptionMap.put("Motif", "Default Look And Feel for vintage Linux and Solaris systems if GTK+ 2.2 or later isn't available.");
+        lafDescriptionMap.put("Windows", "An attempt to replicate the Windows Look And Feel.");
+        lafDescriptionMap.put("Windows Classic", "An attempt to replicate the old Windows Look And Feel.");
         
         loadConfig();
     }
 
     private void loadConfig() {
-        
+        cb_lookandfeel.setSelectedItem(XMLManager.getStringValue("lookAndFeel"));
+        lb_lafpreview.setIcon(new ImageIcon(MainWindow.class.getResource("/lafPreviews/" + cb_lookandfeel.getSelectedItem().toString() + ".PNG")));
+        lafPreviewDesc.setText(lafDescriptionMap.get(cb_lookandfeel.getSelectedItem().toString()));
     }
     
     @SuppressWarnings("unchecked")
@@ -33,9 +48,13 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         lafPreviewDesc = new javax.swing.JTextArea();
 
+        setMaximumSize(new java.awt.Dimension(476, 380));
+        setMinimumSize(new java.awt.Dimension(476, 380));
+
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Look and Feel"));
 
         cb_lookandfeel.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "FlatMacDarkLaf", "FlatMacLightLaf", "Metal", "Nimbus", "Motif", "Windows", "Windows Classic" }));
+        cb_lookandfeel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         cb_lookandfeel.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 cb_lookandfeelItemStateChanged(evt);
@@ -43,6 +62,7 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
         });
 
         bt_save.setText("Apply");
+        bt_save.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_save.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_saveActionPerformed(evt);
@@ -70,9 +90,19 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        lb_lafpreview.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lb_lafpreview.setBorder(javax.swing.BorderFactory.createTitledBorder("Preview"));
+
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Info"));
+        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+
         lafPreviewDesc.setEditable(false);
         lafPreviewDesc.setColumns(20);
+        lafPreviewDesc.setLineWrap(true);
         lafPreviewDesc.setRows(5);
+        lafPreviewDesc.setWrapStyleWord(true);
+        lafPreviewDesc.setMargin(new java.awt.Insets(4, 6, 2, 4));
         jScrollPane1.setViewportView(lafPreviewDesc);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -93,15 +123,16 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lb_lafpreview, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
+                .addComponent(lb_lafpreview, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void cb_lookandfeelItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cb_lookandfeelItemStateChanged
-        lb_lafpreview.setIcon(new ImageIcon(MainWindow.class.getResource("/images/lafPreviews/" + cb_lookandfeel.getSelectedItem().toString() + ".png")));
+        lb_lafpreview.setIcon(new ImageIcon(MainWindow.class.getResource("/lafPreviews/" + cb_lookandfeel.getSelectedItem().toString() + ".PNG")));
+        lafPreviewDesc.setText(lafDescriptionMap.get(cb_lookandfeel.getSelectedItem().toString()));
     }//GEN-LAST:event_cb_lookandfeelItemStateChanged
 
     private void bt_saveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_saveActionPerformed
@@ -110,7 +141,9 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
 
     private void saveLaf() {
         XMLManager.setStringValue("lookAndFeel", cb_lookandfeel.getSelectedItem().toString()); 
-        parent.parent.restartApp();
+        if (JOptionPane.showConfirmDialog(this, "You must restart the application to apply these changes.\nWill you restart?", "Uboa - Alert", 0) == 0) {
+            parent.parent.restartApp();
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

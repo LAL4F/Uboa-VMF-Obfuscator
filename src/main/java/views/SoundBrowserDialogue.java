@@ -4,7 +4,9 @@
  */
 package views;
 
+import config.XMLManager;
 import java.awt.Desktop;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -13,8 +15,10 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,17 +29,25 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
+import utils.SoundPlayer;
 
 public class SoundBrowserDialogue extends javax.swing.JDialog {
     private Conf_SoundPanel parent;
     
     public SoundBrowserDialogue(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-        
         initComponents();
         setLocationRelativeTo(null);
 
+        loadConfig();
         refreshSounds();
+    }
+    
+    private void loadConfig() {
+        tf_fileNameFilter.setText(XMLManager.getStringValue("soundChooserFilter"));
+        combo_searchInside.setSelectedIndex(XMLManager.getIntegerValue("soundChooserSearchIn"));
+        checkbox_autoplay.setSelected(XMLManager.getBooleanValue("soundChooserAutoplay"));
+        slider_sndLevel.setValue(XMLManager.getIntegerValue("soundChooserVol"));
     }
 
     private Set<String> getInternalSndFiles() {
@@ -68,7 +80,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
     private Set<String> getExternalSndFiles(String dir) {
         Set<String> fileSet = new HashSet<>();
         try {
-            System.out.println(new File(".").getCanonicalPath());
+            //System.out.println(new File(".").getCanonicalPath());
             DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(dir));
             for (Path path : stream) {
                 if ((!Files.isDirectory(path)) && (path.getFileName().toString().contains(".wav"))) {
@@ -106,7 +118,6 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Sound Browser");
-        setAlwaysOnTop(true);
         setResizable(false);
 
         jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Sounds"));
@@ -115,10 +126,8 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 sndListMouseClicked(evt);
             }
-        });
-        sndList.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                sndListValueChanged(evt);
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                sndListMouseReleased(evt);
             }
         });
         jScrollPane1.setViewportView(sndList);
@@ -131,6 +140,11 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
         });
 
         slider_sndLevel.setValue(100);
+        slider_sndLevel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                slider_sndLevelMouseReleased(evt);
+            }
+        });
 
         jLabel1.setText("Sound Volume:");
 
@@ -142,6 +156,12 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
 
         tf_filePath.setEditable(false);
 
+        tf_fileNameFilter.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tf_fileNameFilterKeyReleased(evt);
+            }
+        });
+
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel4.setText("Search in:");
 
@@ -152,7 +172,13 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
             }
         });
 
+        checkbox_autoplay.setSelected(true);
         checkbox_autoplay.setText("Autoplay Sounds");
+        checkbox_autoplay.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkbox_autoplayActionPerformed(evt);
+            }
+        });
 
         jPanel1.setLayout(new java.awt.GridLayout(0, 3, 25, 25));
 
@@ -160,6 +186,11 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
         jPanel1.add(bt_confirm);
 
         bt_previewSnd.setText("Preview");
+        bt_previewSnd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_previewSndActionPerformed(evt);
+            }
+        });
         jPanel1.add(bt_previewSnd);
 
         bt_stopSnd.setText("Stop");
@@ -255,23 +286,68 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
     private void sndListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sndListMouseClicked
         if (evt.getClickCount() == 2 && evt.getButton() == evt.BUTTON1) {
             System.out.println("double clicked " + sndList.getSelectedValue());
+            SoundPlayer.killAllSound();
             dispose();
         }
     }//GEN-LAST:event_sndListMouseClicked
 
     private void bt_cancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_cancelActionPerformed
         dispose();
+        SoundPlayer.killAllSound();
     }//GEN-LAST:event_bt_cancelActionPerformed
 
-    private void sndListValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_sndListValueChanged
-        tf_filePath.setText(sndList.getSelectedValue());
-    }//GEN-LAST:event_sndListValueChanged
-
     private void combo_searchInsideItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_combo_searchInsideItemStateChanged
+        XMLManager.setIntegerValue("soundChooserSearchIn", combo_searchInside.getSelectedIndex());
         refreshSounds();
     }//GEN-LAST:event_combo_searchInsideItemStateChanged
 
+    private void sndListMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sndListMouseReleased
+        tf_filePath.setText(sndList.getSelectedValue());
+        if ((checkbox_autoplay.isSelected()) && (sndList.getSelectedValue() != null)) {
+            if (sndList.getSelectedValue().charAt(0) == '/') {
+                SoundPlayer.playSoundInternal(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
+            } else {
+                SoundPlayer.playSoundExternal(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
+            }
+            System.out.println(sndList.getSelectedValue());
+        }
+    }//GEN-LAST:event_sndListMouseReleased
+
+    private void slider_sndLevelMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_slider_sndLevelMouseReleased
+        XMLManager.setIntegerValue("soundChooserVol", slider_sndLevel.getValue());
+    }//GEN-LAST:event_slider_sndLevelMouseReleased
+
+    private void checkbox_autoplayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_autoplayActionPerformed
+        XMLManager.setBooleanValue("soundChooserAutoplay", checkbox_autoplay.isSelected());
+    }//GEN-LAST:event_checkbox_autoplayActionPerformed
+
+    private void tf_fileNameFilterKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tf_fileNameFilterKeyReleased
+        refreshSounds();
+    }//GEN-LAST:event_tf_fileNameFilterKeyReleased
+
+    private void bt_previewSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_previewSndActionPerformed
+        try {
+            if (sndList.getSelectedValue().charAt(0) == '/') {
+                SoundPlayer.playSoundInternal(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
+            } else {
+                SoundPlayer.playSoundExternal(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
+            } 
+        } catch (NullPointerException e) {
+            
+        }
+
+    }//GEN-LAST:event_bt_previewSndActionPerformed
+
     private void refreshSounds() {
+        if (!Files.exists(Path.of("./sound"), LinkOption.NOFOLLOW_LINKS)) {
+            System.err.println("Could not find sound directory, creating one...");
+            try {
+                Files.createDirectories(Path.of("./sound"));
+            } catch (IOException ex) {
+                Logger.getLogger(SoundBrowserDialogue.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
         Set<String> externalSndSet = getExternalSndFiles("./sound");
         Set<String> internalSndSet = getInternalSndFiles();
         Set<Set<String>> allSndFileSet = Set.of(externalSndSet, internalSndSet);
@@ -282,7 +358,9 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
             case 0: //All
                 for (Set<String> set : allSndFileSet) {
                     for (String string : set) {
-                        listModel.addElement(string);
+                        if (string.contains(tf_fileNameFilter.getText())) {
+                            listModel.addElement(string);
+                        }
                     }
                 }
 
@@ -290,19 +368,25 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
                 break;
             case 1: //Internal
                 for (String string : internalSndSet) {
-                    listModel.addElement(string);
+                    if (string.contains(tf_fileNameFilter.getText())) {
+                        listModel.addElement(string);
+                    }
                 }
                 
                 sndList.setModel(listModel);
                 break;
             case 2: //External
                 for (String string : externalSndSet) {
-                    listModel.addElement(string);
+                    if (string.contains(tf_fileNameFilter.getText())) {
+                        listModel.addElement(string);
+                    }
                 }
                 
                 sndList.setModel(listModel);
                 break;
             default:
+                //CRACK HIS SKULL
+                System.exit(1);
                 break;
         }
     }

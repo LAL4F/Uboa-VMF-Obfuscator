@@ -187,11 +187,11 @@
                       <Component id="lb_charset" min="-2" pref="93" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="button_obfuscate" min="-2" pref="112" max="-2" attributes="0"/>
+                      <Component id="bt_obfuscate" min="-2" pref="112" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="checkbox_autoobfuscate" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="button_analyze" min="-2" max="-2" attributes="0"/>
+                      <Component id="bt_analyze" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="checkbox_autoanalyze" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -210,13 +210,13 @@
               <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="button_obfuscate" alignment="3" min="-2" pref="29" max="-2" attributes="0"/>
-                  <Component id="button_analyze" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="bt_obfuscate" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="bt_analyze" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="checkbox_autoanalyze" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="checkbox_autoobfuscate" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="textAreaScrollPane" min="-2" pref="295" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="textAreaScrollPane" min="-2" pref="301" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lb_info" alignment="3" max="-2" attributes="0"/>
@@ -230,6 +230,13 @@
   </Layout>
   <SubComponents>
     <Container class="javax.swing.JScrollPane" name="textAreaScrollPane">
+      <Properties>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
+            <TitledBorder title="Console"/>
+          </Border>
+        </Property>
+      </Properties>
       <AuxValues>
         <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
       </AuxValues>
@@ -459,7 +466,7 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JButton" name="button_obfuscate">
+    <Component class="javax.swing.JButton" name="bt_obfuscate">
       <Properties>
         <Property name="text" type="java.lang.String" value="Obfuscate!"/>
         <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
@@ -487,15 +494,16 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JButton" name="button_analyze">
+    <Component class="javax.swing.JButton" name="bt_analyze">
       <Properties>
         <Property name="text" type="java.lang.String" value="Analyze"/>
         <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
           <Color id="Hand Cursor"/>
         </Property>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="button_analyzeActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_analyzeActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JCheckBox" name="checkbox_autoanalyze">
