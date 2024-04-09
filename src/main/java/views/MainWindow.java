@@ -38,8 +38,12 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JCheckBox;
 import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
@@ -47,10 +51,7 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import utils.SoundPlayer;
 
-/**
- *
- * @author Alejo
- */
+
 public class MainWindow extends javax.swing.JFrame {
     private final ImageIcon ICON_OPENFILE = new ImageIcon(MainWindow.class.getResource("/images/ico20_openFile.png"));
     private final ImageIcon ICON_SAVE = new ImageIcon(MainWindow.class.getResource("/images/ico20_saveFile.png"));
@@ -69,6 +70,19 @@ public class MainWindow extends javax.swing.JFrame {
     private OpenFileProgressDialogue openFileProgressDialogue;
     private AboutDialogue aboutDialogue;
     private ConfigWindow configWindow;
+    
+    private ArrayList<String> entOriginArray = new ArrayList<>();
+    private ArrayList<String> entTargetnameArray = new ArrayList<>();
+    private ArrayList<String> brushEntities = new ArrayList<>(Arrays.asList(
+            "func_physbox",
+            "func_movelinear"
+            )
+        );
+    
+    private ArrayList<String> pointEntities = new ArrayList<>(Arrays.asList(
+            "info_player_start"
+            )
+        );
     
     public MainWindow() {
         initComponents();
@@ -147,8 +161,7 @@ public class MainWindow extends javax.swing.JFrame {
         bt_obfuscate = new javax.swing.JButton();
         lb_filelength = new javax.swing.JLabel();
         lb_charset = new javax.swing.JLabel();
-        bt_analyze = new javax.swing.JButton();
-        checkbox_autoanalyze = new javax.swing.JCheckBox();
+        checkbox_autosave = new javax.swing.JCheckBox();
         checkbox_autoobfuscate = new javax.swing.JCheckBox();
         jMenuBar1 = new javax.swing.JMenuBar();
         menu_file = new javax.swing.JMenu();
@@ -331,6 +344,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         bt_obfuscate.setText("Obfuscate!");
         bt_obfuscate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        bt_obfuscate.setEnabled(false);
 
         lb_filelength.setText("length: 0 | lines: 0");
         lb_filelength.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -338,20 +352,11 @@ public class MainWindow extends javax.swing.JFrame {
         lb_charset.setText("Charset");
         lb_charset.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
-        bt_analyze.setText("Analyze");
-        bt_analyze.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        bt_analyze.setEnabled(false);
-        bt_analyze.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bt_analyzeActionPerformed(evt);
-            }
-        });
-
-        checkbox_autoanalyze.setText("Auto-analyze");
-        checkbox_autoanalyze.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        checkbox_autoanalyze.addMouseListener(new java.awt.event.MouseAdapter() {
+        checkbox_autosave.setText("Autosave");
+        checkbox_autosave.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        checkbox_autosave.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                checkbox_autoanalyzeMouseEntered(evt);
+                checkbox_autosaveMouseEntered(evt);
             }
         });
 
@@ -482,10 +487,8 @@ public class MainWindow extends javax.swing.JFrame {
                         .addComponent(bt_obfuscate, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(checkbox_autoobfuscate)
-                        .addGap(18, 18, 18)
-                        .addComponent(bt_analyze)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(checkbox_autoanalyze)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(checkbox_autosave)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -499,8 +502,7 @@ public class MainWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(bt_obfuscate)
-                    .addComponent(bt_analyze)
-                    .addComponent(checkbox_autoanalyze)
+                    .addComponent(checkbox_autosave)
                     .addComponent(checkbox_autoobfuscate))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(textAreaScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -516,26 +518,23 @@ public class MainWindow extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void openFile() {
-        //clearProgram();
-        
         JnaFileChooser fileChooser = new JnaFileChooser();
         fileChooser.addFilter("Valve Map File (.vmf)", "vmf", "vmx");
 
         if (fileChooser.showOpenDialog(this)) {
+            clearProgram();
             new Thread(new Runnable() {
                 public void run() {
                     openFileProgressDialogue.show();
                 }
             }).start();
-            
+
             selectedFile = fileChooser.getSelectedFile();
 
             filePath = fileChooser.getSelectedFile().getAbsolutePath();
             fileName = selectedFile.getName();
 
             setTitle("Loading, please wait... - Uboa VMF Obfuscator");
-
-            textArea.setText("Reading " + filePath + "\n...");
 
             try {
                 asyncReadVMF();
@@ -550,11 +549,21 @@ public class MainWindow extends javax.swing.JFrame {
             Thread vmfReaderThread = new Thread(new Runnable() {
                 public void run() {
                     try {
+                        textArea.setText("Opening " + fileName + "\n...");
                         long startTime = System.nanoTime();
                         
                         List<String> readVmfList = Files.readAllLines(Paths.get(filePath), Charset.forName(CHARSET));
+                        
                         int totalLines = readVmfList.size();
+                        String totalLinesPretty = String.format("%,d", totalLines);
+                        textArea.append("\nFinished opening " + fileName + ".\nTime to open file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
+                        textArea.append("\nTotal lines: " + totalLinesPretty);
+                        
                         int beginEntitySection = readVmfList.indexOf("entity");
+                        float percentageLinesSkipped = (float)beginEntitySection / totalLines * 100;
+                        textArea.append("\n\nDon't care about solids, moving to entity section, skipping " +  String.format("%,d",beginEntitySection) + " lines ("+String.format("%.2f", percentageLinesSkipped) + "% of all lines)");
+                        textArea.append("\nAnalyzing entity section... working, please wait...");
+                        textArea.append("\n...");
                         
                         List<String> solidSection = readVmfList.subList(0, beginEntitySection);
                         //List<String> entitySection = readVmfList.subList(beginEntitySection, readVmfList.size());
@@ -565,25 +574,76 @@ public class MainWindow extends javax.swing.JFrame {
                         openFileProgressDialogue.setProgressBarMin(beginEntitySection);
                         openFileProgressDialogue.setProgressBarMax(totalLines);
 
+                        boolean isParsingEntity = false;
+                        boolean isBrushEntity = false;
+                        
                         for (int i = beginEntitySection; i < readVmfList.size(); i++) {
+                            //Check if reading entity
+                            if (readVmfList.get(i).equals("entity")) {
+                                iNumEnts++;
+                                isParsingEntity = true;
+                                textArea.append("\n\nGot entity");
+                            }
+                            
+                            //Get origins if point entity
+                            if (isParsingEntity) {
+                                //Figure out class of entity
+                                //Can't modify origin of brush and point entities
+                                if (readVmfList.get(i).contains("classname")) {
+                                    Pattern pattern = Pattern.compile("\"([^\"]*)\"");
+                                    Matcher matcher = pattern.matcher(readVmfList.get(i));
+
+                                    while( matcher.find() ) {
+                                        if (!matcher.group(1).equals("classname")) {
+                                            if ((brushEntities.contains(matcher.group(1))) || (pointEntities.contains(matcher.group(1)))) {
+                                                isBrushEntity = true;
+                                                textArea.append("\nFound brush/point entity " + matcher.group(1) + ", ignoring origins");
+                                            } else {
+                                                isBrushEntity = false;
+                                                textArea.append("\nFound logic entity " + matcher.group(1) + ", obtaining origins");
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                if ((!isBrushEntity) && (readVmfList.get(i).contains("origin"))) {
+                                    Pattern pattern = Pattern.compile("\"([^\"]*)\"");
+                                    Matcher matcher = pattern.matcher(readVmfList.get(i));
+
+                                    while( matcher.find() ) {
+                                        if (!matcher.group(1).equals("origin"))
+                                            textArea.append("\nFound origin " + matcher.group(1) );
+                                    }
+                                }
+                            }
+                            
+                            //Close entity
+                            try {
+                                if ((isParsingEntity) && (readVmfList.get(i).equals("}")) && (readVmfList.get(i + 1).equals("entity")) || (readVmfList.get(i + 1).equals("cameras")) ) {
+                                    isParsingEntity = false;
+                                    isBrushEntity = false;
+                                    textArea.append("\nFinished parsing entity");
+                                }
+                            } catch (IndexOutOfBoundsException e) {
+                                textArea.append("\n\nDug too deep. Catching IndexOutOfBoundsException like it's baseball");
+                            }
+
                             vmfContent += readVmfList.get(i);
-                            openFileProgressDialogue.setStatusText("Line " + i + " of " + totalLines);
+                            openFileProgressDialogue.setStatusText("Line " + String.format("%,d", i) + " of " + totalLinesPretty);
                             openFileProgressDialogue.setProgressBarValue(i);
                             openFileProgressDialogue.appendTextArea(readVmfList.get(i));     
                         }
-                        
-                        long endTime = System.nanoTime() - startTime;
-                        double timeToRead = endTime / 1_000_000_000.;
                         
                         String fileSizePretty = String.format("%.2f", Float.valueOf(selectedFile.length()) / 1024000);
                         
                         setTitle(fileName + " - " + fileSizePretty + " MB - Uboa VMF Obfuscator");
                         
-                        textArea.append("\nFinished reading " + filePath + "\n\nTime to read file: " + String.format("%.2f", timeToRead) + " seconds");
+                        textArea.append("\nFinished reading " + fileName + "\n\nTime to read file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
                         textArea.append("\nNumber of entities: " + iNumEnts);
                         setFileLoaded(true);
                         openFileProgressDialogue.setVisible(false);
-                        lb_filelength.setText("length: " + vmfContent.length() + " | lines: " + totalLines);
+                        openFileProgressDialogue.dispose();
+                        lb_filelength.setText("length: " + String.format("%,d", vmfContent.length()) + " | lines: " + totalLinesPretty);
                         //if (menuOption_playSounds.isSelected()) SoundPlayer.playSound("/snd/success.wav");
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -596,6 +656,10 @@ public class MainWindow extends javax.swing.JFrame {
         } catch (Exception e) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, e);
         }
+    }
+    
+    private void obfuscateVMF() {
+        
     }
     
     private void menuOption_openActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuOption_openActionPerformed
@@ -776,17 +840,13 @@ public class MainWindow extends javax.swing.JFrame {
         aboutDialogue.show();
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
-    private void checkbox_autoanalyzeMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_checkbox_autoanalyzeMouseEntered
-        lb_info.setText("Automatically analyze on load file");
-    }//GEN-LAST:event_checkbox_autoanalyzeMouseEntered
+    private void checkbox_autosaveMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_checkbox_autosaveMouseEntered
+        lb_info.setText("Automatically save on finish obfuscation. Copy will be saved with the _obf suffix");
+    }//GEN-LAST:event_checkbox_autosaveMouseEntered
 
     private void checkbox_autoobfuscateMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_checkbox_autoobfuscateMouseEntered
         lb_info.setText("Automatically obfuscate on finish analysis");
     }//GEN-LAST:event_checkbox_autoobfuscateMouseEntered
-
-    private void bt_analyzeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_analyzeActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_bt_analyzeActionPerformed
 
     private void setRandomEntNameParametersEditable(boolean state) {
         comboBox_rndEntNameChoices.setEnabled(state);
@@ -879,10 +939,9 @@ public class MainWindow extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton bt_analyze;
     private javax.swing.JButton bt_obfuscate;
-    private javax.swing.JCheckBox checkbox_autoanalyze;
     private javax.swing.JCheckBox checkbox_autoobfuscate;
+    private javax.swing.JCheckBox checkbox_autosave;
     private javax.swing.JComboBox<String> comboBox_rndEntNameChoices;
     private javax.swing.JLabel comboBox_rndEntNameLabel;
     private javax.swing.JSpinner comboBox_rndEntNameLength;

@@ -190,10 +190,8 @@
                       <Component id="bt_obfuscate" min="-2" pref="112" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="checkbox_autoobfuscate" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="bt_analyze" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="-2" attributes="0"/>
-                      <Component id="checkbox_autoanalyze" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="checkbox_autosave" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -211,8 +209,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="bt_obfuscate" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="bt_analyze" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="checkbox_autoanalyze" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="checkbox_autosave" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="checkbox_autoobfuscate" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -472,6 +469,7 @@
         <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
           <Color id="Hand Cursor"/>
         </Property>
+        <Property name="enabled" type="boolean" value="false"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lb_filelength">
@@ -494,27 +492,15 @@
         </Property>
       </Properties>
     </Component>
-    <Component class="javax.swing.JButton" name="bt_analyze">
+    <Component class="javax.swing.JCheckBox" name="checkbox_autosave">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Analyze"/>
-        <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
-          <Color id="Hand Cursor"/>
-        </Property>
-        <Property name="enabled" type="boolean" value="false"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_analyzeActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JCheckBox" name="checkbox_autoanalyze">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Auto-analyze"/>
+        <Property name="text" type="java.lang.String" value="Autosave"/>
         <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
           <Color id="Hand Cursor"/>
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="checkbox_autoanalyzeMouseEntered"/>
+        <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="checkbox_autosaveMouseEntered"/>
       </Events>
     </Component>
     <Component class="javax.swing.JCheckBox" name="checkbox_autoobfuscate">

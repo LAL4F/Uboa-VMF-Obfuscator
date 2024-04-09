@@ -25,7 +25,6 @@
     <!--Appearance-->
     <lookAndFeel value="FlatMacDarkLaf"/>
     <!--Main-->
-    <autoAnalyze value="false"/>
     <autoObfuscate value="false"/>
     <entityPosObfuscation value="None"/>
     <entityNameObfuscation value="None"/>

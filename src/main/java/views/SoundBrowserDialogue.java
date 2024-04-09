@@ -146,7 +146,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
             }
         });
 
-        jLabel1.setText("Sound Volume:");
+        jLabel1.setText("Preview Volume:");
 
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel2.setText("Sound Name:");
@@ -305,10 +305,13 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
         tf_filePath.setText(sndList.getSelectedValue());
         if ((checkbox_autoplay.isSelected()) && (sndList.getSelectedValue() != null)) {
             if (sndList.getSelectedValue().charAt(0) == '/') {
-                SoundPlayer.playSoundInternal(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
+               //SoundPlayer.playSoundInternal(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
+               SoundPlayer.playSoundInternal(sndList.getSelectedValue());
             } else {
-                SoundPlayer.playSoundExternal(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
+                //SoundPlayer.playSoundExternal(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
+                SoundPlayer.playSoundExternal(sndList.getSelectedValue());
             }
+            SoundPlayer.initSound(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
             System.out.println(sndList.getSelectedValue());
         }
     }//GEN-LAST:event_sndListMouseReleased
@@ -327,11 +330,12 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
 
     private void bt_previewSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_previewSndActionPerformed
         try {
-            if (sndList.getSelectedValue().charAt(0) == '/') {
-                SoundPlayer.playSoundInternal(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
-            } else {
-                SoundPlayer.playSoundExternal(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
-            } 
+//            if (sndList.getSelectedValue().charAt(0) == '/') {
+//                SoundPlayer.playSoundInternal(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
+//            } else {
+//                SoundPlayer.playSoundExternal(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
+//            } 
+            SoundPlayer.initSound(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
         } catch (NullPointerException e) {
             
         }

@@ -163,7 +163,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel1">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Sound Volume:"/>
+        <Property name="text" type="java.lang.String" value="Preview Volume:"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">

@@ -37,9 +37,9 @@ public class SoundPlayer  {
         SND_OVERRIDE;
     }
     
-    private boolean prePlaySound(SoundType soundType) {
+    public static void initSound(String soundFile, SoundType soundType) {
         
-        return false;
+        //return false;
     }
     
     public static void killAllSound() {
@@ -48,7 +48,7 @@ public class SoundPlayer  {
         }
     }
     
-    public static void playSoundInternal(String soundFile, SoundType soundType) {
+    public static void playSoundInternal(String soundFile) {
         try {
             //Took a while to figure out how to play sounds inside a .jar file but it's here
             InputStream audioSrc = MainWindow.class.getResourceAsStream(soundFile);
@@ -77,7 +77,7 @@ public class SoundPlayer  {
         }
     }
     
-    public static void playSoundExternal(String soundFile, SoundType soundType) {
+    public static void playSoundExternal(String soundFile) {
         try {
             if (activeClip != null) {
                 activeClip.stop();
