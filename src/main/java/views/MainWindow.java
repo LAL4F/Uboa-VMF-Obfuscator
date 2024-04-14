@@ -92,8 +92,8 @@ public class MainWindow extends javax.swing.JFrame {
         openFileProgressDialogue = new OpenFileProgressDialogue(this, false);
         
         setupIcons();
-        loadConfig();
         setupRadioButtons();
+        loadConfig();
         
         setFileLoaded(false);
         setRandomEntNameParametersEditable(false);
@@ -111,7 +111,8 @@ public class MainWindow extends javax.swing.JFrame {
     }
     
     private void loadConfig() {
-        //System.out.println(XMLManager.getStringValue("enableSnd"));
+        checkbox_autoobfuscate.setSelected(XMLManager.getBooleanValue("autoObfuscate"));
+        checkbox_autosave.setSelected(XMLManager.getBooleanValue("autosave"));
     }
     
     private void setupRadioButtons() {
@@ -345,6 +346,11 @@ public class MainWindow extends javax.swing.JFrame {
         bt_obfuscate.setText("Obfuscate!");
         bt_obfuscate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_obfuscate.setEnabled(false);
+        bt_obfuscate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_obfuscateActionPerformed(evt);
+            }
+        });
 
         lb_filelength.setText("length: 0 | lines: 0");
         lb_filelength.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -359,12 +365,22 @@ public class MainWindow extends javax.swing.JFrame {
                 checkbox_autosaveMouseEntered(evt);
             }
         });
+        checkbox_autosave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkbox_autosaveActionPerformed(evt);
+            }
+        });
 
         checkbox_autoobfuscate.setText("Auto-obfuscate");
         checkbox_autoobfuscate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         checkbox_autoobfuscate.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 checkbox_autoobfuscateMouseEntered(evt);
+            }
+        });
+        checkbox_autoobfuscate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkbox_autoobfuscateActionPerformed(evt);
             }
         });
 
@@ -556,6 +572,7 @@ public class MainWindow extends javax.swing.JFrame {
                         
                         int totalLines = readVmfList.size();
                         String totalLinesPretty = String.format("%,d", totalLines);
+                        SoundPlayer.playSound(XMLManager.getStringValue("openFileSnd"), SoundPlayer.SoundType.SND_OPENFILE);
                         textArea.append("\nFinished opening " + fileName + ".\nTime to open file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
                         textArea.append("\nTotal lines: " + totalLinesPretty);
                         
@@ -625,7 +642,7 @@ public class MainWindow extends javax.swing.JFrame {
                                     textArea.append("\nFinished parsing entity");
                                 }
                             } catch (IndexOutOfBoundsException e) {
-                                textArea.append("\n\nDug too deep. Catching IndexOutOfBoundsException like it's baseball");
+                                
                             }
 
                             vmfContent += readVmfList.get(i);
@@ -638,13 +655,16 @@ public class MainWindow extends javax.swing.JFrame {
                         
                         setTitle(fileName + " - " + fileSizePretty + " MB - Uboa VMF Obfuscator");
                         
+                        SoundPlayer.playSound(XMLManager.getStringValue("analyzeFileSnd"), SoundPlayer.SoundType.SND_ANALYZEFILE);
                         textArea.append("\nFinished reading " + fileName + "\n\nTime to read file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
                         textArea.append("\nNumber of entities: " + iNumEnts);
                         setFileLoaded(true);
                         openFileProgressDialogue.setVisible(false);
                         openFileProgressDialogue.dispose();
                         lb_filelength.setText("length: " + String.format("%,d", vmfContent.length()) + " | lines: " + totalLinesPretty);
-                        //if (menuOption_playSounds.isSelected()) SoundPlayer.playSound("/snd/success.wav");
+                        
+                        System.out.print("Finished analyzing VMF");
+                        if (XMLManager.getBooleanValue("autoObfuscate")) {obfuscateVMF();}
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -659,7 +679,9 @@ public class MainWindow extends javax.swing.JFrame {
     }
     
     private void obfuscateVMF() {
-        
+        SoundPlayer.playSound(XMLManager.getStringValue("obfuscateFileSnd"), SoundPlayer.SoundType.SND_OBFUSCATE);
+        System.out.print("Obfuscated VMF");
+        if (XMLManager.getBooleanValue("autosave")) {saveFile();}
     }
     
     private void menuOption_openActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuOption_openActionPerformed
@@ -676,7 +698,7 @@ public class MainWindow extends javax.swing.JFrame {
             
             bufferedWriter.write(vmfContent);
             bufferedWriter.close();
-            //SoundPlayer.playSound("/snd/success2.wav");
+            SoundPlayer.playSound(XMLManager.getStringValue("saveFileSnd"), SoundPlayer.SoundType.SND_SAVE);
             JCheckBox checkbox = new JCheckBox("Do not show save messages ever again");
             Object[] params = {"Success!\nFor your safety, the input VMF has not been overridden. \nA copy of the VMF has been saved with the name of " + fileNameNoExtension + "_obf.vmf\n", "\n", checkbox};
             
@@ -718,7 +740,7 @@ public class MainWindow extends javax.swing.JFrame {
                 bufferedWriter.write(vmfContent);
                 bufferedWriter.close();
                 
-                //if (menuOption_playSounds.isSelected()) SoundPlayer.playSound("/snd/success2.wav");
+                SoundPlayer.playSound(XMLManager.getStringValue("saveFileSnd"), SoundPlayer.SoundType.SND_SAVE);
 
             JCheckBox checkbox = new JCheckBox("Do not show save messages ever again");
             Object[] params = {"Success!", "\n", checkbox};
@@ -847,6 +869,18 @@ public class MainWindow extends javax.swing.JFrame {
     private void checkbox_autoobfuscateMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_checkbox_autoobfuscateMouseEntered
         lb_info.setText("Automatically obfuscate on finish analysis");
     }//GEN-LAST:event_checkbox_autoobfuscateMouseEntered
+
+    private void bt_obfuscateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_obfuscateActionPerformed
+        obfuscateVMF();
+    }//GEN-LAST:event_bt_obfuscateActionPerformed
+
+    private void checkbox_autoobfuscateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_autoobfuscateActionPerformed
+        XMLManager.setBooleanValue("autoObfuscate", checkbox_autoobfuscate.isSelected());
+    }//GEN-LAST:event_checkbox_autoobfuscateActionPerformed
+
+    private void checkbox_autosaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_autosaveActionPerformed
+        XMLManager.setBooleanValue("autosave", checkbox_autosave.isSelected());
+    }//GEN-LAST:event_checkbox_autosaveActionPerformed
 
     private void setRandomEntNameParametersEditable(boolean state) {
         comboBox_rndEntNameChoices.setEnabled(state);

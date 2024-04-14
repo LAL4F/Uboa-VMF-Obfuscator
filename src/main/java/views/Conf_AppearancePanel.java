@@ -78,7 +78,7 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
                 .addComponent(cb_lookandfeel, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(bt_save)
-                .addContainerGap(154, Short.MAX_VALUE))
+                .addContainerGap(159, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -90,7 +90,8 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        lb_lafpreview.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lb_lafpreview.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        lb_lafpreview.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         lb_lafpreview.setBorder(javax.swing.BorderFactory.createTitledBorder("Preview"));
 
         jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Info"));

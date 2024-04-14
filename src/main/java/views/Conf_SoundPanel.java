@@ -110,12 +110,32 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         });
 
         bt_analyzeFileSnd.setText("...");
+        bt_analyzeFileSnd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_analyzeFileSndActionPerformed(evt);
+            }
+        });
 
         bt_obfuscateFileSnd.setText("...");
+        bt_obfuscateFileSnd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_obfuscateFileSndActionPerformed(evt);
+            }
+        });
 
         bt_saveFileSnd.setText("...");
+        bt_saveFileSnd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_saveFileSndActionPerformed(evt);
+            }
+        });
 
         bt_exceptionSnd.setText("...");
+        bt_exceptionSnd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_exceptionSndActionPerformed(evt);
+            }
+        });
 
         tf_openFileSnd.setText("jTextField1");
         tf_openFileSnd.setEnabled(false);
@@ -133,6 +153,11 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         tf_exceptionSnd.setEnabled(false);
 
         bt_resetAllSounds.setText("Reset");
+        bt_resetAllSounds.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_resetAllSoundsActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -149,25 +174,20 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(tf_openFileSnd)
-                    .addComponent(tf_analyzeFileSnd)
-                    .addComponent(tf_obfuscateFileSnd, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(tf_analyzeFileSnd, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(tf_exceptionSnd)
                     .addComponent(tf_saveFileSnd, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(tf_exceptionSnd, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addComponent(tf_obfuscateFileSnd, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(bt_obfuscateFileSnd)
-                            .addComponent(bt_saveFileSnd)
-                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(bt_openFileSnd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(bt_analyzeFileSnd)))
-                        .addGap(145, 145, 145))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(bt_exceptionSnd)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(bt_resetAllSounds)
-                        .addContainerGap())))
+                    .addComponent(bt_obfuscateFileSnd)
+                    .addComponent(bt_saveFileSnd)
+                    .addComponent(bt_openFileSnd, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(bt_analyzeFileSnd)
+                    .addComponent(bt_exceptionSnd))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(bt_resetAllSounds)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -259,7 +279,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void bt_openFileSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_openFileSndActionPerformed
-        openSoundBrowser();
+        openSoundBrowser("openFileSnd");
     }//GEN-LAST:event_bt_openFileSndActionPerformed
 
     private void checkbox_allSoundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_allSoundsActionPerformed
@@ -295,9 +315,66 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         XMLManager.setBooleanValue("enableErrorSnd", checkbox_errorSounds.isSelected());
     }//GEN-LAST:event_checkbox_errorSoundsActionPerformed
 
-    private void openSoundBrowser() {
-        SoundBrowserDialogue soundBrowserDialogue = new SoundBrowserDialogue(parent.parent, false);
+    private void bt_analyzeFileSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_analyzeFileSndActionPerformed
+        openSoundBrowser("analyzeFileSnd");
+    }//GEN-LAST:event_bt_analyzeFileSndActionPerformed
+
+    private void bt_obfuscateFileSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_obfuscateFileSndActionPerformed
+        openSoundBrowser("obfuscateFileSnd");
+    }//GEN-LAST:event_bt_obfuscateFileSndActionPerformed
+
+    private void bt_saveFileSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_saveFileSndActionPerformed
+        openSoundBrowser("saveFileSnd");
+    }//GEN-LAST:event_bt_saveFileSndActionPerformed
+
+    private void bt_exceptionSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_exceptionSndActionPerformed
+        openSoundBrowser("errorSnd");
+    }//GEN-LAST:event_bt_exceptionSndActionPerformed
+
+    private void bt_resetAllSoundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_resetAllSoundsActionPerformed
+       XMLManager.setStringValue("openFileSnd", "/internalSnd/open.wav");
+       tf_openFileSnd.setText("/internalSnd/open.wav");
+       
+       XMLManager.setStringValue("analyzeFileSnd", "/internalSnd/analyzeFile.wav");
+       tf_analyzeFileSnd.setText("/internalSnd/analyzeFile.wav");
+       
+       XMLManager.setStringValue("obfuscateFileSnd", "/internalSnd/obfuscate.wav");
+       tf_obfuscateFileSnd.setText("/internalSnd/obfuscate.wav");
+       
+       XMLManager.setStringValue("saveFileSnd", "/internalSnd/save.wav");
+       tf_saveFileSnd.setText("/internalSnd/save.wav");
+       
+       XMLManager.setStringValue("errorSnd", "/internalSnd/error.wav");
+       tf_exceptionSnd.setText("/internalSnd/error.wav");
+    }//GEN-LAST:event_bt_resetAllSoundsActionPerformed
+
+    private void openSoundBrowser(String event) {
+        SoundBrowserDialogue soundBrowserDialogue = new SoundBrowserDialogue(parent.parent, false, this, event);
         soundBrowserDialogue.show();
+    }
+    
+    public void setEventSnd(String sndEvent, String soundPath) {
+        XMLManager.setStringValue(sndEvent, soundPath);
+        
+        switch (sndEvent) {
+            case "openFileSnd":
+                tf_openFileSnd.setText(soundPath);
+                break;
+            case "analyzeFileSnd":
+                tf_analyzeFileSnd.setText(soundPath);
+                break;
+            case "obfuscateFileSnd":
+                tf_obfuscateFileSnd.setText(soundPath);
+                break;
+            case "saveFileSnd":
+                tf_saveFileSnd.setText(soundPath);
+                break;
+            case "errorSnd":
+                tf_exceptionSnd.setText(soundPath);
+                break;
+            default:
+                break;
+        }
     }
 
     private void setElementState(boolean bool) {

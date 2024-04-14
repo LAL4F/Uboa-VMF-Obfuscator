@@ -109,32 +109,23 @@
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="tf_openFileSnd" max="32767" attributes="0"/>
-                          <Component id="tf_analyzeFileSnd" max="32767" attributes="0"/>
-                          <Component id="tf_obfuscateFileSnd" alignment="1" max="32767" attributes="0"/>
+                          <Component id="tf_openFileSnd" alignment="0" max="32767" attributes="0"/>
+                          <Component id="tf_analyzeFileSnd" alignment="1" max="32767" attributes="0"/>
+                          <Component id="tf_exceptionSnd" alignment="0" max="32767" attributes="0"/>
                           <Component id="tf_saveFileSnd" alignment="1" max="32767" attributes="0"/>
-                          <Component id="tf_exceptionSnd" alignment="1" max="32767" attributes="0"/>
+                          <Component id="tf_obfuscateFileSnd" alignment="1" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="bt_obfuscateFileSnd" min="-2" max="-2" attributes="0"/>
-                                  <Component id="bt_saveFileSnd" min="-2" max="-2" attributes="0"/>
-                                  <Group type="103" alignment="0" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="bt_openFileSnd" max="32767" attributes="0"/>
-                                      <Component id="bt_analyzeFileSnd" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                              </Group>
-                              <EmptySpace min="-2" pref="145" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="bt_exceptionSnd" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="32767" attributes="0"/>
-                              <Component id="bt_resetAllSounds" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                          </Group>
+                          <Component id="bt_obfuscateFileSnd" min="-2" max="-2" attributes="0"/>
+                          <Component id="bt_saveFileSnd" min="-2" max="-2" attributes="0"/>
+                          <Component id="bt_openFileSnd" max="32767" attributes="0"/>
+                          <Component id="bt_analyzeFileSnd" min="-2" max="-2" attributes="0"/>
+                          <Component id="bt_exceptionSnd" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="bt_resetAllSounds" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -230,21 +221,33 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_analyzeFileSndActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="bt_obfuscateFileSnd">
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_obfuscateFileSndActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="bt_saveFileSnd">
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_saveFileSndActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="bt_exceptionSnd">
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_exceptionSndActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JTextField" name="tf_openFileSnd">
               <Properties>
@@ -280,6 +283,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Reset"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_resetAllSoundsActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

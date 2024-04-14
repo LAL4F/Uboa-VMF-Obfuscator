@@ -4,6 +4,7 @@
  */
 package utils;
 
+import config.XMLManager;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -37,9 +38,32 @@ public class SoundPlayer  {
         SND_OVERRIDE;
     }
     
-    public static void initSound(String soundFile, SoundType soundType) {
+    public static void playSound(String soundFile, SoundType soundType) {
+        if ((soundType != SoundType.SND_OVERRIDE) && (!XMLManager.getBooleanValue("enableSnd"))) {return;}
         
-        //return false;
+        switch (soundType) {
+            case SND_OPENFILE:
+                if (!XMLManager.getBooleanValue("enableOpenFileSnd")) { return;}
+                break;
+            case SND_ANALYZEFILE:
+                if (!XMLManager.getBooleanValue("enableAnalyzeFileSnd")) { return;}
+                break;
+            case SND_OBFUSCATE:
+                if (!XMLManager.getBooleanValue("enableObfuscateFileSnd")) { return;}
+                break;
+            case SND_SAVE:
+                if (!XMLManager.getBooleanValue("enableSaveFileSnd")) { return;}
+                break;
+            case SND_ERROR:
+                if (!XMLManager.getBooleanValue("enableErrorSnd")) { return;}
+                break;
+        }
+        
+        if (soundFile.charAt(0) == '/') {
+           playSoundInternal(soundFile);
+        } else {
+           playSoundExternal(soundFile);
+        }
     }
     
     public static void killAllSound() {
@@ -48,7 +72,7 @@ public class SoundPlayer  {
         }
     }
     
-    public static void playSoundInternal(String soundFile) {
+    private static void playSoundInternal(String soundFile) {
         try {
             //Took a while to figure out how to play sounds inside a .jar file but it's here
             InputStream audioSrc = MainWindow.class.getResourceAsStream(soundFile);
@@ -77,7 +101,7 @@ public class SoundPlayer  {
         }
     }
     
-    public static void playSoundExternal(String soundFile) {
+    private static void playSoundExternal(String soundFile) {
         try {
             if (activeClip != null) {
                 activeClip.stop();

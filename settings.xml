@@ -1,31 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?><settings>
+    <version value="1.0"/>
     <!--Sounds-->
     <enableSnd value="true"/>
     <masterVol value="100"/>
     <!--Open File-->
     <enableOpenFileSnd value="true"/>
-    <openFileSnd value="/internalSnd/success.wav"/>
+    <openFileSnd value="/internalSnd/open.wav"/>
     <!--Analyze File-->
     <enableAnalyzeFileSnd value="true"/>
-    <analyzeFileSnd value="/internalSnd/success.wav"/>
+    <analyzeFileSnd value="/internalSnd/analyzeFile.wav"/>
     <!--Obfuscate File-->
     <enableObfuscateFileSnd value="true"/>
-    <obfuscateFileSnd value="/internalSnd/success2.wav"/>
+    <obfuscateFileSnd value="/internalSnd/obfuscate.wav"/>
     <!--Save File-->
     <enableSaveFileSnd value="true"/>
-    <saveFileSnd value="/internalSnd/success2.wav"/>
+    <saveFileSnd value="/internalSnd/save.wav"/>
     <!--Error-->
     <enableErrorSnd value="true"/>
-    <errorSnd value="/internalSnd/success.wav"/>
+    <errorSnd value="/internalSnd/error.wav"/>
     <!--Sound chooser dialog-->
     <soundChooserFilter value=""/>
     <soundChooserSearchIn value="0"/>
-    <!--Combobox index-->
     <soundChooserAutoplay value="true"/>
     <soundChooserVol value="100"/>
     <!--Appearance-->
     <lookAndFeel value="FlatMacDarkLaf"/>
-    <!--Appearance-->
-    <autoAnalyze value="false"/>
+    <!--Main-->
+    <entityPosObfuscation value="None"/>
+    <entityNameObfuscation value="None"/>
+    <entityNameObfuscationKind value="Letters"/>
+    <entityNameObfuscationLength value="5"/>
     <autoObfuscate value="false"/>
+    <autosave value="false"/>
+    <!--Popups-->
+    <showPopupOnAnalyze value="true"/>
+    <showPopupOnObfuscate value="true"/>
+    <showPopupOnSave value="true"/>
+    <showPopupOnException value="true"/>
 </settings>
