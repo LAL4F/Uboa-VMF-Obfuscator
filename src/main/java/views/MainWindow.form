@@ -132,12 +132,12 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuOption_openManualActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem6">
+            <MenuItem class="javax.swing.JMenuItem" name="menuOption_about">
               <Properties>
                 <Property name="text" type="java.lang.String" value="About..."/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem6ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="menuOption_aboutActionPerformed"/>
               </Events>
             </MenuItem>
           </SubComponents>
@@ -182,7 +182,7 @@
                   <Group type="102" attributes="0">
                       <Component id="lb_info" min="-2" pref="457" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="lb_filelength" max="32767" attributes="0"/>
+                      <Component id="lb_filelength" pref="175" max="32767" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="lb_charset" min="-2" pref="93" max="-2" attributes="0"/>
                   </Group>
@@ -192,7 +192,8 @@
                       <Component id="checkbox_autoobfuscate" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="checkbox_autosave" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="checkbox_verbose" min="-2" pref="85" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -211,6 +212,7 @@
                   <Component id="bt_obfuscate" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="checkbox_autosave" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="checkbox_autoobfuscate" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="checkbox_verbose" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="textAreaScrollPane" min="-2" pref="301" max="-2" attributes="0"/>
@@ -300,6 +302,7 @@
           </Properties>
           <Events>
             <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="rb_ePosObfuscation_noneMouseEntered"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rb_ePosObfuscation_noneActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="rb_ePosObfuscation_overlap">
@@ -311,6 +314,7 @@
           </Properties>
           <Events>
             <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="rb_ePosObfuscation_overlapMouseEntered"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rb_ePosObfuscation_overlapActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="rb_ePosObfuscation_randomize">
@@ -322,6 +326,7 @@
           </Properties>
           <Events>
             <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="rb_ePosObfuscation_randomizeMouseEntered"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rb_ePosObfuscation_randomizeActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="rb_ePosObfuscation_randomizeOverlap">
@@ -333,6 +338,7 @@
           </Properties>
           <Events>
             <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="rb_ePosObfuscation_randomizeOverlapMouseEntered"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="rb_ePosObfuscation_randomizeOverlapActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>
@@ -362,7 +368,9 @@
                   <Component id="comboBox_rndEntNameLength" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="comboBox_rndEntNameLabel" min="-2" pref="52" max="-2" attributes="0"/>
-                  <EmptySpace pref="167" max="32767" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="bt_randomStringTest" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -377,6 +385,7 @@
                       <Component id="comboBox_rndEntNameChoices" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="comboBox_rndEntNameLength" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="comboBox_rndEntNameLabel" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="bt_randomStringTest" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
               </Group>
@@ -427,14 +436,17 @@
                 <StringItem index="0" value="Letters"/>
                 <StringItem index="1" value="Numbers"/>
                 <StringItem index="2" value="Letters and numbers"/>
-                <StringItem index="3" value="Symbols only??"/>
-                <StringItem index="4" value="ALL of the above"/>
+                <StringItem index="3" value="Symbols"/>
+                <StringItem index="4" value="All of the above"/>
               </StringArray>
             </Property>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
               <Color id="Hand Cursor"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="comboBox_rndEntNameChoicesActionPerformed"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
           </AuxValues>
@@ -442,14 +454,26 @@
         <Component class="javax.swing.JSpinner" name="comboBox_rndEntNameLength">
           <Properties>
             <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
-              <SpinnerModel initial="5" maximum="20" minimum="5" numberType="java.lang.Integer" stepSize="1" type="number"/>
+              <SpinnerModel initial="5" maximum="30" minimum="5" numberType="java.lang.Integer" stepSize="1" type="number"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="comboBox_rndEntNameLengthStateChanged"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JLabel" name="comboBox_rndEntNameLabel">
           <Properties>
             <Property name="text" type="java.lang.String" value="Length"/>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="bt_randomStringTest">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Test"/>
+          </Properties>
+          <Events>
+            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="bt_randomStringTestMouseEntered"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_randomStringTestActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -517,6 +541,15 @@
       <Events>
         <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="checkbox_autoobfuscateMouseEntered"/>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkbox_autoobfuscateActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="checkbox_verbose">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Verbose"/>
+      </Properties>
+      <Events>
+        <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="checkbox_verboseMouseEntered"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkbox_verboseActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

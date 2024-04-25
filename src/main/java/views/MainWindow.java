@@ -49,6 +49,7 @@ import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
+import utils.RandomString;
 import utils.SoundPlayer;
 
 
@@ -61,7 +62,6 @@ public class MainWindow extends javax.swing.JFrame {
     private final String CHARSET = "ISO-8859-1";
     
     private String filePath, fileName, vmfContent;
-    private boolean isAnalyzed = false;
 
     private int iNumEnts;
     
@@ -73,13 +73,9 @@ public class MainWindow extends javax.swing.JFrame {
     
     private ArrayList<String> entOriginArray = new ArrayList<>();
     private ArrayList<String> entTargetnameArray = new ArrayList<>();
-    private ArrayList<String> brushEntities = new ArrayList<>(Arrays.asList(
-            "func_physbox",
-            "func_movelinear"
-            )
-        );
     
-    private ArrayList<String> pointEntities = new ArrayList<>(Arrays.asList(
+    //Their position and name can be obfuscated
+    private ArrayList<String> logicEntities = new ArrayList<>(Arrays.asList(
             "info_player_start"
             )
         );
@@ -90,13 +86,14 @@ public class MainWindow extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         
         openFileProgressDialogue = new OpenFileProgressDialogue(this, false);
+        setRandomEntNameParametersEditable(false);
         
         setupIcons();
         setupRadioButtons();
         loadConfig();
         
         setFileLoaded(false);
-        setRandomEntNameParametersEditable(false);
+        
         
         textArea.setText("Welcome to Uboa VMF Obfuscator. Load a VMF file to begin.");
         lb_info.setText("Hover over objects to see relevant information");
@@ -110,33 +107,75 @@ public class MainWindow extends javax.swing.JFrame {
         menuOption_saveAs.setIcon(ICON_SAVEAS);
     }
     
+    //Load configuration according to XML file
     private void loadConfig() {
         checkbox_autoobfuscate.setSelected(XMLManager.getBooleanValue("autoObfuscate"));
         checkbox_autosave.setSelected(XMLManager.getBooleanValue("autosave"));
+        checkbox_verbose.setSelected(XMLManager.getBooleanValue("verbose"));
+        
+        switch (XMLManager.getStringValue("entityPosObfuscation")) {
+            case "None":
+                rb_ePosObfuscation_none.setSelected(true);
+                break;
+            case "Overlap":
+                rb_ePosObfuscation_overlap.setSelected(true);
+                break;
+            case "Random":
+                rb_ePosObfuscation_randomize.setSelected(true);
+                break;
+            case "RandomOverlap":
+                rb_ePosObfuscation_randomizeOverlap.setSelected(true);
+                break;
+        }
+        
+        switch (XMLManager.getStringValue("entityNameObfuscation")) {
+            case "None":
+                rb_eNameObfuscation_none.setSelected(true);
+                break;
+            case "Exchange":
+                rb_eNameObfuscation_exchange.setSelected(true);
+                break;
+            case "Random":
+                rb_eNameObfuscation_randomize.setSelected(true);
+                setRandomEntNameParametersEditable(true);
+                break;
+        }
+        
+        comboBox_rndEntNameChoices.setSelectedIndex(XMLManager.getIntegerValue("entityNameObfuscationKind"));
+        comboBox_rndEntNameLength.setValue(XMLManager.getIntegerValue("entityNameObfuscationLength"));
     }
     
     private void setupRadioButtons() {
-        rb_ePosObfuscation_none.setSelected(true);
-        rb_eNameObfuscation_none.setSelected(true);
-        
+        //Entity position buttons
         rg_ePosObfuscation.add(rb_ePosObfuscation_none);
         rg_ePosObfuscation.add(rb_ePosObfuscation_overlap);
         rg_ePosObfuscation.add(rb_ePosObfuscation_randomize);
         rg_ePosObfuscation.add(rb_ePosObfuscation_randomizeOverlap);
         
+        //Entity name buttons
         rg_eNameObfuscation.add(rb_eNameObfuscation_none);
         rg_eNameObfuscation.add(rb_eNameObfuscation_exchange);
         rg_eNameObfuscation.add(rb_eNameObfuscation_randomize);
     }
     
     private void setFileLoaded(boolean state) {
+        //After loading file, allow obfuscation
         menuOption_closeFile.setEnabled(state);
-        menuOption_save.setEnabled(state);
-        menuOption_saveAs.setEnabled(state);
-
         bt_obfuscate.setEnabled(state);
     }
+    
+    private void setFileObfuscated(boolean state) {
+        //After file is obfuscated, allow save
+        menuOption_save.setEnabled(state);
+        menuOption_saveAs.setEnabled(state);
+    }
 
+    private void setRandomEntNameParametersEditable(boolean state) {
+        comboBox_rndEntNameChoices.setEnabled(state);
+        comboBox_rndEntNameLength.setEnabled(state);
+        comboBox_rndEntNameLabel.setEnabled(state);
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -158,12 +197,14 @@ public class MainWindow extends javax.swing.JFrame {
         comboBox_rndEntNameChoices = new javax.swing.JComboBox<>();
         comboBox_rndEntNameLength = new javax.swing.JSpinner();
         comboBox_rndEntNameLabel = new javax.swing.JLabel();
+        bt_randomStringTest = new javax.swing.JButton();
         lb_info = new javax.swing.JLabel();
         bt_obfuscate = new javax.swing.JButton();
         lb_filelength = new javax.swing.JLabel();
         lb_charset = new javax.swing.JLabel();
         checkbox_autosave = new javax.swing.JCheckBox();
         checkbox_autoobfuscate = new javax.swing.JCheckBox();
+        checkbox_verbose = new javax.swing.JCheckBox();
         jMenuBar1 = new javax.swing.JMenuBar();
         menu_file = new javax.swing.JMenu();
         menuOption_open = new javax.swing.JMenuItem();
@@ -181,7 +222,7 @@ public class MainWindow extends javax.swing.JFrame {
         jMenuItem3 = new javax.swing.JMenuItem();
         menu_help = new javax.swing.JMenu();
         menuOption_openManual = new javax.swing.JMenuItem();
-        jMenuItem6 = new javax.swing.JMenuItem();
+        menuOption_about = new javax.swing.JMenuItem();
 
         jMenuItem4.setText("jMenuItem4");
 
@@ -207,12 +248,22 @@ public class MainWindow extends javax.swing.JFrame {
                 rb_ePosObfuscation_noneMouseEntered(evt);
             }
         });
+        rb_ePosObfuscation_none.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rb_ePosObfuscation_noneActionPerformed(evt);
+            }
+        });
 
         rb_ePosObfuscation_overlap.setText("Overlap");
         rb_ePosObfuscation_overlap.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         rb_ePosObfuscation_overlap.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 rb_ePosObfuscation_overlapMouseEntered(evt);
+            }
+        });
+        rb_ePosObfuscation_overlap.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rb_ePosObfuscation_overlapActionPerformed(evt);
             }
         });
 
@@ -223,12 +274,22 @@ public class MainWindow extends javax.swing.JFrame {
                 rb_ePosObfuscation_randomizeMouseEntered(evt);
             }
         });
+        rb_ePosObfuscation_randomize.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rb_ePosObfuscation_randomizeActionPerformed(evt);
+            }
+        });
 
         rb_ePosObfuscation_randomizeOverlap.setText("Randomize w/ Overlap");
         rb_ePosObfuscation_randomizeOverlap.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         rb_ePosObfuscation_randomizeOverlap.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 rb_ePosObfuscation_randomizeOverlapMouseEntered(evt);
+            }
+        });
+        rb_ePosObfuscation_randomizeOverlap.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rb_ePosObfuscation_randomizeOverlapActionPerformed(evt);
             }
         });
 
@@ -300,12 +361,34 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        comboBox_rndEntNameChoices.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Letters", "Numbers", "Letters and numbers", "Symbols only??", "ALL of the above" }));
+        comboBox_rndEntNameChoices.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Letters", "Numbers", "Letters and numbers", "Symbols", "All of the above" }));
         comboBox_rndEntNameChoices.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        comboBox_rndEntNameChoices.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboBox_rndEntNameChoicesActionPerformed(evt);
+            }
+        });
 
-        comboBox_rndEntNameLength.setModel(new javax.swing.SpinnerNumberModel(5, 5, 20, 1));
+        comboBox_rndEntNameLength.setModel(new javax.swing.SpinnerNumberModel(5, 5, 30, 1));
+        comboBox_rndEntNameLength.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                comboBox_rndEntNameLengthStateChanged(evt);
+            }
+        });
 
         comboBox_rndEntNameLabel.setText("Length");
+
+        bt_randomStringTest.setText("Test");
+        bt_randomStringTest.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                bt_randomStringTestMouseEntered(evt);
+            }
+        });
+        bt_randomStringTest.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_randomStringTestActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -324,7 +407,9 @@ public class MainWindow extends javax.swing.JFrame {
                 .addComponent(comboBox_rndEntNameLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(comboBox_rndEntNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(167, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(bt_randomStringTest)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -336,7 +421,8 @@ public class MainWindow extends javax.swing.JFrame {
                     .addComponent(rb_eNameObfuscation_randomize)
                     .addComponent(comboBox_rndEntNameChoices, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(comboBox_rndEntNameLength, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(comboBox_rndEntNameLabel))
+                    .addComponent(comboBox_rndEntNameLabel)
+                    .addComponent(bt_randomStringTest))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -381,6 +467,18 @@ public class MainWindow extends javax.swing.JFrame {
         checkbox_autoobfuscate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 checkbox_autoobfuscateActionPerformed(evt);
+            }
+        });
+
+        checkbox_verbose.setText("Verbose");
+        checkbox_verbose.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                checkbox_verboseMouseEntered(evt);
+            }
+        });
+        checkbox_verbose.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkbox_verboseActionPerformed(evt);
             }
         });
 
@@ -471,13 +569,13 @@ public class MainWindow extends javax.swing.JFrame {
         });
         menu_help.add(menuOption_openManual);
 
-        jMenuItem6.setText("About...");
-        jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
+        menuOption_about.setText("About...");
+        menuOption_about.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem6ActionPerformed(evt);
+                menuOption_aboutActionPerformed(evt);
             }
         });
-        menu_help.add(jMenuItem6);
+        menu_help.add(menuOption_about);
 
         jMenuBar1.add(menu_help);
 
@@ -496,7 +594,7 @@ public class MainWindow extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lb_info, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lb_filelength, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lb_filelength, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lb_charset, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
@@ -505,7 +603,8 @@ public class MainWindow extends javax.swing.JFrame {
                         .addComponent(checkbox_autoobfuscate)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(checkbox_autosave)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(checkbox_verbose, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -519,7 +618,8 @@ public class MainWindow extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(bt_obfuscate)
                     .addComponent(checkbox_autosave)
-                    .addComponent(checkbox_autoobfuscate))
+                    .addComponent(checkbox_autoobfuscate)
+                    .addComponent(checkbox_verbose))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(textAreaScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -592,7 +692,7 @@ public class MainWindow extends javax.swing.JFrame {
                         openFileProgressDialogue.setProgressBarMax(totalLines);
 
                         boolean isParsingEntity = false;
-                        boolean isBrushEntity = false;
+                        boolean isPointEntity = false;
                         
                         for (int i = beginEntitySection; i < readVmfList.size(); i++) {
                             //Check if reading entity
@@ -602,28 +702,37 @@ public class MainWindow extends javax.swing.JFrame {
                                 textArea.append("\n\nGot entity");
                             }
                             
-                            //Get origins if point entity
                             if (isParsingEntity) {
                                 //Figure out class of entity
-                                //Can't modify origin of brush and point entities
                                 if (readVmfList.get(i).contains("classname")) {
                                     Pattern pattern = Pattern.compile("\"([^\"]*)\"");
                                     Matcher matcher = pattern.matcher(readVmfList.get(i));
 
                                     while( matcher.find() ) {
                                         if (!matcher.group(1).equals("classname")) {
-                                            if ((brushEntities.contains(matcher.group(1))) || (pointEntities.contains(matcher.group(1)))) {
-                                                isBrushEntity = true;
-                                                textArea.append("\nFound brush/point entity " + matcher.group(1) + ", ignoring origins");
-                                            } else {
-                                                isBrushEntity = false;
+                                            if (logicEntities.contains(matcher.group(1))) {
                                                 textArea.append("\nFound logic entity " + matcher.group(1) + ", obtaining origins");
+                                            } else {
+                                                isPointEntity = true;
+                                                textArea.append("\nFound brush/point entity " + matcher.group(1) + ", ignoring origins");
                                             }
                                         }
                                     }
                                 }
+
+                                //Get targetname
+                                if (readVmfList.get(i).contains("\"targetname\"")) {
+                                    Pattern pattern = Pattern.compile("\"([^\"]*)\"");
+                                    Matcher matcher = pattern.matcher(readVmfList.get(i));
+
+                                    while( matcher.find() ) {
+                                        if (!matcher.group(1).equals("targetname"))
+                                            textArea.append("\nFound targetname " + matcher.group(1) );
+                                    }
+                                }
                                 
-                                if ((!isBrushEntity) && (readVmfList.get(i).contains("origin"))) {
+                                //Get origin
+                                if ((!isPointEntity) && (readVmfList.get(i).contains("\"origin\""))) {
                                     Pattern pattern = Pattern.compile("\"([^\"]*)\"");
                                     Matcher matcher = pattern.matcher(readVmfList.get(i));
 
@@ -638,7 +747,7 @@ public class MainWindow extends javax.swing.JFrame {
                             try {
                                 if ((isParsingEntity) && (readVmfList.get(i).equals("}")) && (readVmfList.get(i + 1).equals("entity")) || (readVmfList.get(i + 1).equals("cameras")) ) {
                                     isParsingEntity = false;
-                                    isBrushEntity = false;
+                                    isPointEntity = false;
                                     textArea.append("\nFinished parsing entity");
                                 }
                             } catch (IndexOutOfBoundsException e) {
@@ -663,7 +772,6 @@ public class MainWindow extends javax.swing.JFrame {
                         openFileProgressDialogue.dispose();
                         lb_filelength.setText("length: " + String.format("%,d", vmfContent.length()) + " | lines: " + totalLinesPretty);
                         
-                        System.out.print("Finished analyzing VMF");
                         if (XMLManager.getBooleanValue("autoObfuscate")) {obfuscateVMF();}
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -679,6 +787,7 @@ public class MainWindow extends javax.swing.JFrame {
     }
     
     private void obfuscateVMF() {
+        setFileObfuscated(true);
         SoundPlayer.playSound(XMLManager.getStringValue("obfuscateFileSnd"), SoundPlayer.SoundType.SND_OBFUSCATE);
         System.out.print("Obfuscated VMF");
         if (XMLManager.getBooleanValue("autosave")) {saveFile();}
@@ -773,7 +882,6 @@ public class MainWindow extends javax.swing.JFrame {
         fileName = "";
         vmfContent = "";
          
-        isAnalyzed = false;
         selectedFile = null;
         
         textArea.setText("Welcome to Uboa VMF Obfuscator. Load a VMF file to begin.");
@@ -847,20 +955,23 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void rb_eNameObfuscation_randomizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_eNameObfuscation_randomizeActionPerformed
         setRandomEntNameParametersEditable(true);
+        XMLManager.setStringValue("entityNameObfuscation", "Random");
     }//GEN-LAST:event_rb_eNameObfuscation_randomizeActionPerformed
 
     private void rb_eNameObfuscation_exchangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_eNameObfuscation_exchangeActionPerformed
         setRandomEntNameParametersEditable(false);
+        XMLManager.setStringValue("entityNameObfuscation", "Exchange");
     }//GEN-LAST:event_rb_eNameObfuscation_exchangeActionPerformed
 
     private void rb_eNameObfuscation_noneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_eNameObfuscation_noneActionPerformed
         setRandomEntNameParametersEditable(false);
+        XMLManager.setStringValue("entityNameObfuscation", "None");
     }//GEN-LAST:event_rb_eNameObfuscation_noneActionPerformed
 
-    private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
+    private void menuOption_aboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuOption_aboutActionPerformed
         aboutDialogue = new AboutDialogue(this, false);
         aboutDialogue.show();
-    }//GEN-LAST:event_jMenuItem6ActionPerformed
+    }//GEN-LAST:event_menuOption_aboutActionPerformed
 
     private void checkbox_autosaveMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_checkbox_autosaveMouseEntered
         lb_info.setText("Automatically save on finish obfuscation. Copy will be saved with the _obf suffix");
@@ -882,20 +993,50 @@ public class MainWindow extends javax.swing.JFrame {
         XMLManager.setBooleanValue("autosave", checkbox_autosave.isSelected());
     }//GEN-LAST:event_checkbox_autosaveActionPerformed
 
-    private void setRandomEntNameParametersEditable(boolean state) {
-        comboBox_rndEntNameChoices.setEnabled(state);
-        comboBox_rndEntNameLength.setEnabled(state);
-        comboBox_rndEntNameLabel.setEnabled(state);
-        
-    }
+    private void rb_ePosObfuscation_noneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_noneActionPerformed
+        XMLManager.setStringValue("entityPosObfuscation", "None");
+    }//GEN-LAST:event_rb_ePosObfuscation_noneActionPerformed
 
-    public void restartApp() {
-        dispose();
-        SwingUtilities.invokeLater(() -> {
-            new MainWindow().setVisible(true);
-        });
+    private void rb_ePosObfuscation_overlapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_overlapActionPerformed
+        XMLManager.setStringValue("entityPosObfuscation", "Overlap");
+    }//GEN-LAST:event_rb_ePosObfuscation_overlapActionPerformed
+
+    private void rb_ePosObfuscation_randomizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_randomizeActionPerformed
+        XMLManager.setStringValue("entityPosObfuscation", "Random");
+    }//GEN-LAST:event_rb_ePosObfuscation_randomizeActionPerformed
+
+    private void rb_ePosObfuscation_randomizeOverlapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_randomizeOverlapActionPerformed
+        XMLManager.setStringValue("entityPosObfuscation", "RandomOverlap");
+    }//GEN-LAST:event_rb_ePosObfuscation_randomizeOverlapActionPerformed
+
+    private void comboBox_rndEntNameChoicesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBox_rndEntNameChoicesActionPerformed
+        XMLManager.setIntegerValue("entityNameObfuscationKind", comboBox_rndEntNameChoices.getSelectedIndex());
+    }//GEN-LAST:event_comboBox_rndEntNameChoicesActionPerformed
+
+    private void comboBox_rndEntNameLengthStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_comboBox_rndEntNameLengthStateChanged
+        XMLManager.setIntegerValue("entityNameObfuscationLength", (int)comboBox_rndEntNameLength.getValue());
+    }//GEN-LAST:event_comboBox_rndEntNameLengthStateChanged
+
+    private void checkbox_verboseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_verboseActionPerformed
+        XMLManager.setBooleanValue("verbose", checkbox_verbose.isSelected());
+    }//GEN-LAST:event_checkbox_verboseActionPerformed
+
+    private void bt_randomStringTestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_randomStringTestActionPerformed
+        RandomString stringGenerator = new RandomString();
+        textArea.append("\n" + stringGenerator.getRandomString(comboBox_rndEntNameChoices.getSelectedIndex(), (int)comboBox_rndEntNameLength.getValue()));
+    }//GEN-LAST:event_bt_randomStringTestActionPerformed
+
+    private void checkbox_verboseMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_checkbox_verboseMouseEntered
+        lb_info.setText("Additional messages during analysis and obfuscation");
+    }//GEN-LAST:event_checkbox_verboseMouseEntered
+
+    private void bt_randomStringTestMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bt_randomStringTestMouseEntered
+        lb_info.setText("Test entity name randomization");
+    }//GEN-LAST:event_bt_randomStringTestMouseEntered
+
+
+    private static void setLookAndFeel() {
         String lookAndFeel = XMLManager.getStringValue("lookAndFeel");
-
         try {
             switch (lookAndFeel) {
                 case "FlatMacDarkLaf":
@@ -926,6 +1067,16 @@ public class MainWindow extends javax.swing.JFrame {
         } catch( Exception ex ) {
             System.err.println( "Failed to initialize LaF" );
         }
+    }
+    
+    //Called when applying a new theme from the configuration window
+    public void restartApp() {
+        dispose();
+        SwingUtilities.invokeLater(() -> {
+            new MainWindow().setVisible(true);
+        });
+        
+        setLookAndFeel();
     }
 
     public static void main(String args[]) {
@@ -933,38 +1084,7 @@ public class MainWindow extends javax.swing.JFrame {
             System.out.println("Rebuilding XML");
         }
         
-        String lookAndFeel = XMLManager.getStringValue("lookAndFeel");
-        
-        try {
-            switch (lookAndFeel) {
-                case "FlatMacDarkLaf":
-                    UIManager.setLookAndFeel( new FlatMacDarkLaf());
-                    break;
-                case "FlatMacLightLaf":
-                    UIManager.setLookAndFeel( new FlatMacLightLaf());
-                    break;
-                case "Metal":
-                    UIManager.setLookAndFeel( new MetalLookAndFeel());
-                    break;
-                case "Nimbus":
-                    UIManager.setLookAndFeel( new NimbusLookAndFeel());
-                    break;
-                case "Motif":
-                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
-                    break;
-                case "Windows":
-                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-                    break;
-                case "Windows Classic":
-                    UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel");
-                    break;
-                default:
-                    UIManager.setLookAndFeel( new FlatMacDarkLaf());
-                    break;
-            } 
-        } catch( Exception ex ) {
-            System.err.println( "Failed to initialize LaF" );
-        }
+        setLookAndFeel();
 
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -974,8 +1094,10 @@ public class MainWindow extends javax.swing.JFrame {
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bt_obfuscate;
+    private javax.swing.JButton bt_randomStringTest;
     private javax.swing.JCheckBox checkbox_autoobfuscate;
     private javax.swing.JCheckBox checkbox_autosave;
+    private javax.swing.JCheckBox checkbox_verbose;
     private javax.swing.JComboBox<String> comboBox_rndEntNameChoices;
     private javax.swing.JLabel comboBox_rndEntNameLabel;
     private javax.swing.JSpinner comboBox_rndEntNameLength;
@@ -985,7 +1107,6 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPopupMenu.Separator jSeparator1;
@@ -993,6 +1114,7 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JLabel lb_charset;
     private javax.swing.JLabel lb_filelength;
     private javax.swing.JLabel lb_info;
+    private javax.swing.JMenuItem menuOption_about;
     private javax.swing.JMenuItem menuOption_closeFile;
     private javax.swing.JMenuItem menuOption_exit;
     private javax.swing.JMenuItem menuOption_open;
