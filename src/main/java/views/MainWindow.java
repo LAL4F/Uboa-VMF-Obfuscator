@@ -12,6 +12,9 @@ import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import config.XMLManager;
 import java.awt.Desktop;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -45,10 +48,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.LookAndFeel;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
+import utils.EntityDictionary;
 import utils.RandomString;
 import utils.SoundPlayer;
 
@@ -60,25 +66,26 @@ public class MainWindow extends javax.swing.JFrame {
     private final ImageIcon APPIMAGE = new ImageIcon(MainWindow.class.getResource("/images/appicon.png"));
     
     private final String CHARSET = "ISO-8859-1";
-    
     private String filePath, fileName, vmfContent;
-
     private int iNumEnts;
-    
     private File selectedFile;
     
+    //Swing classes
     private OpenFileProgressDialogue openFileProgressDialogue;
     private AboutDialogue aboutDialogue;
     private ConfigWindow configWindow;
     
-    private ArrayList<String> entOriginArray = new ArrayList<>();
-    private ArrayList<String> entTargetnameArray = new ArrayList<>();
-    
-    //Their position and name can be obfuscated
+    //A list of base logic entities. Their position and name can be obfuscated
+    //Any entity not in this list will still have their targetname obfuscated if possible, 
+    //but their origins will remain intact as to not affect functionality
     private ArrayList<String> logicEntities = new ArrayList<>(Arrays.asList(
-            "info_player_start"
+            "logic_case",
+            "logic_auto"
             )
         );
+    
+    private ArrayList<String> originArray = new ArrayList<>();
+    private ArrayList<String> targetnameArray = new ArrayList<>();
     
     public MainWindow() {
         initComponents();
@@ -93,7 +100,6 @@ public class MainWindow extends javax.swing.JFrame {
         loadConfig();
         
         setFileLoaded(false);
-        
         
         textArea.setText("Welcome to Uboa VMF Obfuscator. Load a VMF file to begin.");
         lb_info.setText("Hover over objects to see relevant information");
@@ -160,6 +166,8 @@ public class MainWindow extends javax.swing.JFrame {
     
     private void setFileLoaded(boolean state) {
         //After loading file, allow obfuscation
+        menuOption_save.setEnabled(state);
+        menuOption_saveAs.setEnabled(state);
         menuOption_closeFile.setEnabled(state);
         bt_obfuscate.setEnabled(state);
     }
@@ -205,6 +213,9 @@ public class MainWindow extends javax.swing.JFrame {
         checkbox_autosave = new javax.swing.JCheckBox();
         checkbox_autoobfuscate = new javax.swing.JCheckBox();
         checkbox_verbose = new javax.swing.JCheckBox();
+        bt_clearConsole = new javax.swing.JButton();
+        bt_exportLog = new javax.swing.JButton();
+        bt_copyClipboard = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         menu_file = new javax.swing.JMenu();
         menuOption_open = new javax.swing.JMenuItem();
@@ -214,7 +225,6 @@ public class MainWindow extends javax.swing.JFrame {
         menuOption_closeFile = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         menuOption_exit = new javax.swing.JMenuItem();
-        menu_edit = new javax.swing.JMenu();
         jMenu3 = new javax.swing.JMenu();
         menuOption_preferences = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
@@ -370,6 +380,7 @@ public class MainWindow extends javax.swing.JFrame {
         });
 
         comboBox_rndEntNameLength.setModel(new javax.swing.SpinnerNumberModel(5, 5, 30, 1));
+        comboBox_rndEntNameLength.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         comboBox_rndEntNameLength.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 comboBox_rndEntNameLengthStateChanged(evt);
@@ -378,7 +389,8 @@ public class MainWindow extends javax.swing.JFrame {
 
         comboBox_rndEntNameLabel.setText("Length");
 
-        bt_randomStringTest.setText("Test");
+        bt_randomStringTest.setText("Test Random");
+        bt_randomStringTest.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_randomStringTest.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 bt_randomStringTestMouseEntered(evt);
@@ -408,8 +420,8 @@ public class MainWindow extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(comboBox_rndEntNameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bt_randomStringTest)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(bt_randomStringTest, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -471,6 +483,7 @@ public class MainWindow extends javax.swing.JFrame {
         });
 
         checkbox_verbose.setText("Verbose");
+        checkbox_verbose.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         checkbox_verbose.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 checkbox_verboseMouseEntered(evt);
@@ -479,6 +492,45 @@ public class MainWindow extends javax.swing.JFrame {
         checkbox_verbose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 checkbox_verboseActionPerformed(evt);
+            }
+        });
+
+        bt_clearConsole.setText("Clear");
+        bt_clearConsole.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        bt_clearConsole.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                bt_clearConsoleMouseEntered(evt);
+            }
+        });
+        bt_clearConsole.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_clearConsoleActionPerformed(evt);
+            }
+        });
+
+        bt_exportLog.setText("Export log...");
+        bt_exportLog.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        bt_exportLog.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                bt_exportLogMouseEntered(evt);
+            }
+        });
+        bt_exportLog.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_exportLogActionPerformed(evt);
+            }
+        });
+
+        bt_copyClipboard.setText("Copy to Clipboard");
+        bt_copyClipboard.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        bt_copyClipboard.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                bt_copyClipboardMouseEntered(evt);
+            }
+        });
+        bt_copyClipboard.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_copyClipboardActionPerformed(evt);
             }
         });
 
@@ -532,9 +584,6 @@ public class MainWindow extends javax.swing.JFrame {
         menu_file.add(menuOption_exit);
 
         jMenuBar1.add(menu_file);
-
-        menu_edit.setText("Edit");
-        jMenuBar1.add(menu_edit);
 
         jMenu3.setText("Settings");
 
@@ -592,25 +641,34 @@ public class MainWindow extends javax.swing.JFrame {
                     .addComponent(textAreaScrollPane)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lb_info, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lb_filelength, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lb_charset, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(bt_obfuscate, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(checkbox_autoobfuscate)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(checkbox_autosave)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(checkbox_verbose, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lb_info, javax.swing.GroupLayout.PREFERRED_SIZE, 457, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lb_filelength, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(bt_copyClipboard)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(bt_exportLog, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(checkbox_verbose, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lb_charset, javax.swing.GroupLayout.DEFAULT_SIZE, 93, Short.MAX_VALUE)
+                            .addComponent(bt_clearConsole, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -618,16 +676,21 @@ public class MainWindow extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(bt_obfuscate)
                     .addComponent(checkbox_autosave)
-                    .addComponent(checkbox_autoobfuscate)
-                    .addComponent(checkbox_verbose))
+                    .addComponent(checkbox_autoobfuscate))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(textAreaScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 301, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(textAreaScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 270, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(bt_copyClipboard, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(bt_clearConsole)
+                        .addComponent(bt_exportLog)
+                        .addComponent(checkbox_verbose)))
+                .addGap(8, 8, 8)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lb_info)
                     .addComponent(lb_filelength)
-                    .addComponent(lb_charset))
-                .addContainerGap())
+                    .addComponent(lb_charset)))
         );
 
         pack();
@@ -673,7 +736,7 @@ public class MainWindow extends javax.swing.JFrame {
                         int totalLines = readVmfList.size();
                         String totalLinesPretty = String.format("%,d", totalLines);
                         SoundPlayer.playSound(XMLManager.getStringValue("openFileSnd"), SoundPlayer.SoundType.SND_OPENFILE);
-                        textArea.append("\nFinished opening " + fileName + ".\nTime to open file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
+                        textArea.append("\n\nFinished opening " + fileName + ".\nTime to open file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
                         textArea.append("\nTotal lines: " + totalLinesPretty);
                         
                         int beginEntitySection = readVmfList.indexOf("entity");
@@ -683,7 +746,6 @@ public class MainWindow extends javax.swing.JFrame {
                         textArea.append("\n...");
                         
                         List<String> solidSection = readVmfList.subList(0, beginEntitySection);
-                        //List<String> entitySection = readVmfList.subList(beginEntitySection, readVmfList.size());
                         
                         vmfContent = String.join("\n", solidSection);
                         
@@ -693,13 +755,16 @@ public class MainWindow extends javax.swing.JFrame {
 
                         boolean isParsingEntity = false;
                         boolean isPointEntity = false;
+                        String verboseTextToAppend = "";
                         
                         for (int i = beginEntitySection; i < readVmfList.size(); i++) {
+                            
                             //Check if reading entity
                             if (readVmfList.get(i).equals("entity")) {
                                 iNumEnts++;
                                 isParsingEntity = true;
-                                textArea.append("\n\nGot entity");
+                                
+                                //verboseTextToAppend += "\n\nGot entity"; reduntant
                             }
                             
                             if (isParsingEntity) {
@@ -711,34 +776,36 @@ public class MainWindow extends javax.swing.JFrame {
                                     while( matcher.find() ) {
                                         if (!matcher.group(1).equals("classname")) {
                                             if (logicEntities.contains(matcher.group(1))) {
-                                                textArea.append("\nFound logic entity " + matcher.group(1) + ", obtaining origins");
+                                                verboseTextToAppend += "\n\nFound logic entity " + matcher.group(1) + ", obtaining origins";
                                             } else {
                                                 isPointEntity = true;
-                                                textArea.append("\nFound brush/point entity " + matcher.group(1) + ", ignoring origins");
+                                                verboseTextToAppend += "\n\nFound brush/point entity " + matcher.group(1) + ", ignoring origins";
                                             }
                                         }
                                     }
                                 }
 
-                                //Get targetname
+                                //Get targetname regardless of entity class
                                 if (readVmfList.get(i).contains("\"targetname\"")) {
                                     Pattern pattern = Pattern.compile("\"([^\"]*)\"");
                                     Matcher matcher = pattern.matcher(readVmfList.get(i));
 
                                     while( matcher.find() ) {
                                         if (!matcher.group(1).equals("targetname"))
-                                            textArea.append("\nFound targetname " + matcher.group(1) );
+                                            verboseTextToAppend += "\n  -Found targetname " + matcher.group(1);
+                                            targetnameArray.add(matcher.group(1));
                                     }
                                 }
                                 
-                                //Get origin
+                                //Get origin only if the found entity is a logic entity
                                 if ((!isPointEntity) && (readVmfList.get(i).contains("\"origin\""))) {
                                     Pattern pattern = Pattern.compile("\"([^\"]*)\"");
                                     Matcher matcher = pattern.matcher(readVmfList.get(i));
 
                                     while( matcher.find() ) {
                                         if (!matcher.group(1).equals("origin"))
-                                            textArea.append("\nFound origin " + matcher.group(1) );
+                                            verboseTextToAppend += "\n  -Found origin " + matcher.group(1);
+                                            originArray.add(matcher.group(1));
                                     }
                                 }
                             }
@@ -748,16 +815,19 @@ public class MainWindow extends javax.swing.JFrame {
                                 if ((isParsingEntity) && (readVmfList.get(i).equals("}")) && (readVmfList.get(i + 1).equals("entity")) || (readVmfList.get(i + 1).equals("cameras")) ) {
                                     isParsingEntity = false;
                                     isPointEntity = false;
-                                    textArea.append("\nFinished parsing entity");
+                                    verboseTextToAppend += "\nFinished parsing entity";
                                 }
-                            } catch (IndexOutOfBoundsException e) {
-                                
-                            }
+                            } catch (IndexOutOfBoundsException e) {}
 
                             vmfContent += readVmfList.get(i);
                             openFileProgressDialogue.setStatusText("Line " + String.format("%,d", i) + " of " + totalLinesPretty);
                             openFileProgressDialogue.setProgressBarValue(i);
                             openFileProgressDialogue.appendTextArea(readVmfList.get(i));     
+                            
+                            if (checkbox_verbose.isSelected()) {
+                                textArea.append(verboseTextToAppend);
+                                verboseTextToAppend = "";
+                            }
                         }
                         
                         String fileSizePretty = String.format("%.2f", Float.valueOf(selectedFile.length()) / 1024000);
@@ -765,7 +835,7 @@ public class MainWindow extends javax.swing.JFrame {
                         setTitle(fileName + " - " + fileSizePretty + " MB - Uboa VMF Obfuscator");
                         
                         SoundPlayer.playSound(XMLManager.getStringValue("analyzeFileSnd"), SoundPlayer.SoundType.SND_ANALYZEFILE);
-                        textArea.append("\nFinished reading " + fileName + "\n\nTime to read file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
+                        textArea.append("\n\nFinished reading " + fileName + "\n\nTime to read file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
                         textArea.append("\nNumber of entities: " + iNumEnts);
                         setFileLoaded(true);
                         openFileProgressDialogue.setVisible(false);
@@ -1023,16 +1093,66 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void bt_randomStringTestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_randomStringTestActionPerformed
         RandomString stringGenerator = new RandomString();
-        textArea.append("\n" + stringGenerator.getRandomString(comboBox_rndEntNameChoices.getSelectedIndex(), (int)comboBox_rndEntNameLength.getValue()));
+        textArea.append("\n" 
+                + stringGenerator.getRandomString(comboBox_rndEntNameChoices.getSelectedIndex(), (int)comboBox_rndEntNameLength.getValue())
+                + " (" + comboBox_rndEntNameChoices.getSelectedItem().toString() + ", " + comboBox_rndEntNameLength.getValue().toString() + " entropy)");
     }//GEN-LAST:event_bt_randomStringTestActionPerformed
 
     private void checkbox_verboseMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_checkbox_verboseMouseEntered
-        lb_info.setText("Additional messages during analysis and obfuscation");
+        lb_info.setText("Additional console messages during analysis and obfuscation");
     }//GEN-LAST:event_checkbox_verboseMouseEntered
 
     private void bt_randomStringTestMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bt_randomStringTestMouseEntered
         lb_info.setText("Test entity name randomization");
     }//GEN-LAST:event_bt_randomStringTestMouseEntered
+
+    private void bt_exportLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_exportLogActionPerformed
+        JnaFileChooser fileChooser = new JnaFileChooser();
+        fileChooser.addFilter("Plain Text File", "txt");
+
+        if (fileChooser.showSaveDialog(this)) {
+            File file = fileChooser.getSelectedFile();
+            
+            String consoleContent = textArea.getText();
+            BufferedWriter bw = null;
+            try {
+                bw = new BufferedWriter(new FileWriter(file.getAbsolutePath() + ".txt"));
+                bw.write(consoleContent);
+            } catch (IOException ioe) {
+                System.out.println("IO Exception");
+            } finally {
+                if (bw != null) {
+                    try {
+                        bw.close();
+                    } catch (IOException ioe) {
+                        System.out.println("IO Exception");
+                    }
+                }
+            }
+        }
+    }//GEN-LAST:event_bt_exportLogActionPerformed
+
+    private void bt_copyClipboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_copyClipboardActionPerformed
+        Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+        StringSelection testData = new StringSelection(textArea.getText());
+        c.setContents(testData, testData);
+    }//GEN-LAST:event_bt_copyClipboardActionPerformed
+
+    private void bt_clearConsoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_clearConsoleActionPerformed
+        textArea.setText("");
+    }//GEN-LAST:event_bt_clearConsoleActionPerformed
+
+    private void bt_clearConsoleMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bt_clearConsoleMouseEntered
+        lb_info.setText("Clear the console");
+    }//GEN-LAST:event_bt_clearConsoleMouseEntered
+
+    private void bt_copyClipboardMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bt_copyClipboardMouseEntered
+        lb_info.setText("Copy the entire console output to the clipboard");
+    }//GEN-LAST:event_bt_copyClipboardMouseEntered
+
+    private void bt_exportLogMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bt_exportLogMouseEntered
+        lb_info.setText("Export the console output as a text file");
+    }//GEN-LAST:event_bt_exportLogMouseEntered
 
 
     private static void setLookAndFeel() {
@@ -1084,6 +1204,10 @@ public class MainWindow extends javax.swing.JFrame {
             System.out.println("Rebuilding XML");
         }
         
+        if (!EntityDictionary.edictExists()) {
+            System.out.println("Rebuilding edict");
+        }
+        
         setLookAndFeel();
 
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -1093,6 +1217,9 @@ public class MainWindow extends javax.swing.JFrame {
         });
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bt_clearConsole;
+    private javax.swing.JButton bt_copyClipboard;
+    private javax.swing.JButton bt_exportLog;
     private javax.swing.JButton bt_obfuscate;
     private javax.swing.JButton bt_randomStringTest;
     private javax.swing.JCheckBox checkbox_autoobfuscate;
@@ -1122,7 +1249,6 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuOption_preferences;
     private javax.swing.JMenuItem menuOption_save;
     private javax.swing.JMenuItem menuOption_saveAs;
-    private javax.swing.JMenu menu_edit;
     private javax.swing.JMenu menu_file;
     private javax.swing.JMenu menu_help;
     private javax.swing.JRadioButton rb_eNameObfuscation_exchange;

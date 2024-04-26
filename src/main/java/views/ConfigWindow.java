@@ -13,6 +13,7 @@ public class ConfigWindow extends javax.swing.JDialog {
     private CardLayout navigator;
     
     private Conf_AppearancePanel appearancePanel;
+    private Conf_EntDictionary eDictPanel;
     private Conf_PopupPanel popupPanel;
     private Conf_SoundPanel soundPanel;
     
@@ -32,11 +33,13 @@ public class ConfigWindow extends javax.swing.JDialog {
 
         //Instance the panels
         appearancePanel = new Conf_AppearancePanel(this);
+        eDictPanel = new Conf_EntDictionary(this);
         soundPanel = new Conf_SoundPanel(this);
         popupPanel = new Conf_PopupPanel(this);
         
         //Add panels to container
         panelContainer.add(appearancePanel, "appearancePanel");
+        panelContainer.add(eDictPanel, "eDictPanel");
         panelContainer.add(soundPanel, "soundPanel");
         panelContainer.add(popupPanel, "popupPanel");
     }
@@ -60,7 +63,7 @@ public class ConfigWindow extends javax.swing.JDialog {
         setResizable(false);
 
         optionList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Appearance", "Sounds", "Popups", " " };
+            String[] strings = { "Appearance", "E. Dictionary", "Sounds", "Popups", "Database", " " };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
@@ -105,6 +108,9 @@ public class ConfigWindow extends javax.swing.JDialog {
         switch (optionList.getSelectedValue()) {
             case "Appearance":
                 navigate("appearancePanel");
+                break;
+            case "E. Dictionary":
+                navigate("eDictPanel");
                 break;
             case "Sounds":
                 navigate("soundPanel");
