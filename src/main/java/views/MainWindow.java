@@ -44,6 +44,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,7 +67,7 @@ public class MainWindow extends javax.swing.JFrame {
     private final ImageIcon APPIMAGE = new ImageIcon(MainWindow.class.getResource("/images/appicon.png"));
     
     private final String CHARSET = "ISO-8859-1";
-    private String filePath, fileName, vmfContent;
+    private String filePath, fileName, vmfContent, rebuiltVmf;
     private int iNumEnts;
     private File selectedFile;
     
@@ -75,17 +76,16 @@ public class MainWindow extends javax.swing.JFrame {
     private AboutDialogue aboutDialogue;
     private ConfigWindow configWindow;
     
-    //A list of base logic entities. Their position and name can be obfuscated
-    //Any entity not in this list will still have their targetname obfuscated if possible, 
-    //but their origins will remain intact as to not affect functionality
-    private ArrayList<String> logicEntities = new ArrayList<>(Arrays.asList(
-            "logic_case",
-            "logic_auto"
-            )
-        );
-    
+    //Stored entity origins and targetnames
     private ArrayList<String> originArray = new ArrayList<>();
     private ArrayList<String> targetnameArray = new ArrayList<>();
+    
+    //Obfuscation methods
+    private int originObfuscationKind;
+    private int targetnameObfuscationKind;
+    
+    //The VMF that is read from a file, a list of strings
+    List<String> readVmfList;
     
     public MainWindow() {
         initComponents();
@@ -94,6 +94,9 @@ public class MainWindow extends javax.swing.JFrame {
         
         openFileProgressDialogue = new OpenFileProgressDialogue(this, false);
         setRandomEntNameParametersEditable(false);
+
+        originObfuscationKind = 0;
+        targetnameObfuscationKind = 0;
         
         setupIcons();
         setupRadioButtons();
@@ -124,12 +127,15 @@ public class MainWindow extends javax.swing.JFrame {
                 rb_ePosObfuscation_none.setSelected(true);
                 break;
             case "Overlap":
+                originObfuscationKind = 1;
                 rb_ePosObfuscation_overlap.setSelected(true);
                 break;
             case "Random":
+                originObfuscationKind = 2;
                 rb_ePosObfuscation_randomize.setSelected(true);
                 break;
             case "RandomOverlap":
+                originObfuscationKind = 3;
                 rb_ePosObfuscation_randomizeOverlap.setSelected(true);
                 break;
         }
@@ -139,9 +145,11 @@ public class MainWindow extends javax.swing.JFrame {
                 rb_eNameObfuscation_none.setSelected(true);
                 break;
             case "Exchange":
+                targetnameObfuscationKind = 1;
                 rb_eNameObfuscation_exchange.setSelected(true);
                 break;
             case "Random":
+                targetnameObfuscationKind = 2;
                 rb_eNameObfuscation_randomize.setSelected(true);
                 setRandomEntNameParametersEditable(true);
                 break;
@@ -165,9 +173,7 @@ public class MainWindow extends javax.swing.JFrame {
     }
     
     private void setFileLoaded(boolean state) {
-        //After loading file, allow obfuscation
-        menuOption_save.setEnabled(state);
-        menuOption_saveAs.setEnabled(state);
+        //After loading file, allow obfuscation as well as closing the file
         menuOption_closeFile.setEnabled(state);
         bt_obfuscate.setEnabled(state);
     }
@@ -182,6 +188,13 @@ public class MainWindow extends javax.swing.JFrame {
         comboBox_rndEntNameChoices.setEnabled(state);
         comboBox_rndEntNameLength.setEnabled(state);
         comboBox_rndEntNameLabel.setEnabled(state);
+    }
+    
+    //Add text to the textArea, then automatically scroll down
+    //to the bottom
+    private void addText(String string) {
+        textArea.append(string);
+        textArea.setCaretPosition(textArea.getDocument().getLength());
     }
     
     @SuppressWarnings("unchecked")
@@ -725,25 +738,28 @@ public class MainWindow extends javax.swing.JFrame {
     
     private void asyncReadVMF() throws ExecutionException {
         try {
-            Thread vmfReaderThread = new Thread(new Runnable() {
+            Thread vmfReaderThread;
+            vmfReaderThread = new Thread(new Runnable() {
                 public void run() {
                     try {
+                        ArrayList<String> eDidct = EntityDictionary.getEdict();
+                        
                         textArea.setText("Opening " + fileName + "\n...");
                         long startTime = System.nanoTime();
                         
-                        List<String> readVmfList = Files.readAllLines(Paths.get(filePath), Charset.forName(CHARSET));
+                        readVmfList = Files.readAllLines(Paths.get(filePath), Charset.forName(CHARSET));
                         
                         int totalLines = readVmfList.size();
                         String totalLinesPretty = String.format("%,d", totalLines);
                         SoundPlayer.playSound(XMLManager.getStringValue("openFileSnd"), SoundPlayer.SoundType.SND_OPENFILE);
-                        textArea.append("\n\nFinished opening " + fileName + ".\nTime to open file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
-                        textArea.append("\nTotal lines: " + totalLinesPretty);
+                        addText("\n\nFinished opening " + fileName + ".\nTime to open file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
+                        addText("\nTotal lines: " + totalLinesPretty);
                         
                         int beginEntitySection = readVmfList.indexOf("entity");
                         float percentageLinesSkipped = (float)beginEntitySection / totalLines * 100;
-                        textArea.append("\n\nDon't care about solids, moving to entity section, skipping " +  String.format("%,d",beginEntitySection) + " lines ("+String.format("%.2f", percentageLinesSkipped) + "% of all lines)");
-                        textArea.append("\nAnalyzing entity section... working, please wait...");
-                        textArea.append("\n...");
+                        addText("\n\nDon't care about solids, moving to entity section, skipping " +  String.format("%,d",beginEntitySection) + " lines ("+String.format("%.2f", percentageLinesSkipped) + "% of all lines)");
+                        addText("\nAnalyzing entity section... working, please wait...");
+                        addText("\n...");
                         
                         List<String> solidSection = readVmfList.subList(0, beginEntitySection);
                         
@@ -763,8 +779,6 @@ public class MainWindow extends javax.swing.JFrame {
                             if (readVmfList.get(i).equals("entity")) {
                                 iNumEnts++;
                                 isParsingEntity = true;
-                                
-                                //verboseTextToAppend += "\n\nGot entity"; reduntant
                             }
                             
                             if (isParsingEntity) {
@@ -775,7 +789,7 @@ public class MainWindow extends javax.swing.JFrame {
 
                                     while( matcher.find() ) {
                                         if (!matcher.group(1).equals("classname")) {
-                                            if (logicEntities.contains(matcher.group(1))) {
+                                            if (eDidct.contains(matcher.group(1))) {
                                                 verboseTextToAppend += "\n\nFound logic entity " + matcher.group(1) + ", obtaining origins";
                                             } else {
                                                 isPointEntity = true;
@@ -791,9 +805,10 @@ public class MainWindow extends javax.swing.JFrame {
                                     Matcher matcher = pattern.matcher(readVmfList.get(i));
 
                                     while( matcher.find() ) {
-                                        if (!matcher.group(1).equals("targetname"))
+                                        if (!matcher.group(1).equals("targetname")) {
                                             verboseTextToAppend += "\n  -Found targetname " + matcher.group(1);
-                                            targetnameArray.add(matcher.group(1));
+                                            targetnameArray.add(matcher.group(1));  
+                                        }
                                     }
                                 }
                                 
@@ -803,9 +818,10 @@ public class MainWindow extends javax.swing.JFrame {
                                     Matcher matcher = pattern.matcher(readVmfList.get(i));
 
                                     while( matcher.find() ) {
-                                        if (!matcher.group(1).equals("origin"))
+                                        if (!matcher.group(1).equals("origin")) {
                                             verboseTextToAppend += "\n  -Found origin " + matcher.group(1);
                                             originArray.add(matcher.group(1));
+                                        }
                                     }
                                 }
                             }
@@ -819,13 +835,13 @@ public class MainWindow extends javax.swing.JFrame {
                                 }
                             } catch (IndexOutOfBoundsException e) {}
 
-                            vmfContent += readVmfList.get(i);
+                            vmfContent += readVmfList.get(i) + "\n";
                             openFileProgressDialogue.setStatusText("Line " + String.format("%,d", i) + " of " + totalLinesPretty);
                             openFileProgressDialogue.setProgressBarValue(i);
                             openFileProgressDialogue.appendTextArea(readVmfList.get(i));     
                             
                             if (checkbox_verbose.isSelected()) {
-                                textArea.append(verboseTextToAppend);
+                                addText(verboseTextToAppend);
                                 verboseTextToAppend = "";
                             }
                         }
@@ -835,8 +851,8 @@ public class MainWindow extends javax.swing.JFrame {
                         setTitle(fileName + " - " + fileSizePretty + " MB - Uboa VMF Obfuscator");
                         
                         SoundPlayer.playSound(XMLManager.getStringValue("analyzeFileSnd"), SoundPlayer.SoundType.SND_ANALYZEFILE);
-                        textArea.append("\n\nFinished reading " + fileName + "\n\nTime to read file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
-                        textArea.append("\nNumber of entities: " + iNumEnts);
+                        addText("\n\nFinished reading " + fileName + "\n\nTime to read file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
+                        addText("\nNumber of entities: " + iNumEnts);
                         setFileLoaded(true);
                         openFileProgressDialogue.setVisible(false);
                         openFileProgressDialogue.dispose();
@@ -857,6 +873,54 @@ public class MainWindow extends javax.swing.JFrame {
     }
     
     private void obfuscateVMF() {
+        rebuiltVmf = vmfContent;
+        
+        ArrayList<String> originArrayTemp = originArray;
+        
+        Random rnd = new Random();
+        int randomOrigin = 0;
+        
+        addText("\n\nStored Origins:\n");
+        for (String origin : originArray) {
+            addText(origin + "\n");
+        }
+        
+        if (originObfuscationKind != 0) {
+            for (String origin : originArray) {
+                String regex = "(." + origin + "?)";
+                switch (originObfuscationKind) {
+                    case 1: //Overlap
+                        addText("\nObfuscated origin " + origin + " using overlap method");
+                        rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArray.getFirst());
+                        break;
+                    case 2: //Randomized
+                        addText("\nObfuscated origin " + origin + "  using random method");
+                        randomOrigin = rnd.nextInt(originArrayTemp.size());
+                        addText(", random index " + randomOrigin);
+                        rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArrayTemp.get(randomOrigin));
+                        //originArrayTemp.remove(randomOrigin);
+                        break;
+                    case 3: //Randomize w/ Overlap
+                        addText("\nObfuscated origin " + origin + " using random w/ overlap method");
+                        randomOrigin = rnd.nextInt(originArray.size());
+                        rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArray.get(randomOrigin));
+                        break;
+                }
+            }  
+        } else {
+            addText("\nSkipping origin obfuscation");
+        }
+
+        
+        /*
+        addText("\nTargetnames:\n");
+        for (String targetname : targetnameArray) {
+            addText(targetname + "\n");
+            String regex = "(." + targetname + "?)";
+            rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + targetnameArray.getFirst());
+        }
+        */
+        
         setFileObfuscated(true);
         SoundPlayer.playSound(XMLManager.getStringValue("obfuscateFileSnd"), SoundPlayer.SoundType.SND_OBFUSCATE);
         System.out.print("Obfuscated VMF");
@@ -875,7 +939,7 @@ public class MainWindow extends javax.swing.JFrame {
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileToWrite));
             
-            bufferedWriter.write(vmfContent);
+            bufferedWriter.write(rebuiltVmf);
             bufferedWriter.close();
             SoundPlayer.playSound(XMLManager.getStringValue("saveFileSnd"), SoundPlayer.SoundType.SND_SAVE);
             JCheckBox checkbox = new JCheckBox("Do not show save messages ever again");
@@ -916,7 +980,7 @@ public class MainWindow extends javax.swing.JFrame {
                     bufferedWriter = new BufferedWriter(new FileWriter(fileToWrite + ".vmf"));
                 }
                 
-                bufferedWriter.write(vmfContent);
+                bufferedWriter.write(rebuiltVmf);
                 bufferedWriter.close();
                 
                 SoundPlayer.playSound(XMLManager.getStringValue("saveFileSnd"), SoundPlayer.SoundType.SND_SAVE);
@@ -947,10 +1011,12 @@ public class MainWindow extends javax.swing.JFrame {
         setTitle("Uboa VMF Obfuscator");
                 
         iNumEnts = 0;
-        
+        originArray.clear();
+        targetnameArray.clear();
         filePath = "";
         fileName = "";
         vmfContent = "";
+        rebuiltVmf = "";
          
         selectedFile = null;
         
@@ -1001,10 +1067,6 @@ public class MainWindow extends javax.swing.JFrame {
             //is rebuilt using the stream and opened by the OS
             
             //as for the path of the temp file, it must be the same folder as the jar file
-            //back home the path of the temp file could be something like /temp/manual.pdf, which is ideal
-            //but on my school laptop it just doesnt work and throws a NoSuchFileException
-            //this is so sad I feel like crying
-            
             InputStream inputStream = MainWindow.class.getResourceAsStream("/pdf/manual.pdf");
             File file = new File("manual.pdf");
             Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -1026,16 +1088,19 @@ public class MainWindow extends javax.swing.JFrame {
     private void rb_eNameObfuscation_randomizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_eNameObfuscation_randomizeActionPerformed
         setRandomEntNameParametersEditable(true);
         XMLManager.setStringValue("entityNameObfuscation", "Random");
+        targetnameObfuscationKind = 2;
     }//GEN-LAST:event_rb_eNameObfuscation_randomizeActionPerformed
 
     private void rb_eNameObfuscation_exchangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_eNameObfuscation_exchangeActionPerformed
         setRandomEntNameParametersEditable(false);
         XMLManager.setStringValue("entityNameObfuscation", "Exchange");
+        targetnameObfuscationKind = 1;
     }//GEN-LAST:event_rb_eNameObfuscation_exchangeActionPerformed
 
     private void rb_eNameObfuscation_noneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_eNameObfuscation_noneActionPerformed
         setRandomEntNameParametersEditable(false);
         XMLManager.setStringValue("entityNameObfuscation", "None");
+        targetnameObfuscationKind = 0;
     }//GEN-LAST:event_rb_eNameObfuscation_noneActionPerformed
 
     private void menuOption_aboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuOption_aboutActionPerformed
@@ -1065,18 +1130,22 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void rb_ePosObfuscation_noneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_noneActionPerformed
         XMLManager.setStringValue("entityPosObfuscation", "None");
+        originObfuscationKind = 0;
     }//GEN-LAST:event_rb_ePosObfuscation_noneActionPerformed
 
     private void rb_ePosObfuscation_overlapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_overlapActionPerformed
         XMLManager.setStringValue("entityPosObfuscation", "Overlap");
+        originObfuscationKind = 1;
     }//GEN-LAST:event_rb_ePosObfuscation_overlapActionPerformed
 
     private void rb_ePosObfuscation_randomizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_randomizeActionPerformed
         XMLManager.setStringValue("entityPosObfuscation", "Random");
+        originObfuscationKind = 2;
     }//GEN-LAST:event_rb_ePosObfuscation_randomizeActionPerformed
 
     private void rb_ePosObfuscation_randomizeOverlapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_randomizeOverlapActionPerformed
         XMLManager.setStringValue("entityPosObfuscation", "RandomOverlap");
+        originObfuscationKind = 3;
     }//GEN-LAST:event_rb_ePosObfuscation_randomizeOverlapActionPerformed
 
     private void comboBox_rndEntNameChoicesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBox_rndEntNameChoicesActionPerformed
@@ -1093,7 +1162,7 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void bt_randomStringTestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_randomStringTestActionPerformed
         RandomString stringGenerator = new RandomString();
-        textArea.append("\n" 
+        addText("\n" 
                 + stringGenerator.getRandomString(comboBox_rndEntNameChoices.getSelectedIndex(), (int)comboBox_rndEntNameLength.getValue())
                 + " (" + comboBox_rndEntNameChoices.getSelectedItem().toString() + ", " + comboBox_rndEntNameLength.getValue().toString() + " entropy)");
     }//GEN-LAST:event_bt_randomStringTestActionPerformed
