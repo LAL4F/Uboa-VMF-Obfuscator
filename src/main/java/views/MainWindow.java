@@ -197,6 +197,13 @@ public class MainWindow extends javax.swing.JFrame {
         textArea.setCaretPosition(textArea.getDocument().getLength());
     }
     
+    private void addVerbose(String string) {
+        if (checkbox_verbose.isSelected()) {
+            textArea.append(string);
+            textArea.setCaretPosition(textArea.getDocument().getLength());    
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -874,43 +881,149 @@ public class MainWindow extends javax.swing.JFrame {
     
     private void obfuscateVMF() {
         rebuiltVmf = vmfContent;
+        ArrayList<Integer> spentOriginsIndexes = new ArrayList<>();
+        ArrayList<String> sanitizedOrigins = new ArrayList<>();
         
-        ArrayList<String> originArrayTemp = originArray;
+        ArrayList<Integer> spentTargetnameIndexes = new ArrayList<>();
+        ArrayList<String> sanitizedTargetnames = new ArrayList<>();
         
-        Random rnd = new Random();
-        int randomOrigin = 0;
+        Random rnd =  new Random();
+        int randomIndex = 0;
+        String sanitizedString = "";
+        String regex = "";
+        String doubleQuoteRegex = ""; //Workaround because this thing likes to add unnecessary quotes
         
         addText("\n\nStored Origins:\n");
         for (String origin : originArray) {
             addText(origin + "\n");
         }
         
+        if (originObfuscationKind == 2) { //Randomized origins
+            //We must first sanitize origins stored in the VMF
+            //to prevent horrible things from happening, like two entities
+            //having their origins set to the same value, which
+            //this obfuscation method should prevent
+            addText("\nOrigin randomization method: sanitizing origins\n");
+            for (String origin : originArray) {
+                regex = "(." + origin + "?)";
+                RandomString randomString = new RandomString();
+                
+                do {
+                    sanitizedString = randomString.getRandomString(1, 20);
+                    if (sanitizedOrigins.contains(sanitizedString)) addText("\nSanitized origin " + sanitizedString + " is already in use, rerolling");
+                } while (sanitizedOrigins.contains(sanitizedString));
+                
+                addText("Origin " + origin + " sanitized with string " + sanitizedString + "\n");
+                rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + sanitizedString);
+                sanitizedOrigins.add(sanitizedString);
+            }
+        }
+        
+        int sanitizedOriginsIndex = 0;
         if (originObfuscationKind != 0) {
             for (String origin : originArray) {
-                String regex = "(." + origin + "?)";
+                regex = "(." + origin + "?)";
+                
                 switch (originObfuscationKind) {
                     case 1: //Overlap
-                        addText("\nObfuscated origin " + origin + " using overlap method");
+                        addText("\nObfuscating origin " + origin + " using overlap method");
                         rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArray.getFirst());
+                        doubleQuoteRegex = "(. \"\"" + originArray.getFirst() + "?)";
+                        rebuiltVmf = rebuiltVmf.replaceAll(doubleQuoteRegex, "\" \"" + originArray.getFirst());
                         break;
                     case 2: //Randomized
-                        addText("\nObfuscated origin " + origin + "  using random method");
-                        randomOrigin = rnd.nextInt(originArrayTemp.size());
-                        addText(", random index " + randomOrigin);
-                        rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArrayTemp.get(randomOrigin));
-                        //originArrayTemp.remove(randomOrigin);
+                        regex = "(." + sanitizedOrigins.get(sanitizedOriginsIndex) + "?)";
+                        addText("\nObfuscating origin " + sanitizedOrigins.get(sanitizedOriginsIndex) + "  using random method");
+                        do {
+                            randomIndex = rnd.nextInt(originArray.size());
+                            if (spentOriginsIndexes.contains(randomIndex)) addText("\nOrigin index " + randomIndex + " is already in use, rerolling");
+                        } while (spentOriginsIndexes.contains(randomIndex));
+                        
+                        addText("\nFound proper index " + randomIndex);
+                        addText("\nReplacing sanitized origin " + sanitizedOrigins.get(sanitizedOriginsIndex) + " with " + originArray.get(randomIndex));
+                        
+                        rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArray.get(randomIndex));
+                        
+                        doubleQuoteRegex = "(. \"\"" + originArray.get(randomIndex) + "?)";
+                        rebuiltVmf = rebuiltVmf.replaceAll(doubleQuoteRegex, "\" \"" + originArray.get(randomIndex));
+                        spentOriginsIndexes.add(randomIndex);
+                        addText("\nAdded " + randomIndex + " to spent origin list\n");
+                        sanitizedOriginsIndex++;
                         break;
                     case 3: //Randomize w/ Overlap
-                        addText("\nObfuscated origin " + origin + " using random w/ overlap method");
-                        randomOrigin = rnd.nextInt(originArray.size());
-                        rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArray.get(randomOrigin));
+                        addText("\nObfuscating origin " + origin + " using random w/ overlap method");
+                        randomIndex = rnd.nextInt(originArray.size());
+                        addText(", random index " + randomIndex);
+                        rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArray.get(randomIndex));
+                        
+                        doubleQuoteRegex = "(. \"\"" + originArray.get(randomIndex) + "?)";
+                        rebuiltVmf = rebuiltVmf.replaceAll(doubleQuoteRegex, "\" \"" + originArray.get(randomIndex));
                         break;
                 }
             }  
+            addText("\nFinished obfuscating origins\n");
         } else {
             addText("\nSkipping origin obfuscation");
         }
 
+        addText("\n\nStored targetnames:\n");
+        for (String targetname : targetnameArray) {
+            addText(targetname + "\n");
+        }
+        
+        if (targetnameObfuscationKind == 1) { //Exchange targetnames
+            //Sanitize targetnames to ensure that there's no repetition unless
+            //stated so, for example, when two entities share the same 
+            //targetname 
+            addText("\nTargetname exchange method: sanitizing targetnames\n");
+            for (String targetname : targetnameArray) {
+                regex = " \"" + targetname;
+                RandomString randomString = new RandomString();
+                
+                do {
+                    sanitizedString = randomString.getRandomString(1, 20);
+                    if (sanitizedOrigins.contains(sanitizedString)) addText("\nSanitized origin " + sanitizedString + " is already in use, rerolling");
+                } while (sanitizedOrigins.contains(sanitizedString));
+                
+                addText("Targetname " + targetname + " sanitized with string " + sanitizedString + "\n");
+                rebuiltVmf = rebuiltVmf.replaceAll(regex, " \"" + sanitizedString);
+                sanitizedTargetnames.add(sanitizedString);
+            }
+        }
+        
+        int targetnameArrayIndex = 0;
+        if (targetnameObfuscationKind != 0) {
+            for (String targetname : targetnameArray) {
+                switch (targetnameObfuscationKind) {
+                    case 1: //Exchange
+                        regex = sanitizedTargetnames.get(targetnameArrayIndex);
+                        
+                        addText("\nObfuscating targetname " + sanitizedTargetnames.get(targetnameArrayIndex) + " using exchange method");
+                        do {
+                            randomIndex = rnd.nextInt(targetnameArray.size());
+                            if (spentTargetnameIndexes.contains(randomIndex)) addVerbose("\nOrigin index " + randomIndex + " is already in use, rerolling");
+                        } while (spentTargetnameIndexes.contains(randomIndex));
+                        
+                        addText("\nFound proper index " + randomIndex);
+                        addText("\nReplacing sanitized targetname " + sanitizedTargetnames.get(targetnameArrayIndex) + " with " + targetnameArray.get(randomIndex));
+                        
+                        rebuiltVmf = rebuiltVmf.replaceAll(regex, targetnameArray.get(randomIndex));
+                        
+                        //doubleQuoteRegex = "(. \"\"" + targetnameArray.get(randomIndex) + "?)";
+                        //rebuiltVmf = rebuiltVmf.replaceAll(doubleQuoteRegex, "\" \"" + targetnameArray.get(randomIndex));
+                        
+                        spentTargetnameIndexes.add(randomIndex);
+                        addText("\nAdded " + randomIndex + " to spent targetname list\n");
+                        targetnameArrayIndex++;
+                        break;  
+                    case 2: //Randomize
+                        break;
+                }
+            }  
+            addText("\nFinished obfuscating targetnames\n");
+        } else {
+            addText("\nSkipping targetname obfuscation");
+        }
         
         /*
         addText("\nTargetnames:\n");
@@ -921,9 +1034,9 @@ public class MainWindow extends javax.swing.JFrame {
         }
         */
         
+        addText("\nObfuscated VMF! file is ready to save");
         setFileObfuscated(true);
         SoundPlayer.playSound(XMLManager.getStringValue("obfuscateFileSnd"), SoundPlayer.SoundType.SND_OBFUSCATE);
-        System.out.print("Obfuscated VMF");
         if (XMLManager.getBooleanValue("autosave")) {saveFile();}
     }
     
