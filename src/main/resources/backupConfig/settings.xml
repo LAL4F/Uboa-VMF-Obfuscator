@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><settings>
     <version value="1.0"/>
+    <width value="1100"/>
+    <height value="700"/>
     <!--Sounds-->
     <enableSnd value="true"/>
     <masterVol value="100"/>
@@ -30,12 +32,18 @@
     <entityNameObfuscation value="None"/>
     <entityNameObfuscationKind value="0"/>
     <entityNameObfuscationLength value="5"/>
-    <autoObfuscate value="false"/>
-    <autosave value="false"/>
     <verbose value="false"/>
+    <inputType value="0"/>
+    <inputPath value="Insert a file path here"/>
+    <outputType value="0"/>
+    <outputSubfolder value="uboa_obf"/>
+    <outputWorkfolder value="$DOCUMENTS"/>
     <!--Popups-->
     <showPopupOnAnalyze value="true"/>
     <showPopupOnObfuscate value="true"/>
     <showPopupOnSave value="true"/>
     <showPopupOnException value="true"/>
+    <!--Hammer path-->
+    <preferFileTypeAssociation value="false"/>
+    <hammerPath value="Path to executable (ex: /bin/hammer.exe"/>
 </settings>

@@ -2,9 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JDialog.java to edit this template
  */
-package views;
+package dialogs;
 
+import views2.Conf_SoundPanel;
 import config.XMLManager;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -22,6 +25,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
 import utils.SoundPlayer;
 
 public class SoundBrowserDialogue extends javax.swing.JDialog {
@@ -38,6 +42,13 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
         setupWindowTitle();
         loadConfig();
         refreshSounds();
+
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                SoundPlayer.killAllSound();
+            }
+       });
     }
     
     private void setupWindowTitle() {
@@ -102,7 +113,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
         try {
             DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(dir));
             for (Path path : stream) {
-                if ((!Files.isDirectory(path)) && (path.getFileName().toString().contains(".wav"))) {
+                if ((!Files.isDirectory(path)) && (path.getFileName().toString().toUpperCase().contains(".WAV"))) {
                     fileSet.add(path.toString());
                 }
             }
@@ -132,7 +143,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
             case 0: //All
                 for (Set<String> set : allSndFileSet) {
                     for (String string : set) {
-                        if (string.contains(tf_fileNameFilter.getText())) {
+                        if (string.toUpperCase().contains(tf_fileNameFilter.getText().toUpperCase())) {
                             listModel.addElement(string);
                         }
                     }
@@ -142,7 +153,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
                 break;
             case 1: //Internal
                 for (String string : internalSndSet) {
-                    if (string.contains(tf_fileNameFilter.getText())) {
+                    if (string.toUpperCase().contains(tf_fileNameFilter.getText().toUpperCase())) {
                         listModel.addElement(string);
                     }
                 }
@@ -151,7 +162,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
                 break;
             case 2: //External
                 for (String string : externalSndSet) {
-                    if (string.contains(tf_fileNameFilter.getText())) {
+                    if (string.toUpperCase().contains(tf_fileNameFilter.getText().toUpperCase())) {
                         listModel.addElement(string);
                     }
                 }
@@ -255,6 +266,11 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
         jPanel1.setLayout(new java.awt.GridLayout(0, 3, 25, 25));
 
         bt_confirm.setText("Ok");
+        bt_confirm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_confirmActionPerformed(evt);
+            }
+        });
         jPanel1.add(bt_confirm);
 
         bt_previewSnd.setText("Preview");
@@ -266,6 +282,11 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
         jPanel1.add(bt_previewSnd);
 
         bt_stopSnd.setText("Stop");
+        bt_stopSnd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_stopSndActionPerformed(evt);
+            }
+        });
         jPanel1.add(bt_stopSnd);
 
         bt_cancel.setText("Cancel");
@@ -403,6 +424,16 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
         }
 
     }//GEN-LAST:event_bt_previewSndActionPerformed
+
+    private void bt_stopSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_stopSndActionPerformed
+        SoundPlayer.killAllSound();
+    }//GEN-LAST:event_bt_stopSndActionPerformed
+
+    private void bt_confirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_confirmActionPerformed
+        SoundPlayer.killAllSound();
+        soundPanel.setEventSnd(sndEvent, sndList.getSelectedValue());
+        dispose();
+    }//GEN-LAST:event_bt_confirmActionPerformed
 
 
 

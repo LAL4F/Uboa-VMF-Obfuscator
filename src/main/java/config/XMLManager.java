@@ -22,7 +22,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import views.MainWindow;
+import views2.MainWindow;
 
 public class XMLManager {
     public static boolean xmlExists() {

@@ -15,7 +15,7 @@ import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import views.MainWindow;
+import views2.MainWindow;
 
 public class SoundPlayer  {
     private static AudioInputStream audioIn;

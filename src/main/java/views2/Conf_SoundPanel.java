@@ -1,11 +1,12 @@
-package views;
+package views2;
 
 import config.XMLManager;
+import dialogs.SoundBrowserDialogue;
 
 public class Conf_SoundPanel extends javax.swing.JPanel {
-    public ConfigWindow parent;
+    public MainWindow parent;
     
-    public Conf_SoundPanel(ConfigWindow parent) {
+    public Conf_SoundPanel(MainWindow parent) {
         initComponents();
         this.parent = parent;
         
@@ -59,6 +60,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Sounds"));
 
         checkbox_allSounds.setText("Enable sounds");
+        checkbox_allSounds.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         checkbox_allSounds.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 checkbox_allSoundsActionPerformed(evt);
@@ -68,6 +70,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder("Play Sound On..."));
 
         checkbox_openFileSounds.setText("Open file");
+        checkbox_openFileSounds.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         checkbox_openFileSounds.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 checkbox_openFileSoundsActionPerformed(evt);
@@ -75,6 +78,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         });
 
         checkbox_saveFileSounds.setText("Save file");
+        checkbox_saveFileSounds.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         checkbox_saveFileSounds.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 checkbox_saveFileSoundsActionPerformed(evt);
@@ -82,6 +86,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         });
 
         checkbox_analyzeFileSounds.setText("Analyze file");
+        checkbox_analyzeFileSounds.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         checkbox_analyzeFileSounds.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 checkbox_analyzeFileSoundsActionPerformed(evt);
@@ -89,6 +94,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         });
 
         checkbox_errorSounds.setText("On errors");
+        checkbox_errorSounds.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         checkbox_errorSounds.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 checkbox_errorSoundsActionPerformed(evt);
@@ -96,6 +102,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         });
 
         checkbox_obfuscateFileSounds.setText("Obfuscate file");
+        checkbox_obfuscateFileSounds.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         checkbox_obfuscateFileSounds.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 checkbox_obfuscateFileSoundsActionPerformed(evt);
@@ -103,6 +110,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         });
 
         bt_openFileSnd.setText("...");
+        bt_openFileSnd.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_openFileSnd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_openFileSndActionPerformed(evt);
@@ -110,6 +118,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         });
 
         bt_analyzeFileSnd.setText("...");
+        bt_analyzeFileSnd.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_analyzeFileSnd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_analyzeFileSndActionPerformed(evt);
@@ -117,6 +126,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         });
 
         bt_obfuscateFileSnd.setText("...");
+        bt_obfuscateFileSnd.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_obfuscateFileSnd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_obfuscateFileSndActionPerformed(evt);
@@ -124,6 +134,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         });
 
         bt_saveFileSnd.setText("...");
+        bt_saveFileSnd.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_saveFileSnd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_saveFileSndActionPerformed(evt);
@@ -131,6 +142,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         });
 
         bt_exceptionSnd.setText("...");
+        bt_exceptionSnd.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_exceptionSnd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_exceptionSndActionPerformed(evt);
@@ -153,6 +165,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         tf_exceptionSnd.setEnabled(false);
 
         bt_resetAllSounds.setText("Reset");
+        bt_resetAllSounds.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_resetAllSounds.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_resetAllSoundsActionPerformed(evt);
@@ -242,7 +255,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(checkbox_allSounds)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 52, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 671, Short.MAX_VALUE)
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(masterVolumeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -257,7 +270,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
                     .addComponent(checkbox_allSounds))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(144, Short.MAX_VALUE))
+                .addContainerGap(464, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -349,7 +362,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_bt_resetAllSoundsActionPerformed
 
     private void openSoundBrowser(String event) {
-        SoundBrowserDialogue soundBrowserDialogue = new SoundBrowserDialogue(parent.parent, false, this, event);
+        SoundBrowserDialogue soundBrowserDialogue = new SoundBrowserDialogue(parent, false, this, event);
         soundBrowserDialogue.show();
     }
     

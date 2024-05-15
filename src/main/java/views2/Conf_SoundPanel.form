@@ -52,7 +52,7 @@
                       <Component id="jPanel2" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
                           <Component id="checkbox_allSounds" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace pref="52" max="32767" attributes="0"/>
+                          <EmptySpace pref="671" max="32767" attributes="0"/>
                           <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="masterVolumeSlider" min="-2" max="-2" attributes="0"/>
@@ -72,7 +72,7 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="144" max="32767" attributes="0"/>
+                  <EmptySpace pref="464" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -81,6 +81,9 @@
         <Component class="javax.swing.JCheckBox" name="checkbox_allSounds">
           <Properties>
             <Property name="text" type="java.lang.String" value="Enable sounds"/>
+            <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+              <Color id="Hand Cursor"/>
+            </Property>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkbox_allSoundsActionPerformed"/>
@@ -172,6 +175,9 @@
             <Component class="javax.swing.JCheckBox" name="checkbox_openFileSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Open file"/>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Hand Cursor"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkbox_openFileSoundsActionPerformed"/>
@@ -180,6 +186,9 @@
             <Component class="javax.swing.JCheckBox" name="checkbox_saveFileSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Save file"/>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Hand Cursor"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkbox_saveFileSoundsActionPerformed"/>
@@ -188,6 +197,9 @@
             <Component class="javax.swing.JCheckBox" name="checkbox_analyzeFileSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Analyze file"/>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Hand Cursor"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkbox_analyzeFileSoundsActionPerformed"/>
@@ -196,6 +208,9 @@
             <Component class="javax.swing.JCheckBox" name="checkbox_errorSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="On errors"/>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Hand Cursor"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkbox_errorSoundsActionPerformed"/>
@@ -204,6 +219,9 @@
             <Component class="javax.swing.JCheckBox" name="checkbox_obfuscateFileSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Obfuscate file"/>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Hand Cursor"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkbox_obfuscateFileSoundsActionPerformed"/>
@@ -212,6 +230,9 @@
             <Component class="javax.swing.JButton" name="bt_openFileSnd">
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Hand Cursor"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_openFileSndActionPerformed"/>
@@ -220,6 +241,9 @@
             <Component class="javax.swing.JButton" name="bt_analyzeFileSnd">
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Hand Cursor"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_analyzeFileSndActionPerformed"/>
@@ -228,6 +252,9 @@
             <Component class="javax.swing.JButton" name="bt_obfuscateFileSnd">
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Hand Cursor"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_obfuscateFileSndActionPerformed"/>
@@ -236,6 +263,9 @@
             <Component class="javax.swing.JButton" name="bt_saveFileSnd">
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Hand Cursor"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_saveFileSndActionPerformed"/>
@@ -244,6 +274,9 @@
             <Component class="javax.swing.JButton" name="bt_exceptionSnd">
               <Properties>
                 <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Hand Cursor"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_exceptionSndActionPerformed"/>
@@ -282,6 +315,9 @@
             <Component class="javax.swing.JButton" name="bt_resetAllSounds">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Reset"/>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Hand Cursor"/>
+                </Property>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_resetAllSoundsActionPerformed"/>

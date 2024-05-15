@@ -26,8 +26,8 @@ public class RandomString {
     );
     
     private final ArrayList<String> symbolArray = new ArrayList<>(Arrays.asList(
-            "`","#","$","%","^","&","(",")","_","+",
-            "~","#","$","%","^","&","(",")","_","+",
+            "`","#","%","&","(",")","+",
+            "~","^","&","_",
             "[","]","'",".","/","{","}","|","<",
             ">"
         )

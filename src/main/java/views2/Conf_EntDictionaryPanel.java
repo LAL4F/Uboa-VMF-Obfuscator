@@ -1,4 +1,4 @@
-package views;
+package views2;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,11 +8,11 @@ import javax.swing.JOptionPane;
 import utils.EntityDictionary;
 import utils.SoundPlayer;
 
-public class Conf_EntDictionary extends javax.swing.JPanel {
-    private ConfigWindow parent;
+public class Conf_EntDictionaryPanel extends javax.swing.JPanel {
+    private MainWindow parent;
     private ArrayList<String> edict = new ArrayList<>();
             
-    public Conf_EntDictionary(ConfigWindow parent) {
+    public Conf_EntDictionaryPanel(MainWindow parent) {
         initComponents();
         this.parent = parent;
 
@@ -70,6 +70,7 @@ public class Conf_EntDictionary extends javax.swing.JPanel {
         jScrollPane1.setViewportView(list_eDict);
 
         bt_addEntity.setText("+");
+        bt_addEntity.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_addEntity.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_addEntityActionPerformed(evt);
@@ -77,6 +78,7 @@ public class Conf_EntDictionary extends javax.swing.JPanel {
         });
 
         bt_removeEntity.setText("-");
+        bt_removeEntity.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_removeEntity.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_removeEntityActionPerformed(evt);
@@ -96,6 +98,7 @@ public class Conf_EntDictionary extends javax.swing.JPanel {
         jScrollPane2.setViewportView(jTextArea1);
 
         bt_resetDict.setText("Reset");
+        bt_resetDict.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_resetDict.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_resetDictActionPerformed(evt);
@@ -103,6 +106,7 @@ public class Conf_EntDictionary extends javax.swing.JPanel {
         });
 
         bt_removeSelected.setText("Remove Selected");
+        bt_removeSelected.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_removeSelected.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_removeSelectedActionPerformed(evt);
@@ -119,12 +123,12 @@ public class Conf_EntDictionary extends javax.swing.JPanel {
                     .addComponent(jSeparator1)
                     .addComponent(jScrollPane1)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(tf_addEntity, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(tf_addEntity, javax.swing.GroupLayout.PREFERRED_SIZE, 218, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(bt_addEntity)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(bt_removeEntity)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 592, Short.MAX_VALUE)
                         .addComponent(bt_removeSelected)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(bt_resetDict))
@@ -135,7 +139,7 @@ public class Conf_EntDictionary extends javax.swing.JPanel {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 491, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(bt_removeSelected, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -147,7 +151,7 @@ public class Conf_EntDictionary extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

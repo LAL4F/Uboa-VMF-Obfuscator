@@ -235,6 +235,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Ok"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_confirmActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="bt_previewSnd">
           <Properties>
@@ -248,6 +251,9 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Stop"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_stopSndActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="bt_cancel">
           <Properties>

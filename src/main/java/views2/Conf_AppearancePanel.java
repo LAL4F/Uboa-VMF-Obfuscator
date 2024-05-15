@@ -1,4 +1,4 @@
-package views;
+package views2;
 
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import config.XMLManager;
@@ -13,10 +13,10 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 public class Conf_AppearancePanel extends javax.swing.JPanel {
-    private ConfigWindow parent;
+    private MainWindow parent;
     private Map<String, String> lafDescriptionMap = new HashMap<String, String>();
             
-    public Conf_AppearancePanel(ConfigWindow parent) {
+    public Conf_AppearancePanel(MainWindow parent) {
         initComponents();
         this.parent = parent;
         
@@ -76,9 +76,9 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(cb_lookandfeel, javax.swing.GroupLayout.PREFERRED_SIZE, 210, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(bt_save)
-                .addContainerGap(159, Short.MAX_VALUE))
+                .addContainerGap(784, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -90,8 +90,7 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        lb_lafpreview.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        lb_lafpreview.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        lb_lafpreview.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lb_lafpreview.setBorder(javax.swing.BorderFactory.createTitledBorder("Preview"));
 
         jScrollPane1.setBorder(javax.swing.BorderFactory.createTitledBorder("Info"));
@@ -124,9 +123,9 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lb_lafpreview, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lb_lafpreview, javax.swing.GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -143,7 +142,7 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
     private void saveLaf() {
         XMLManager.setStringValue("lookAndFeel", cb_lookandfeel.getSelectedItem().toString()); 
         if (JOptionPane.showConfirmDialog(this, "You must restart the application to apply these changes.\nWill you restart?", "Uboa - Alert", 0) == 0) {
-            parent.parent.restartApp();
+            parent.restartApp();
         }
     }
 
