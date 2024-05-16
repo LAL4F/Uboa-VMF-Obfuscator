@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package views2;
+package views;
 
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
@@ -19,7 +19,7 @@ public class MainWindow extends javax.swing.JFrame {
     private final ImageIcon APPIMAGE = new ImageIcon(MainWindow.class.getResource("/images/appicon.png"));
     
     private ObfuscatePanel obfuscatePanel;
-    private Conf_GeneralPanel conf_GeneralPanel;
+    public Conf_GeneralPanel conf_GeneralPanel;
     private Conf_AppearancePanel conf_AppearancePanel;
     private Conf_EntDictionaryPanel conf_EntDictionaryPanel;
     private Conf_SoundPanel conf_SoundPanel;
@@ -100,7 +100,6 @@ public class MainWindow extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Uboa VMF Obfuscator");
         setMinimumSize(new java.awt.Dimension(1100, 700));
-        setPreferredSize(new java.awt.Dimension(1100, 700));
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent evt) {
                 formComponentResized(evt);

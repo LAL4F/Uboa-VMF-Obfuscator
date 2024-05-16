@@ -9,7 +9,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import jnafilechooser.api.JnaFileChooser;
-import views2.MainWindow;
+import views.MainWindow;
 
 public class SetHammerPathDialogue extends javax.swing.JDialog {
     private MainWindow parent;
@@ -72,6 +72,11 @@ public class SetHammerPathDialogue extends javax.swing.JDialog {
         jLabel1.setText("Hammer Executable");
 
         tf_hammerExePath.setText("Path to executable (ex: hammer.exe)");
+        tf_hammerExePath.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tf_hammerExePathKeyReleased(evt);
+            }
+        });
 
         bt_browseExec.setText("Browse");
         bt_browseExec.addActionListener(new java.awt.event.ActionListener() {
@@ -144,12 +149,14 @@ public class SetHammerPathDialogue extends javax.swing.JDialog {
             XMLManager.setBooleanValue("preferFileTypeAssociation", true);
             tf_hammerExePath.setEnabled(false);
             bt_browseExec.setEnabled(false);
+            parent.conf_GeneralPanel.loadConfig();
             return;
         }
         
         XMLManager.setBooleanValue("preferFileTypeAssociation", false);
         tf_hammerExePath.setEnabled(true);
         bt_browseExec.setEnabled(true);
+        parent.conf_GeneralPanel.loadConfig();
     }//GEN-LAST:event_checkbox_preferFileAssociationActionPerformed
 
     private void bt_browseExecActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_browseExecActionPerformed
@@ -159,6 +166,7 @@ public class SetHammerPathDialogue extends javax.swing.JDialog {
         if (fileChooser.showOpenDialog(this)) {
             tf_hammerExePath.setText(fileChooser.getSelectedFile().getAbsolutePath());
             XMLManager.setStringValue("hammerPath", fileChooser.getSelectedFile().getAbsolutePath());
+            parent.conf_GeneralPanel.loadConfig();
         }
     }//GEN-LAST:event_bt_browseExecActionPerformed
 
@@ -171,6 +179,7 @@ public class SetHammerPathDialogue extends javax.swing.JDialog {
             } catch (IOException ex) {
                 System.out.println("Hammer path not configured");
             }
+            parent.conf_GeneralPanel.loadConfig();
             return;
         }
         
@@ -180,7 +189,13 @@ public class SetHammerPathDialogue extends javax.swing.JDialog {
         } catch (IOException ex) {
             System.out.println("Hammer path not configured");
         }
+        parent.conf_GeneralPanel.loadConfig();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void tf_hammerExePathKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tf_hammerExePathKeyReleased
+        XMLManager.setStringValue("hammerPath", tf_hammerExePath.getText());
+        parent.conf_GeneralPanel.loadConfig();
+    }//GEN-LAST:event_tf_hammerExePathKeyReleased
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */

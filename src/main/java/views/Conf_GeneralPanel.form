@@ -36,7 +36,7 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="566" max="32767" attributes="0"/>
+              <EmptySpace pref="563" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -46,7 +46,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="General"/>
+            <TitledBorder title="Hammer Editor"/>
           </Border>
         </Property>
       </Properties>
@@ -59,13 +59,11 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="jLabel2" pref="1066" max="32767" attributes="0"/>
                       <Group type="102" attributes="0">
+                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="tf_hammerExePath" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="bt_browseExec" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Group type="102" attributes="0">
-                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <Component id="checkbox_preferFileAssociation" max="32767" attributes="0"/>
                   </Group>
@@ -77,9 +75,8 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="tf_hammerExePath" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="bt_browseExec" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -95,13 +92,13 @@
       <SubComponents>
         <Component class="javax.swing.JLabel" name="jLabel1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Hammer Executable"/>
+            <Property name="text" type="java.lang.String" value="Hammer Executable:"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="tf_hammerExePath">
-          <Properties>
-            <Property name="text" type="java.lang.String" value="Path to executable (ex: hammer.exe)"/>
-          </Properties>
+          <Events>
+            <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tf_hammerExePathKeyReleased"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="bt_browseExec">
           <Properties>

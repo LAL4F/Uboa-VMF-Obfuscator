@@ -1,16 +1,10 @@
-package views2;
+package views;
 
-import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import config.XMLManager;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 
 public class Conf_AppearancePanel extends javax.swing.JPanel {
     private MainWindow parent;
@@ -22,7 +16,7 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
         
         lafDescriptionMap.put("FlatMacDarkLaf", "Default Look And Feel for this application.\nCredits: www.formdev.com");
         lafDescriptionMap.put("FlatMacLightLaf", "Light theme of the default Look And Feel for this application.\nCredits: www.formdev.com");
-        lafDescriptionMap.put("Metal", "The good old Java Look And Feel.\nIt is crossplatform, meaning it looks the same on all systems. \nYou can't go wrong with this one.");
+        lafDescriptionMap.put("Metal", "The Java Look And Feel.\nIt is crossplatform, meaning it looks the same on all systems.");
         lafDescriptionMap.put("Nimbus", "Nimbus is a cross-platform Look And Feel.\nIt uses Java 2D vector graphics to draw the user interface, so the UI can be crisply rendered at any resolution.");
         lafDescriptionMap.put("Motif", "Default Look And Feel for vintage Linux and Solaris systems if GTK+ 2.2 or later isn't available.");
         lafDescriptionMap.put("Windows", "An attempt to replicate the Windows Look And Feel.");
@@ -123,9 +117,9 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lb_lafpreview, javax.swing.GroupLayout.DEFAULT_SIZE, 487, Short.MAX_VALUE)
+                .addComponent(lb_lafpreview, javax.swing.GroupLayout.DEFAULT_SIZE, 448, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 170, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents

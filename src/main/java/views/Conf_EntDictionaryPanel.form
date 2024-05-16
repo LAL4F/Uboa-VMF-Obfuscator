@@ -83,7 +83,7 @@
                   <Component id="jScrollPane1" pref="491" max="32767" attributes="0"/>
                   <EmptySpace min="-2" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="bt_removeSelected" alignment="0" min="-2" pref="23" max="-2" attributes="0"/>
+                      <Component id="bt_removeSelected" alignment="0" min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="tf_addEntity" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="bt_addEntity" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -166,7 +166,7 @@
                 <Property name="columns" type="int" value="20"/>
                 <Property name="lineWrap" type="boolean" value="true"/>
                 <Property name="rows" type="int" value="5"/>
-                <Property name="text" type="java.lang.String" value="All entities defined in the list above will have both their targetname and origin obfuscated. Entities NOT in the list will exclusively have their targetname obfuscated.&#xa;&#xa;If there is any entity that is not included in the dictionary whose origin you&apos;d like to target, write its classname in the textbox and click on the plus button."/>
+                <Property name="text" type="java.lang.String" value="All entities defined in the list above will have both their targetname and origin obfuscated. Entities NOT in the list will exclusively have their targetname obfuscated.&#xa;If there is any entity that is not included in the dictionary whose origin you&apos;d like to target, write its classname in the textbox and click on the plus button."/>
                 <Property name="wrapStyleWord" type="boolean" value="true"/>
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="null"/>

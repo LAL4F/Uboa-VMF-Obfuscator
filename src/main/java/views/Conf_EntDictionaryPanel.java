@@ -1,12 +1,10 @@
-package views2;
+package views;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import javax.swing.DefaultListModel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
 import utils.EntityDictionary;
-import utils.SoundPlayer;
 
 public class Conf_EntDictionaryPanel extends javax.swing.JPanel {
     private MainWindow parent;
@@ -17,8 +15,7 @@ public class Conf_EntDictionaryPanel extends javax.swing.JPanel {
         this.parent = parent;
 
         loadConfig();
-        populateList();
-        //sortDictionary();
+        sortDictionary();
     }
 
     private void loadConfig() {
@@ -91,7 +88,7 @@ public class Conf_EntDictionaryPanel extends javax.swing.JPanel {
         jTextArea1.setColumns(20);
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
-        jTextArea1.setText("All entities defined in the list above will have both their targetname and origin obfuscated. Entities NOT in the list will exclusively have their targetname obfuscated.\n\nIf there is any entity that is not included in the dictionary whose origin you'd like to target, write its classname in the textbox and click on the plus button.");
+        jTextArea1.setText("All entities defined in the list above will have both their targetname and origin obfuscated. Entities NOT in the list will exclusively have their targetname obfuscated.\nIf there is any entity that is not included in the dictionary whose origin you'd like to target, write its classname in the textbox and click on the plus button.");
         jTextArea1.setWrapStyleWord(true);
         jTextArea1.setBorder(null);
         jTextArea1.setFocusable(false);
@@ -142,7 +139,7 @@ public class Conf_EntDictionaryPanel extends javax.swing.JPanel {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 491, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(bt_removeSelected, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bt_removeSelected)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(tf_addEntity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(bt_addEntity)
@@ -202,7 +199,6 @@ public class Conf_EntDictionaryPanel extends javax.swing.JPanel {
         }
         
         sortDictionary();
-        //list_eDict.setSelectedIndex(selectedEntities[0]);
     }//GEN-LAST:event_bt_removeSelectedActionPerformed
 
     private void list_eDictMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_list_eDictMouseClicked

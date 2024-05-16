@@ -21,7 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import java.util.ArrayList;
-import views2.MainWindow;
+import views.MainWindow;
 
 public class EntityDictionary {
     public static boolean edictExists() {

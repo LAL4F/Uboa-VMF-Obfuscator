@@ -32,7 +32,7 @@
                   <Group type="102" alignment="1" attributes="0">
                       <Component id="bt_copyClipboard" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="bt_exportLog" min="-2" pref="104" max="-2" attributes="0"/>
+                      <Component id="bt_exportLog" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
                       <Component id="checkbox_verbose" min="-2" pref="85" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
@@ -82,7 +82,7 @@
               <Component id="textAreaScrollPane" pref="329" max="32767" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="bt_copyClipboard" alignment="0" min="-2" pref="23" max="-2" attributes="0"/>
+                  <Component id="bt_copyClipboard" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="103" alignment="0" groupAlignment="3" attributes="0">
                       <Component id="bt_clearConsole" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="bt_exportLog" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -112,7 +112,7 @@
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-            <TitledBorder title="Console"/>
+            <TitledBorder title="Log"/>
           </Border>
         </Property>
       </Properties>
@@ -175,6 +175,9 @@
       <SubComponents>
         <Component class="javax.swing.JRadioButton" name="rb_ePosObfuscation_none">
           <Properties>
+            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+              <ComponentRef name="rg_ePosObfuscation"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="None"/>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
               <Color id="Hand Cursor"/>
@@ -187,6 +190,9 @@
         </Component>
         <Component class="javax.swing.JRadioButton" name="rb_ePosObfuscation_overlap">
           <Properties>
+            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+              <ComponentRef name="rg_ePosObfuscation"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="Overlap"/>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
               <Color id="Hand Cursor"/>
@@ -199,6 +205,9 @@
         </Component>
         <Component class="javax.swing.JRadioButton" name="rb_ePosObfuscation_randomize">
           <Properties>
+            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+              <ComponentRef name="rg_ePosObfuscation"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="Randomize"/>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
               <Color id="Hand Cursor"/>
@@ -211,6 +220,9 @@
         </Component>
         <Component class="javax.swing.JRadioButton" name="rb_ePosObfuscation_randomizeOverlap">
           <Properties>
+            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+              <ComponentRef name="rg_ePosObfuscation"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="Randomize w/ Overlap"/>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
               <Color id="Hand Cursor"/>
@@ -275,6 +287,9 @@
       <SubComponents>
         <Component class="javax.swing.JRadioButton" name="rb_eNameObfuscation_none">
           <Properties>
+            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+              <ComponentRef name="rg_eNameObfuscation"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="None"/>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
               <Color id="Hand Cursor"/>
@@ -287,6 +302,9 @@
         </Component>
         <Component class="javax.swing.JRadioButton" name="rb_eNameObfuscation_exchange">
           <Properties>
+            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+              <ComponentRef name="rg_eNameObfuscation"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="Exchange"/>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
               <Color id="Hand Cursor"/>
@@ -299,6 +317,9 @@
         </Component>
         <Component class="javax.swing.JRadioButton" name="rb_eNameObfuscation_randomize">
           <Properties>
+            <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+              <ComponentRef name="rg_eNameObfuscation"/>
+            </Property>
             <Property name="text" type="java.lang.String" value="Randomized..."/>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
               <Color id="Hand Cursor"/>
@@ -552,9 +573,10 @@
         <Component class="javax.swing.JComboBox" name="combo_output">
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="2">
+              <StringArray count="3">
                 <StringItem index="0" value="Subfolder (of VMF input)"/>
                 <StringItem index="1" value="Work folder"/>
+                <StringItem index="2" value="Same as VMF input"/>
               </StringArray>
             </Property>
             <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
@@ -570,12 +592,18 @@
           </AuxValues>
         </Component>
         <Component class="javax.swing.JTextField" name="tf_input">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
           <Events>
             <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tf_inputMouseEntered"/>
             <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tf_inputKeyReleased"/>
           </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="tf_output">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
           <Events>
             <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tf_outputMouseEntered"/>
             <EventHandler event="keyReleased" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="tf_outputKeyReleased"/>

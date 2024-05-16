@@ -4,27 +4,19 @@
     <height value="700"/>
     <!--Sounds-->
     <enableSnd value="true"/>
-    <masterVol value="100"/>
-    <!--Open File-->
-    <enableOpenFileSnd value="true"/>
-    <openFileSnd value="/internalSnd/open.wav"/>
-    <!--Analyze File-->
-    <enableAnalyzeFileSnd value="true"/>
-    <analyzeFileSnd value="/internalSnd/analyzeFile.wav"/>
+    <masterVol value="50"/>
     <!--Obfuscate File-->
     <enableObfuscateFileSnd value="true"/>
     <obfuscateFileSnd value="/internalSnd/obfuscate.wav"/>
-    <!--Save File-->
-    <enableSaveFileSnd value="true"/>
-    <saveFileSnd value="/internalSnd/save.wav"/>
-    <!--Error-->
-    <enableErrorSnd value="true"/>
-    <errorSnd value="/internalSnd/error.wav"/>
+    <!--Batch Operation-->
+    <enableBatchOperationSnd value="true"/>
+    <batchOperationSnd value="/internalSnd/save.wav"/>
+    <playObfuscateSndWhileBatch value="false"/>
     <!--Sound chooser dialog-->
     <soundChooserFilter value=""/>
     <soundChooserSearchIn value="0"/>
     <soundChooserAutoplay value="true"/>
-    <soundChooserVol value="100"/>
+    <soundChooserVol value="50"/>
     <!--Appearance-->
     <lookAndFeel value="FlatMacDarkLaf"/>
     <!--Main-->
@@ -38,12 +30,22 @@
     <outputType value="0"/>
     <outputSubfolder value="uboa_obf"/>
     <outputWorkfolder value="$DOCUMENTS"/>
-    <!--Popups-->
-    <showPopupOnAnalyze value="true"/>
-    <showPopupOnObfuscate value="true"/>
-    <showPopupOnSave value="true"/>
-    <showPopupOnException value="true"/>
     <!--Hammer path-->
     <preferFileTypeAssociation value="false"/>
     <hammerPath value="Path to executable (ex: /bin/hammer.exe"/>
+    <!--Leaderboard-->
+    <rankingParticipation value="false"/>
+    <!--Username-->
+    <allowUsername value="false"/>
+    <usernameType value="displayName"/>
+    <displayName value="$USERACCOUNT"/>
+    <!--VMF Download-->
+    <allowVmfDownload value="false"/>
+    <vmfDownloadType value="obf"/>
+    <!--Other data-->
+    <allowFilename value="false"/>
+    <allowDate value="false"/>
+    <allowTimeElapsed value="false"/>
+    <allowNumEnts value="false"/>
+    <allowSize value="false"/>
 </settings>

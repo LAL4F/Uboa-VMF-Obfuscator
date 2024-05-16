@@ -4,7 +4,7 @@
  */
 package dialogs;
 
-import views2.Conf_SoundPanel;
+import views.Conf_SoundPanel;
 import config.XMLManager;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -398,7 +398,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
     private void sndListMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_sndListMouseReleased
         tf_filePath.setText(sndList.getSelectedValue());
         if ((checkbox_autoplay.isSelected()) && (sndList.getSelectedValue() != null)) {
-            SoundPlayer.playSound(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
+            SoundPlayer.initSound(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_BROWSERDIALOG);
             System.out.println(sndList.getSelectedValue());
         }
     }//GEN-LAST:event_sndListMouseReleased
@@ -418,7 +418,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
 
     private void bt_previewSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_previewSndActionPerformed
         try {
-            SoundPlayer.playSound(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_OVERRIDE);
+            SoundPlayer.initSound(sndList.getSelectedValue(), SoundPlayer.SoundType.SND_BROWSERDIALOG);
         } catch (NullPointerException e) {
             
         }

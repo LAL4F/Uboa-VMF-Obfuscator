@@ -1,16 +1,7 @@
-package views2;
+package views;
 
-import views2.HelpPanel;
 import config.XMLManager;
-import java.awt.CardLayout;
-import java.util.ArrayList;
-import java.util.Collections;
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
 import jnafilechooser.api.JnaFileChooser;
-import utils.EntityDictionary;
-import utils.SoundPlayer;
 
 public class Conf_GeneralPanel extends javax.swing.JPanel {
     private MainWindow parent;
@@ -22,7 +13,7 @@ public class Conf_GeneralPanel extends javax.swing.JPanel {
         loadConfig();
     }
 
-    private void loadConfig() {
+    public void loadConfig() {
         checkbox_preferFileAssociation.setSelected(XMLManager.getBooleanValue("preferFileTypeAssociation"));
         tf_hammerExePath.setText(XMLManager.getStringValue("hammerPath"));
         
@@ -46,11 +37,15 @@ public class Conf_GeneralPanel extends javax.swing.JPanel {
         setMaximumSize(new java.awt.Dimension(476, 380));
         setMinimumSize(new java.awt.Dimension(476, 380));
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("General"));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Hammer Editor"));
 
-        jLabel1.setText("Hammer Executable");
+        jLabel1.setText("Hammer Executable:");
 
-        tf_hammerExePath.setText("Path to executable (ex: hammer.exe)");
+        tf_hammerExePath.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                tf_hammerExePathKeyReleased(evt);
+            }
+        });
 
         bt_browseExec.setText("Browse");
         bt_browseExec.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -79,12 +74,11 @@ public class Conf_GeneralPanel extends javax.swing.JPanel {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 1066, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
                         .addComponent(tf_hammerExePath)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(bt_browseExec))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(checkbox_preferFileAssociation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -92,9 +86,8 @@ public class Conf_GeneralPanel extends javax.swing.JPanel {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
                     .addComponent(tf_hammerExePath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(bt_browseExec))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -118,7 +111,7 @@ public class Conf_GeneralPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(566, Short.MAX_VALUE))
+                .addContainerGap(563, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -144,6 +137,10 @@ public class Conf_GeneralPanel extends javax.swing.JPanel {
             XMLManager.setStringValue("hammerPath", fileChooser.getSelectedFile().getAbsolutePath());
         }
     }//GEN-LAST:event_bt_browseExecActionPerformed
+
+    private void tf_hammerExePathKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tf_hammerExePathKeyReleased
+        XMLManager.setStringValue("hammerPath", tf_hammerExePath.getText());
+    }//GEN-LAST:event_tf_hammerExePathKeyReleased
 
 
 
