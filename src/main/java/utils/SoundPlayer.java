@@ -25,28 +25,17 @@ public class SoundPlayer  {
     public enum SoundType {
         SND_OBFUSCATE,
         SND_BATCH,
+        SND_ERROR,
         SND_OVERRIDE, //Bypasses rules, master volume
         SND_BROWSERDIALOG; //Bypasses rules, sound browser preview volume
     }
     
-    public static void killAllSound() {
-        if (activeClip != null) {
-            activeClip.stop();
-        }
-    }
+
     
-    private static float getVolume(FloatControl control, SoundType soundType) {
-        int volume = XMLManager.getIntegerValue("masterVol");
-        
-        if (soundType == SoundType.SND_BROWSERDIALOG) {
-            volume = XMLManager.getIntegerValue("soundChooserVol");
-        }
-        
-        float range = control.getMinimum();
-        float result = range * (1 - volume / 100.0f);
-        return result;
-    }
-    
+    //Initial check to figure out if sound should be played in the first place
+    //Sounds with the SND_OVERRIDE and SND_BROWSERDIALOG flags should always play no matter what
+    //Otherwise if playing any other sound, check wether the enable sound flag is true, then perform individual checks
+    //based on user configuration and sound type
     public static void initSound(String soundFile, SoundType soundType) {
         if ((soundType != SoundType.SND_OVERRIDE) && (soundType != SoundType.SND_BROWSERDIALOG) && (!XMLManager.getBooleanValue("enableSnd"))) {return;}
         
@@ -55,7 +44,10 @@ public class SoundPlayer  {
                 if (!XMLManager.getBooleanValue("enableObfuscateFileSnd")) { return;}
                 break;
             case SND_BATCH:
-                if (!XMLManager.getBooleanValue("enableSaveFileSnd")) { return;}
+                if (!XMLManager.getBooleanValue("enableBatchOperationSnd")) { return;}
+                break;
+            case SND_ERROR:
+                if (!XMLManager.getBooleanValue("enableErrorSnd")) { return;}
                 break;
         }
         
@@ -64,6 +56,8 @@ public class SoundPlayer  {
     
     private static void playSound(String soundFile, SoundType soundType) {
         try {
+            //If sound is internal (packed inside of the executable), get input stream from the main class resource
+            //otherwise, get input stream directly from the file system
             if (soundFile.charAt(0) == '/') {
                 InputStream audioSrc = MainWindow.class.getResourceAsStream(soundFile);
                 InputStream bufferedAudioInput = new BufferedInputStream(audioSrc);
@@ -72,6 +66,7 @@ public class SoundPlayer  {
                 audioIn = AudioSystem.getAudioInputStream(new File(soundFile));
             }
             
+            //Stop any sound that may already be playing
             if (activeClip != null) {
                 activeClip.stop();
             }
@@ -79,6 +74,7 @@ public class SoundPlayer  {
             Clip clip = AudioSystem.getClip();
             clip.open(audioIn);
             
+            //Set volume
             FloatControl control = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
             control.setValue(getVolume(control, soundType));
             
@@ -95,5 +91,26 @@ public class SoundPlayer  {
         } catch (LineUnavailableException ex) {
             Logger.getLogger(MainWindow.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    //As defined above, stop any sound that may be playing without initializing another one
+    public static void killAllSound() {
+        if (activeClip != null) {
+            activeClip.stop();
+        }
+    }
+    
+    //Returns volume as a float based on user configuration
+    //Sounds played from within the sound browser dialog use a different parameter from the XML config
+    private static float getVolume(FloatControl control, SoundType soundType) {
+        int volume = XMLManager.getIntegerValue("masterVol");
+        
+        if (soundType == SoundType.SND_BROWSERDIALOG) {
+            volume = XMLManager.getIntegerValue("soundChooserVol");
+        }
+        
+        float range = control.getMinimum();
+        float result = range * (1 - volume / 100.0f);
+        return result;
     }
 }

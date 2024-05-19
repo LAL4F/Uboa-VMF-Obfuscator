@@ -18,8 +18,12 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         checkbox_allSounds.setSelected(XMLManager.getBooleanValue("enableSnd"));
         checkbox_obfuscateFile.setSelected(XMLManager.getBooleanValue("enableObfuscateFileSnd"));
         checkbox_finishBatch.setSelected(XMLManager.getBooleanValue("enableBatchOperationSnd"));
+        checkbox_error.setSelected(XMLManager.getBooleanValue("enableErrorSnd"));
+        checkbox_individualSoundsOnBatch.setSelected(XMLManager.getBooleanValue("playObfuscateSndWhileBatch"));
+        
         tf_obfuscateFileSnd.setText(XMLManager.getStringValue("obfuscateFileSnd"));
         tf_finishBatchSnd.setText(XMLManager.getStringValue("batchOperationSnd"));
+        tf_errorSnd.setText(XMLManager.getStringValue("errorSnd"));
         
         masterVolumeSlider.setValue(XMLManager.getIntegerValue("masterVol"));
         setElementState(checkbox_allSounds.isSelected());
@@ -43,6 +47,10 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         jSeparator1 = new javax.swing.JSeparator();
         bt_previewObfSnd = new javax.swing.JButton();
         bt_previewBatchSnd = new javax.swing.JButton();
+        checkbox_error = new javax.swing.JCheckBox();
+        tf_errorSnd = new javax.swing.JTextField();
+        bt_errorSnd = new javax.swing.JButton();
+        bt_previewErrorSnd = new javax.swing.JButton();
         masterVolumeSlider = new javax.swing.JSlider();
         jLabel1 = new javax.swing.JLabel();
 
@@ -126,6 +134,32 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
             }
         });
 
+        checkbox_error.setText("Error / Interruption");
+        checkbox_error.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        checkbox_error.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkbox_errorActionPerformed(evt);
+            }
+        });
+
+        tf_errorSnd.setText("jTextField4");
+        tf_errorSnd.setEnabled(false);
+
+        bt_errorSnd.setText("...");
+        bt_errorSnd.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        bt_errorSnd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_errorSndActionPerformed(evt);
+            }
+        });
+
+        bt_previewErrorSnd.setText("Preview");
+        bt_previewErrorSnd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_previewErrorSndActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -134,26 +168,35 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jSeparator1)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(checkbox_finishBatch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(checkbox_obfuscateFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(tf_finishBatchSnd, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 675, Short.MAX_VALUE)
-                            .addComponent(tf_obfuscateFileSnd, javax.swing.GroupLayout.Alignment.TRAILING))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(bt_batchOperationFile)
-                            .addComponent(bt_obfuscateFileSnd))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(bt_previewBatchSnd)
-                            .addComponent(bt_previewObfSnd)))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(checkbox_individualSoundsOnBatch)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 516, Short.MAX_VALUE)
-                        .addComponent(bt_resetAllSounds)))
+                        .addComponent(bt_resetAllSounds))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(checkbox_finishBatch, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(checkbox_obfuscateFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(checkbox_error, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(18, 18, Short.MAX_VALUE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(tf_errorSnd)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(bt_errorSnd)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(bt_previewErrorSnd))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(tf_finishBatchSnd, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 675, Short.MAX_VALUE)
+                                    .addComponent(tf_obfuscateFileSnd, javax.swing.GroupLayout.Alignment.TRAILING))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(bt_batchOperationFile)
+                                    .addComponent(bt_obfuscateFileSnd))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(bt_previewBatchSnd)
+                                    .addComponent(bt_previewObfSnd))))))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -171,9 +214,15 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
                     .addComponent(bt_batchOperationFile)
                     .addComponent(tf_finishBatchSnd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(bt_previewBatchSnd))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(checkbox_error)
+                    .addComponent(bt_errorSnd)
+                    .addComponent(tf_errorSnd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bt_previewErrorSnd))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(bt_resetAllSounds)
                     .addComponent(checkbox_individualSoundsOnBatch))
@@ -216,7 +265,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
                     .addComponent(checkbox_allSounds))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(500, Short.MAX_VALUE))
+                .addContainerGap(469, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -255,7 +304,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_checkbox_obfuscateFileActionPerformed
 
     private void checkbox_finishBatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_finishBatchActionPerformed
-        XMLManager.setBooleanValue("enableSaveFileSnd", checkbox_finishBatch.isSelected());
+        XMLManager.setBooleanValue("enableBatchOperationSnd", checkbox_finishBatch.isSelected());
     }//GEN-LAST:event_checkbox_finishBatchActionPerformed
 
     private void bt_obfuscateFileSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_obfuscateFileSndActionPerformed
@@ -286,6 +335,18 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         SoundPlayer.initSound(tf_finishBatchSnd.getText(), SoundPlayer.SoundType.SND_OVERRIDE);
     }//GEN-LAST:event_bt_previewBatchSndActionPerformed
 
+    private void checkbox_errorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_errorActionPerformed
+        XMLManager.setBooleanValue("enableErrorSnd", checkbox_error.isSelected());
+    }//GEN-LAST:event_checkbox_errorActionPerformed
+
+    private void bt_errorSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_errorSndActionPerformed
+        openSoundBrowser("errorSnd");
+    }//GEN-LAST:event_bt_errorSndActionPerformed
+
+    private void bt_previewErrorSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_previewErrorSndActionPerformed
+        SoundPlayer.initSound(tf_errorSnd.getText(), SoundPlayer.SoundType.SND_OVERRIDE);
+    }//GEN-LAST:event_bt_previewErrorSndActionPerformed
+
     private void openSoundBrowser(String event) {
         SoundBrowserDialogue soundBrowserDialogue = new SoundBrowserDialogue(parent, false, this, event);
         soundBrowserDialogue.show();
@@ -301,6 +362,9 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
             case "batchOperationSnd":
                 tf_finishBatchSnd.setText(soundPath);
                 break;
+            case "errorSnd":
+                tf_errorSnd.setText(soundPath);
+                break;
             default:
                 break;
         }
@@ -309,16 +373,20 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
     private void setElementState(boolean bool) {
         checkbox_obfuscateFile.setEnabled(bool);
         checkbox_finishBatch.setEnabled(bool);
+        checkbox_error.setEnabled(bool);
         checkbox_individualSoundsOnBatch.setEnabled(bool);
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bt_batchOperationFile;
+    private javax.swing.JButton bt_errorSnd;
     private javax.swing.JButton bt_obfuscateFileSnd;
     private javax.swing.JButton bt_previewBatchSnd;
+    private javax.swing.JButton bt_previewErrorSnd;
     private javax.swing.JButton bt_previewObfSnd;
     private javax.swing.JButton bt_resetAllSounds;
     private javax.swing.JCheckBox checkbox_allSounds;
+    private javax.swing.JCheckBox checkbox_error;
     private javax.swing.JCheckBox checkbox_finishBatch;
     private javax.swing.JCheckBox checkbox_individualSoundsOnBatch;
     private javax.swing.JCheckBox checkbox_obfuscateFile;
@@ -327,6 +395,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSlider masterVolumeSlider;
+    private javax.swing.JTextField tf_errorSnd;
     private javax.swing.JTextField tf_finishBatchSnd;
     private javax.swing.JTextField tf_obfuscateFileSnd;
     // End of variables declaration//GEN-END:variables

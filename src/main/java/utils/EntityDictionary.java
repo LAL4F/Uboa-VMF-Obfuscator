@@ -3,6 +3,7 @@
     a list of entities whose origin can be modified without affecting
     functionality
  */
+
 package utils;
 
 import config.XMLManager;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import views.MainWindow;
 
 public class EntityDictionary {
+    //Check if it exists in the active directory, if not, rebuild
     public static boolean edictExists() {
         if (!Files.exists(Path.of("./entityDictionary.txt"), LinkOption.NOFOLLOW_LINKS)) {
             JOptionPane.showMessageDialog(null, "Entity dictionary was not found. It will now be rebuilt.", "Edict not found", 2);
@@ -33,6 +35,7 @@ public class EntityDictionary {
         return true;
     }
     
+    //Rebuild dictionary from backup
     public static void rebuildEdict() {
         try {
             byte[] backupEdictBytes = MainWindow.class.getResourceAsStream("/backupConfig/entityDictionary.txt").readAllBytes();

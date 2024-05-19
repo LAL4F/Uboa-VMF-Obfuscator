@@ -72,7 +72,7 @@
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="500" max="32767" attributes="0"/>
+                  <EmptySpace pref="469" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -105,31 +105,43 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="jSeparator1" max="32767" attributes="0"/>
-                          <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="checkbox_finishBatch" alignment="0" max="32767" attributes="0"/>
-                                  <Component id="checkbox_obfuscateFile" max="32767" attributes="0"/>
-                              </Group>
-                              <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="tf_finishBatchSnd" alignment="1" pref="675" max="32767" attributes="0"/>
-                                  <Component id="tf_obfuscateFileSnd" alignment="1" max="32767" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="bt_batchOperationFile" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="bt_obfuscateFileSnd" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="bt_previewBatchSnd" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="bt_previewObfSnd" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                          </Group>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="checkbox_individualSoundsOnBatch" min="-2" max="-2" attributes="0"/>
                               <EmptySpace pref="516" max="32767" attributes="0"/>
                               <Component id="bt_resetAllSounds" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="checkbox_finishBatch" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="checkbox_obfuscateFile" max="32767" attributes="0"/>
+                                  <Component id="checkbox_error" max="32767" attributes="0"/>
+                              </Group>
+                              <EmptySpace type="separate" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="tf_errorSnd" max="32767" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="bt_errorSnd" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="bt_previewErrorSnd" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="tf_finishBatchSnd" alignment="1" pref="675" max="32767" attributes="0"/>
+                                          <Component id="tf_obfuscateFileSnd" alignment="1" max="32767" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="bt_batchOperationFile" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="bt_obfuscateFileSnd" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="bt_previewBatchSnd" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="bt_previewObfSnd" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                  </Group>
+                              </Group>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -153,9 +165,16 @@
                           <Component id="tf_finishBatchSnd" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="bt_previewBatchSnd" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="checkbox_error" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="bt_errorSnd" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="tf_errorSnd" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="bt_previewErrorSnd" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="14" max="32767" attributes="0"/>
                       <Component id="jSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="bt_resetAllSounds" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="checkbox_individualSoundsOnBatch" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -260,6 +279,42 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_previewBatchSndActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JCheckBox" name="checkbox_error">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Error / Interruption"/>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Hand Cursor"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkbox_errorActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JTextField" name="tf_errorSnd">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="jTextField4"/>
+                <Property name="enabled" type="boolean" value="false"/>
+              </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="bt_errorSnd">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="..."/>
+                <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+                  <Color id="Hand Cursor"/>
+                </Property>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_errorSndActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="bt_previewErrorSnd">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Preview"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bt_previewErrorSndActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>

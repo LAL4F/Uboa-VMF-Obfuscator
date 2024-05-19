@@ -15,7 +15,7 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
         this.parent = parent;
         
         lafDescriptionMap.put("FlatMacDarkLaf", "Default Look And Feel for this application.\nCredits: www.formdev.com");
-        lafDescriptionMap.put("FlatMacLightLaf", "Light theme of the default Look And Feel for this application.\nCredits: www.formdev.com");
+        lafDescriptionMap.put("FlatMacLightLaf", "Light theme of the default Look And Feel for this application. MY EYES! \nCredits: www.formdev.com");
         lafDescriptionMap.put("Metal", "The Java Look And Feel.\nIt is crossplatform, meaning it looks the same on all systems.");
         lafDescriptionMap.put("Nimbus", "Nimbus is a cross-platform Look And Feel.\nIt uses Java 2D vector graphics to draw the user interface, so the UI can be crisply rendered at any resolution.");
         lafDescriptionMap.put("Motif", "Default Look And Feel for vintage Linux and Solaris systems if GTK+ 2.2 or later isn't available.");

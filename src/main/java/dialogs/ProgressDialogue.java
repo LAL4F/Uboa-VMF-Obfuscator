@@ -36,6 +36,11 @@ public class ProgressDialogue extends javax.swing.JDialog {
         lb_status.setText(text);
     }
     
+    public void clearTextArea() {
+        textArea.setText("");
+        textArea.getCaret().setDot(Integer.MAX_VALUE);
+    }
+    
     public void appendTextArea(String text) {
         textArea.append(text + "\n");
         textArea.getCaret().setDot(Integer.MAX_VALUE);
@@ -51,6 +56,18 @@ public class ProgressDialogue extends javax.swing.JDialog {
     
     public void setProgressBarMin(int value) {
         progressBar.setMinimum(value);
+    }
+    
+    public int getProgressBarValue() {
+        return progressBar.getValue();
+    }
+    
+    public int getProgressBarMax() {
+        return progressBar.getMaximum();
+    }
+    
+    public int getProgressBarMin() {
+        return progressBar.getMinimum();
     }
 
     @SuppressWarnings("unchecked")

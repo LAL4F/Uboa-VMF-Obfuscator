@@ -12,6 +12,9 @@
     <enableBatchOperationSnd value="true"/>
     <batchOperationSnd value="/internalSnd/save.wav"/>
     <playObfuscateSndWhileBatch value="false"/>
+    <!--Batch Operation-->
+    <enableErrorSnd value="true"/>
+    <errorSnd value="/internalSnd/error.wav"/>
     <!--Sound chooser dialog-->
     <soundChooserFilter value=""/>
     <soundChooserSearchIn value="0"/>

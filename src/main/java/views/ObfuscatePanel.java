@@ -34,8 +34,13 @@ import utils.SoundPlayer;
 import dialogs.ProgressDialogue;
 import dialogs.SetHammerPathDialogue;
 import dialogs.SoundBrowserDialogue;
+import java.nio.file.AccessDeniedException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 public class ObfuscatePanel extends javax.swing.JPanel {
     private final ImageIcon APPIMAGE = new ImageIcon(views.MainWindow.class.getResource("/images/appicon.png"));
@@ -67,6 +72,10 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     //Swing classes
     private ProgressDialogue openFileProgressDialogue;
     
+    //This will be useful for both single and batch operations
+    private ArrayList<String> filesToProcess = new ArrayList<>();
+    private int filesToProcessIndex = 0;
+   
     public ObfuscatePanel(MainWindow parent) {
         initComponents();
         
@@ -84,7 +93,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
         lb_charset.setText(CHARSET);
     }
 
-private void loadConfig() {
+    private void loadConfig() {
         setPreferredSize(new java.awt.Dimension(XMLManager.getIntegerValue("width"), 
                 XMLManager.getIntegerValue("height"))
         );
@@ -93,27 +102,7 @@ private void loadConfig() {
         combo_output.setSelectedIndex(XMLManager.getIntegerValue("outputType"));
         tf_input.setText(XMLManager.getStringValue("inputPath"));
         
-        switch (combo_output.getSelectedIndex()) {
-            case 0: //Subfolder
-                tf_output.setText(XMLManager.getStringValue("outputSubfolder"));
-                bt_browseOutput.setEnabled(false);
-                bt_gotoOutput.setEnabled(false);
-                break;
-            case 1: //Work folder
-                tf_output.setText(XMLManager.getStringValue("outputWorkfolder"));
-                bt_browseOutput.setEnabled(true);
-                bt_gotoOutput.setEnabled(true);
-
-                if (XMLManager.getStringValue("outputWorkfolder").equals("$DOCUMENTS")) {
-                    tf_output.setText(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
-                    return;
-                }
-        
-                break;
-            case 2: //Same folder as input
-                refreshOutputFolder();
-                break;
-        }
+        setupOutput();
         
         switch (XMLManager.getStringValue("entityPosObfuscation")) {
             case "None":
@@ -167,6 +156,7 @@ private void loadConfig() {
         textArea.setCaretPosition(textArea.getDocument().getLength());
     }
     
+    //Same as above but verbose
     private void addVerbose(String string) {
         if (checkbox_verbose.isSelected()) {
             textArea.append(string);
@@ -634,6 +624,11 @@ private void loadConfig() {
 
         bt_cancelObfuscation.setText("Cancel obfuscation");
         bt_cancelObfuscation.setEnabled(false);
+        bt_cancelObfuscation.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bt_cancelObfuscationActionPerformed(evt);
+            }
+        });
 
         combo_obfuscatedVmfList.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Output VMF files will go here" }));
         combo_obfuscatedVmfList.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -733,172 +728,496 @@ private void loadConfig() {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void openFile() {
+    //The first method in a long chain of processes
+    private void initObfuscation() {
+        clearProgram();
+        String inputPath = tf_input.getText();
+
+        //If input is folder, prepare for a batch operation
+        //otherwise, just add the VMF input to the file processing array
+        if (combo_input.getSelectedIndex() == 1) {
+            
+            //If input points to a file, sanitize path so it points to the directory of the file instead
+            if (inputPath.contains(".vm")) {
+                inputPath = getSanitizedPath(inputPath);
+            }
+            
+            addVerbose("\nSanitized input path is " + inputPath);
+            
+            //Get every vmf file in the directory and add their full path to the file processing array
+            try {
+                DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(inputPath));
+                for (Path path : stream) {
+                    if ((!Files.isDirectory(path)) && (path.getFileName().toString().contains(".vmf"))) {
+                        filesToProcess.add(path.toString());
+                        addVerbose("\nAdded " + path.toString() + " to batch list");
+                    }
+                }
+            } catch (IOException ex) {
+                openFileProgressDialogue.dispose();
+                finishProcess();
+                clearLog();
+                clearProgram();
+                addText("Error! IOException. Check input and try again");
+                SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR); 
+                return;
+            }
+        } else {
+            filesToProcess.add(tf_input.getText());
+            addVerbose("\nAdded " + tf_input.getText() + " to batch list");
+        }
+
+        bt_obfuscate.setEnabled(false);
+        bt_cancelObfuscation.setEnabled(true);
+
+        processNextFileInQueue();
+    }
+    
+    //Load file
+    private void openFile(String file) {
         new Thread(new Runnable() {
             public void run() {
                 openFileProgressDialogue.show();
             }
         }).start();
+        
+        selectedFile = new File(file);
 
-        selectedFile = new File(tf_input.getText());
-
-        filePath = tf_input.getText();
+        filePath = file;
         fileName = selectedFile.getName();
+        
         try {
             asyncReadVMF();
         } catch (ExecutionException ex) {
-            Logger.getLogger(views.MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-        }    
+            openFileProgressDialogue.dispose();
+            finishProcess();
+            clearLog();
+            clearProgram();
+            addText("Error! ExecutionException. Probably related to the VMF read thread.");
+            SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR); 
+            return;
+        }
     }
     
+    //Analyze VMF on a separate thread to prevent the GUI thread from
+    //becoming unresponsive
     private void asyncReadVMF() throws ExecutionException {
         try {
             Thread vmfReaderThread;
             vmfReaderThread = new Thread(new Runnable() {
                 public void run() {
+                    ArrayList<String> eDidct = EntityDictionary.getEdict();
+                    textArea.setText("Opening " + fileName + "\n...");
+                    long startTime = System.nanoTime();
                     try {
-                        ArrayList<String> eDidct = EntityDictionary.getEdict();
-                        
-                        textArea.setText("Opening " + fileName + "\n...");
-                        long startTime = System.nanoTime();
-                        
                         readVmfList = Files.readAllLines(Paths.get(filePath), Charset.forName(CHARSET));
-                        
-                        int totalLines = readVmfList.size();
-                        String totalLinesPretty = String.format("%,d", totalLines);
-                        addText("\n\nFinished opening " + fileName + ".\nTime to open file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
-                        addText("\nTotal lines: " + totalLinesPretty);
-                        
-                        int beginEntitySection = readVmfList.indexOf("entity");
-                        float percentageLinesSkipped = (float)beginEntitySection / totalLines * 100;
-                        addText("\n\nDon't care about solids, moving to entity section, skipping " +  String.format("%,d",beginEntitySection) + " lines ("+String.format("%.2f", percentageLinesSkipped) + "% of all lines)");
-                        addText("\nAnalyzing entity section... working, please wait...");
-                        addText("\n...");
-                        
-                        List<String> solidSection = null;
-                        
-                        try {
-                            solidSection = readVmfList.subList(0, beginEntitySection); 
-                        } catch (Exception e) {
-                            openFileProgressDialogue.dispose();
-                            finishProcess();
-                            clearProgram();
-                            clearLog();
-                            
-                            addText("Something went wrong while reading file. Probably no entities");
-                            return;
-                        }
-
-                        vmfContent = String.join("\n", solidSection);
-                        
-                        openFileProgressDialogue.setFileText("Reading " + fileName);
-                        openFileProgressDialogue.setProgressBarMin(beginEntitySection);
-                        openFileProgressDialogue.setProgressBarMax(totalLines);
-
-                        boolean isParsingEntity = false;
-                        boolean isPointEntity = false;
-                        String verboseTextToAppend = "";
-                        
-                        for (int i = beginEntitySection; i < readVmfList.size(); i++) {
-                            
-                            //Check if reading entity
-                            if (readVmfList.get(i).equals("entity")) {
-                                iNumEnts++;
-                                isParsingEntity = true;
-                            }
-                            
-                            if (isParsingEntity) {
-                                //Figure out class of entity
-                                if (readVmfList.get(i).contains("classname")) {
-                                    Pattern pattern = Pattern.compile("\"([^\"]*)\"");
-                                    Matcher matcher = pattern.matcher(readVmfList.get(i));
-
-                                    while( matcher.find() ) {
-                                        if (!matcher.group(1).equals("classname")) {
-                                            if (eDidct.contains(matcher.group(1))) {
-                                                verboseTextToAppend += "\n\nFound logic entity " + matcher.group(1) + ", obtaining origins";
-                                            } else {
-                                                isPointEntity = true;
-                                                verboseTextToAppend += "\n\nFound brush/point entity " + matcher.group(1) + ", ignoring origins";
-                                            }
-                                        }
-                                    }
-                                }
-
-                                //Get targetname regardless of entity class
-                                if (readVmfList.get(i).contains("\"targetname\"")) {
-                                    Pattern pattern = Pattern.compile("\"([^\"]*)\"");
-                                    Matcher matcher = pattern.matcher(readVmfList.get(i));
-
-                                    while( matcher.find() ) {
-                                        if (!matcher.group(1).equals("targetname")) {
-                                            verboseTextToAppend += "\n  -Found targetname " + matcher.group(1);
-                                            targetnameArray.add(matcher.group(1));  
-                                        }
-                                    }
-                                }
-                                
-                                //Get origin only if the found entity is a logic entity
-                                if ((!isPointEntity) && (readVmfList.get(i).contains("\"origin\""))) {
-                                    Pattern pattern = Pattern.compile("\"([^\"]*)\"");
-                                    Matcher matcher = pattern.matcher(readVmfList.get(i));
-
-                                    while( matcher.find() ) {
-                                        if (!matcher.group(1).equals("origin")) {
-                                            verboseTextToAppend += "\n  -Found origin " + matcher.group(1);
-                                            originArray.add(matcher.group(1));
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            //Close entity
-                            try {
-                                if ((isParsingEntity) && (readVmfList.get(i).equals("}")) && (readVmfList.get(i + 1).equals("entity")) || (readVmfList.get(i + 1).equals("cameras")) ) {
-                                    isParsingEntity = false;
-                                    isPointEntity = false;
-                                    verboseTextToAppend += "\nFinished parsing entity";
-                                }
-                            } catch (IndexOutOfBoundsException e) {}
-
-                            vmfContent += readVmfList.get(i) + "\n";
-                            openFileProgressDialogue.setStatusText("Line " + String.format("%,d", i) + " of " + totalLinesPretty);
-                            openFileProgressDialogue.setProgressBarValue(i);
-                            openFileProgressDialogue.appendTextArea(readVmfList.get(i));     
-                            
-                            if (checkbox_verbose.isSelected()) {
-                                addVerbose(verboseTextToAppend);
-                                verboseTextToAppend = "";
-                            }
-                        }
-                        
-                        addText("\n\nFinished reading " + fileName + "\n\nTime to read file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
-                        addText("\nNumber of entities: " + iNumEnts);
-                        openFileProgressDialogue.setVisible(false);
-                        openFileProgressDialogue.dispose();
-                        lb_filelength.setText("length: " + String.format("%,d", vmfContent.length()) + " | lines: " + totalLinesPretty);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } catch (AccessDeniedException e) {
                         openFileProgressDialogue.dispose();
                         finishProcess();
                         clearLog();
                         clearProgram();
+                        addText("Error! AccessDeniedException. Check input and try again");
+                        SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
+                        return;
+                    } catch (Exception e) {
+                        openFileProgressDialogue.dispose();
+                        finishProcess();
+                        clearLog();
+                        clearProgram();
+                        addText("Error! Check input and try again");
+                        SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
+                        return;
                     }
-                    obfuscateVMF();
+                    
+                    int totalLines = readVmfList.size();
+                    String totalLinesPretty = String.format("%,d", totalLines);
+                    addText("\n\nFinished opening " + fileName + ".\nTime to open file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
+                    addText("\nTotal lines: " + totalLinesPretty);
+                    int beginEntitySection = readVmfList.indexOf("entity");
+                    float percentageLinesSkipped = (float)beginEntitySection / totalLines * 100;
+                    addText("\n\nDon't care about solids, moving to entity section, skipping " +  String.format("%,d",beginEntitySection) + " lines ("+String.format("%.2f", percentageLinesSkipped) + "% of all lines)");
+                    addText("\nAnalyzing entity section... working, please wait...");
+                    addText("\n...");
+                    List<String> solidSection = null;
+                    try {
+                        solidSection = readVmfList.subList(0, beginEntitySection);
+                    } catch (Exception e) {
+                        openFileProgressDialogue.dispose();
+                        finishProcess();
+                        clearProgram();
+                        clearLog();
+                        addText("Something went wrong while analyzing file. Probably no entities");
+                        SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
+                        return;
+                    }
+                    vmfContent = String.join("\n", solidSection);
+                    openFileProgressDialogue.setFileText("Reading " + fileName);
+                    openFileProgressDialogue.setProgressBarMin(beginEntitySection);
+                    openFileProgressDialogue.setProgressBarMax(totalLines);
+                    boolean isParsingEntity = false;
+                    boolean isPointEntity = false;
+                    String verboseTextToAppend = "";
+                    for (int i = beginEntitySection; i < readVmfList.size(); i++) {
+                        
+                        //Check if reading entity
+                        if (readVmfList.get(i).equals("entity")) {
+                            iNumEnts++;
+                            isParsingEntity = true;
+                        }
+                        
+                        if (isParsingEntity) {
+                            //Figure out class of entity
+                            if (readVmfList.get(i).contains("classname")) {
+                                Pattern pattern = Pattern.compile("\"([^\"]*)\"");
+                                Matcher matcher = pattern.matcher(readVmfList.get(i));
+                                
+                                while( matcher.find() ) {
+                                    if (!matcher.group(1).equals("classname")) {
+                                        if (eDidct.contains(matcher.group(1))) {
+                                            verboseTextToAppend += "\n\nFound logic entity " + matcher.group(1) + ", obtaining origins";
+                                        } else {
+                                            isPointEntity = true;
+                                            verboseTextToAppend += "\n\nFound brush/point entity " + matcher.group(1) + ", ignoring origins";
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            //Get targetname regardless of entity class
+                            if (readVmfList.get(i).contains("\"targetname\"")) {
+                                Pattern pattern = Pattern.compile("\"([^\"]*)\"");
+                                Matcher matcher = pattern.matcher(readVmfList.get(i));
+                                
+                                while( matcher.find() ) {
+                                    if (!matcher.group(1).equals("targetname")) {
+                                        verboseTextToAppend += "\n  -Found targetname " + matcher.group(1);
+                                        targetnameArray.add(matcher.group(1));
+                                    }
+                                }
+                            }
+                            
+                            //Get origin only if the found entity is a logic entity
+                            if ((!isPointEntity) && (readVmfList.get(i).contains("\"origin\""))) {
+                                Pattern pattern = Pattern.compile("\"([^\"]*)\"");
+                                Matcher matcher = pattern.matcher(readVmfList.get(i));
+                                
+                                while( matcher.find() ) {
+                                    if (!matcher.group(1).equals("origin")) {
+                                        verboseTextToAppend += "\n  -Found origin " + matcher.group(1);
+                                        originArray.add(matcher.group(1));
+                                    }
+                                }
+                            }
+                        }
+                        
+                        //Close entity
+                        try {
+                            if ((isParsingEntity) && (readVmfList.get(i).equals("}")) && (readVmfList.get(i + 1).equals("entity")) || (readVmfList.get(i + 1).equals("cameras")) ) {
+                                isParsingEntity = false;
+                                isPointEntity = false;
+                                verboseTextToAppend += "\nFinished parsing entity";
+                            }
+                        } catch (IndexOutOfBoundsException e) {
+                            //This is intentional
+                        }
+                        
+                        vmfContent += readVmfList.get(i) + "\n";
+                        openFileProgressDialogue.setStatusText("Line " + String.format("%,d", i) + " of " + totalLinesPretty);
+                        openFileProgressDialogue.setProgressBarValue(i);
+                        openFileProgressDialogue.appendTextArea(readVmfList.get(i));
+                        
+                        if (checkbox_verbose.isSelected()) {
+                            addVerbose(verboseTextToAppend);
+                            verboseTextToAppend = "";
+                        }
+                    }
+                    addText("\n\nFinished reading " + fileName + "\n\nTime to read file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
+                    addText("\nNumber of entities: " + iNumEnts);
+                    openFileProgressDialogue.setVisible(false);
+                    //openFileProgressDialogue.dispose();
+                    lb_filelength.setText("length: " + String.format("%,d", vmfContent.length()) + " | lines: " + totalLinesPretty);
+                    
+                    try {
+                        //obfuscateVMF();
+                        asyncObfuscateVMF();
+                    } catch (ExecutionException ex) {
+                        Logger.getLogger(ObfuscatePanel.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             });
+    
             vmfReaderThread.start();
         } catch (Exception e) {
-            Logger.getLogger(views.MainWindow.class.getName()).log(Level.SEVERE, null, e);
             openFileProgressDialogue.dispose();
             finishProcess();
-            clearLog();
             clearProgram();
+            clearLog();
+            addText("Massive fuckup while initializing VMF reader thread. This is not your fault");
+            SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
+            return;
         }
-        
-        
+
     }
     
+    private void asyncObfuscateVMF() throws ExecutionException {
+        //new Thread(new Runnable() {
+        //    public void run() {
+        //        openFileProgressDialogue.show();
+        //    }
+        //}).start();
+                    
+        try {
+            Thread vmfReaderThread;
+            vmfReaderThread = new Thread(new Runnable() {
+                public void run() {                    
+                    addText("\n\nObfuscating VMF, please wait...");
+                    rebuiltVmf = vmfContent;
+                    
+                    int totalOrigins = originArray.size();
+                    int totalTargetnames = targetnameArray.size();
+                    
+                    ArrayList<Integer> spentOriginsIndexes = new ArrayList<>();
+                    ArrayList<String> sanitizedOrigins = new ArrayList<>();
+
+                    ArrayList<Integer> spentTargetnameIndexes = new ArrayList<>();
+                    ArrayList<String> sanitizedTargetnames = new ArrayList<>();
+
+                    ArrayList<String> spentRandomStrings = new ArrayList<>();
+
+                    Random rnd =  new Random();
+                    int randomIndex = 0;
+                    String sanitizedString = "";
+                    String regex = "";
+                    String doubleQuoteRegex = ""; //Workaround because this thing likes to add unnecessary quotes, might fix in the future
+                    String randomStringResult = ""; 
+
+                    addVerbose("\n\nStored Origins:\n");
+                    for (String origin : originArray) {
+                        addVerbose(origin + "\n");
+                    }
+                                            
+                    if (originObfuscationKind == 2) { //Randomized origins
+                        openFileProgressDialogue.setVisible(true);
+                        openFileProgressDialogue.clearTextArea();
+                        openFileProgressDialogue.setStatusText("Sanitizing Origins");
+                        openFileProgressDialogue.setProgressBarMin(0);
+                        openFileProgressDialogue.setProgressBarValue(0);
+                        openFileProgressDialogue.setProgressBarMax(totalOrigins);
+                        
+                        //We must first sanitize origins stored in the VMF
+                        //to prevent horrible things from happening, like two entities
+                        //having their origins set to the same value, which
+                        //this obfuscation method should prevent
+                        addVerbose("\nOrigin randomization method: sanitizing origins\n");
+                        for (String origin : originArray) {
+                            regex = "(." + origin + "?)";
+                            RandomString randomString = new RandomString();
+
+                            do {
+                                sanitizedString = randomString.getRandomString(1, 20);
+                                if (sanitizedOrigins.contains(sanitizedString)) addVerbose("\nSanitized origin " + sanitizedString + " is already in use, rerolling");
+                            } while (sanitizedOrigins.contains(sanitizedString));
+
+                            addVerbose("Origin " + origin + " sanitized with string " + sanitizedString + "\n");
+                            rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + sanitizedString);
+                            sanitizedOrigins.add(sanitizedString);
+                            
+                            try {
+                                openFileProgressDialogue.appendTextArea(origin + " = " + sanitizedString);
+                                openFileProgressDialogue.setProgressBarValue(openFileProgressDialogue.getProgressBarValue() + 1);
+                            } catch (Exception e) {}
+                        }
+                    }
+
+                    int sanitizedOriginsIndex = 0;
+                    if (originObfuscationKind != 0) {
+                        openFileProgressDialogue.setVisible(true);
+                        openFileProgressDialogue.clearTextArea();
+                        openFileProgressDialogue.setStatusText("Obfuscating Origins");
+                        openFileProgressDialogue.setProgressBarMin(0);
+                        openFileProgressDialogue.setProgressBarValue(0);
+                        openFileProgressDialogue.setProgressBarMax(totalOrigins);
+                        
+                        for (String origin : originArray) {
+                            regex = "(." + origin + "?)";
+
+                            switch (originObfuscationKind) {
+                                case 1: //Overlap
+                                    addVerbose("\nObfuscating origin " + origin + " using overlap method");
+                                    rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArray.getFirst());
+                                    doubleQuoteRegex = "(. \"\"" + originArray.getFirst() + "?)";
+                                    rebuiltVmf = rebuiltVmf.replaceAll(doubleQuoteRegex, "\" \"" + originArray.getFirst());
+                                    
+                                    try {
+                                        openFileProgressDialogue.appendTextArea(origin + " = " + originArray.getFirst());
+                                        openFileProgressDialogue.setProgressBarValue(openFileProgressDialogue.getProgressBarValue() + 1);
+                                    } catch (Exception e) {}
+                                    
+                                    break;
+                                case 2: //Randomized
+                                    regex = "(." + sanitizedOrigins.get(sanitizedOriginsIndex) + "?)";
+                                    addVerbose("\nObfuscating origin " + sanitizedOrigins.get(sanitizedOriginsIndex) + "  using random method");
+                                    do {
+                                        randomIndex = rnd.nextInt(originArray.size());
+                                        if (spentOriginsIndexes.contains(randomIndex)) addVerbose("\nOrigin index " + randomIndex + " is already in use, rerolling");
+                                    } while (spentOriginsIndexes.contains(randomIndex));
+
+                                    addVerbose("\nFound proper index " + randomIndex);
+                                    addVerbose("\nReplacing sanitized origin " + sanitizedOrigins.get(sanitizedOriginsIndex) + " with " + originArray.get(randomIndex));
+
+                                    rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArray.get(randomIndex));
+
+                                    doubleQuoteRegex = "(. \"\"" + originArray.get(randomIndex) + "?)";
+                                    rebuiltVmf = rebuiltVmf.replaceAll(doubleQuoteRegex, "\" \"" + originArray.get(randomIndex));
+                                    spentOriginsIndexes.add(randomIndex);
+                                    addVerbose("\nAdded " + randomIndex + " to spent origin list\n");
+                                    sanitizedOriginsIndex++;
+                                    
+                                    try {
+                                        openFileProgressDialogue.appendTextArea(sanitizedOrigins.get(sanitizedOriginsIndex) + " = " + originArray.get(randomIndex));
+                                        openFileProgressDialogue.setProgressBarValue(openFileProgressDialogue.getProgressBarValue() + 1);
+                                    } catch (Exception e) {}
+
+                                    break;
+                                case 3: //Randomize w/ Overlap
+                                    addVerbose("\nObfuscating origin " + origin + " using random w/ overlap method");
+                                    randomIndex = rnd.nextInt(originArray.size());
+                                    addVerbose(", random index " + randomIndex);
+                                    rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArray.get(randomIndex));
+
+                                    doubleQuoteRegex = "(. \"\"" + originArray.get(randomIndex) + "?)";
+                                    rebuiltVmf = rebuiltVmf.replaceAll(doubleQuoteRegex, "\" \"" + originArray.get(randomIndex));
+                                    
+                                    try {
+                                        openFileProgressDialogue.appendTextArea(origin + " = " + originArray.get(randomIndex));
+                                        openFileProgressDialogue.setProgressBarValue(openFileProgressDialogue.getProgressBarValue() + 1);
+                                    } catch (Exception e) {}
+                                    
+                                    break;
+                            }
+                        }  
+                        addVerbose("\nFinished obfuscating origins");
+                    } else {
+                        addVerbose("\nSkipping origin obfuscation");
+                    }
+
+                    addVerbose("\n\nStored targetnames:\n");
+                    for (String targetname : targetnameArray) {
+                        addVerbose(targetname + "\n");
+                    }
+
+                    if (targetnameObfuscationKind != 0) { //Exchange and randomize targetnames
+                        openFileProgressDialogue.setVisible(true);
+                        openFileProgressDialogue.clearTextArea();
+                        openFileProgressDialogue.setStatusText("Sanitizing Targetnames");
+                        openFileProgressDialogue.setProgressBarMin(0);
+                        openFileProgressDialogue.setProgressBarValue(0);
+                        openFileProgressDialogue.setProgressBarMax(totalTargetnames);
+
+                        //Sanitize targetnames to ensure that there's no repetition unless
+                        //stated so, for example, when two entities share the same 
+                        //targetname 
+                        addVerbose("\nSanitizing targetnames\n");
+                        for (String targetname : targetnameArray) {
+                            regex = " \"" + targetname;
+                            RandomString randomString = new RandomString();
+
+                            do {
+                                sanitizedString = randomString.getRandomString(1, 20);
+                                if (sanitizedTargetnames.contains(sanitizedString)) addVerbose("\nSanitized targetname " + sanitizedString + " is already in use, rerolling");
+                            } while (sanitizedTargetnames.contains(sanitizedString));
+
+                            addVerbose("Targetname " + targetname + " sanitized with string " + sanitizedString + "\n");
+                            rebuiltVmf = rebuiltVmf.replaceAll(regex, " \"" + sanitizedString);
+                            sanitizedTargetnames.add(sanitizedString);
+                            
+                            openFileProgressDialogue.appendTextArea(targetname + " = " + sanitizedString);
+                            openFileProgressDialogue.setProgressBarValue(openFileProgressDialogue.getProgressBarValue() + 1);
+                        }
+                    }
+
+                    int targetnameArrayIndex = 0;
+                    if (targetnameObfuscationKind != 0) {
+                        openFileProgressDialogue.setVisible(true);
+                        openFileProgressDialogue.clearTextArea();
+                        openFileProgressDialogue.setStatusText("Obfuscating Targetnames");
+                        openFileProgressDialogue.setProgressBarMin(0);
+                        openFileProgressDialogue.setProgressBarValue(0);
+                        openFileProgressDialogue.setProgressBarMax(totalTargetnames);
+                        
+                        for (String targetname : targetnameArray) {
+                            switch (targetnameObfuscationKind) {
+                                case 1: //Exchange
+                                    regex = sanitizedTargetnames.get(targetnameArrayIndex);
+
+                                    addVerbose("\nObfuscating targetname " + sanitizedTargetnames.get(targetnameArrayIndex) + " using exchange method");
+                                    do {
+                                        randomIndex = rnd.nextInt(targetnameArray.size());
+                                        if (spentTargetnameIndexes.contains(randomIndex)) addVerbose("\nOrigin index " + randomIndex + " is already in use, rerolling");
+                                    } while (spentTargetnameIndexes.contains(randomIndex));
+
+                                    addVerbose("\nFound proper index " + randomIndex);
+                                    addVerbose("\nReplacing sanitized targetname " + sanitizedTargetnames.get(targetnameArrayIndex) + " with " + targetnameArray.get(randomIndex));
+
+                                    rebuiltVmf = rebuiltVmf.replaceAll(regex, targetnameArray.get(randomIndex));
+
+                                    spentTargetnameIndexes.add(randomIndex);
+                                    addVerbose("\nAdded " + randomIndex + " to spent targetname list\n");
+                                    targetnameArrayIndex++;
+                                    
+                                    openFileProgressDialogue.appendTextArea(regex + " = " + targetnameArray.get(randomIndex));
+                                    openFileProgressDialogue.setProgressBarValue(openFileProgressDialogue.getProgressBarValue() + 1);
+                                    break;  
+                                case 2: //Randomize
+                                    regex = sanitizedTargetnames.get(targetnameArrayIndex);
+
+                                    addVerbose("\nObfuscating targetname " + sanitizedTargetnames.get(targetnameArrayIndex) + " using random string method");
+
+                                    do {
+                                        RandomString randomString = new RandomString();
+                                        randomStringResult = randomString.getRandomString(comboBox_rndEntNameChoices.getSelectedIndex(), (int)comboBox_rndEntNameLength.getValue());  
+                                        if (spentRandomStrings.contains(randomStringResult)) addVerbose("\nRandom targetname " + randomStringResult + " is already in use, rerolling (this is super rare)");
+                                    } while (spentRandomStrings.contains(randomStringResult));
+
+                                    addVerbose("\nReplacing sanitized targetname " + sanitizedTargetnames.get(targetnameArrayIndex) + " with " + randomStringResult + "\n");
+
+                                    rebuiltVmf = rebuiltVmf.replaceAll(regex, randomStringResult);
+
+                                    spentTargetnameIndexes.add(randomIndex);
+                                    targetnameArrayIndex++;
+
+                                    openFileProgressDialogue.appendTextArea(regex + " = " + randomStringResult);
+                                    openFileProgressDialogue.setProgressBarValue(openFileProgressDialogue.getProgressBarValue() + 1);
+                                    break;
+                            }
+                        }  
+                        addVerbose("\nFinished obfuscating targetnames\n");
+                    } else {
+                        addVerbose("\nSkipping targetname obfuscation");
+                    }
+
+                    addText("\n\nObfuscated VMF! file is ready to go");
+                    openFileProgressDialogue.dispose();
+                    originArray.clear();
+                    targetnameArray.clear();
+                    saveFile();
+                }
+            });
+    
+            vmfReaderThread.start();
+        } catch (Exception e) {
+            openFileProgressDialogue.dispose();
+            finishProcess();
+            clearProgram();
+            clearLog();
+            addText("Massive fuckup while initializing VMF obfuscator thread. This is not your fault");
+            SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
+            return;
+        }
+
+    }
+    
+    /*
     private void obfuscateVMF() {
         addText("\n\nObfuscating VMF, please wait...");
         rebuiltVmf = vmfContent;
@@ -1063,8 +1382,11 @@ private void loadConfig() {
         }
         
         addText("\n\nObfuscated VMF! file is ready to go");
+        originArray.clear();
+        targetnameArray.clear();
         saveFile();
     }
+    */
     
     private void saveFile() {
         //I need more sleep
@@ -1078,10 +1400,17 @@ private void loadConfig() {
                 addVerbose("\nSaving to subfolder");
                 String[] sanitizedInputFolderArray = tf_input.getText().split("\\\\");
                 String inputFolderNoFilename = "";
+                int limiter = 0;
 
-                for (int i = 0; i < sanitizedInputFolderArray.length - 1; i++) {
+                if (tf_input.getText().contains(".vmf")) {
+                    limiter = 1;
+                }
+                
+                for (int i = 0; i < sanitizedInputFolderArray.length - limiter; i++) {
                     inputFolderNoFilename += sanitizedInputFolderArray[i] + "\\";
                 }
+                
+                addVerbose("\nInput folder is " + fileNameNoExtension);
                 
                 fileToWrite = new File(inputFolderNoFilename + "\\" + tf_output.getText() + "\\" + fileNameNoExtension + "_obf.vmf");
                 
@@ -1106,22 +1435,19 @@ private void loadConfig() {
                 break;
         }
         
-        
-        addVerbose("\nFile name no extension is " + fileNameNoExtension);
-        addVerbose("\nFile path no extension is " + filePathNoExtension);
-        addVerbose("\n\nFile path to write is " + fileToWrite);
-        
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileToWrite));
             
             bufferedWriter.write(rebuiltVmf);
             bufferedWriter.close();
-            SoundPlayer.initSound(XMLManager.getStringValue("obfuscateFileSnd"), SoundPlayer.SoundType.SND_OBFUSCATE);
             addText("\nSaved file to " + fileToWrite);
         } catch (IOException ex) {
-            Logger.getLogger(views.MainWindow.class.getName()).log(Level.SEVERE, null, ex);
-            addText(ex.getMessage());
-            addText("\nSomething went wrong, Error saving file!!");
+            finishProcess();
+            clearProgram();
+            clearLog();
+            addText("Error! IOException while attemting to save file. Weird.");
+            SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
+            return;
         }
         
         combo_obfuscatedVmfList.setEnabled(true);
@@ -1130,15 +1456,23 @@ private void loadConfig() {
         
         obfuscatedVmfList.add(fileToWrite.getAbsolutePath());
         
-        finishProcess();
+        if (combo_input.getSelectedIndex() != 1 || XMLManager.getBooleanValue("playObfuscateSndWhileBatch")) {
+            SoundPlayer.initSound(XMLManager.getStringValue("obfuscateFileSnd"), SoundPlayer.SoundType.SND_OBFUSCATE);   
+        }
+
         addVMFtoComboBox();
+        filesToProcessIndex++;
+        processNextFileInQueue();
     }  
     
+    //Enable some buttons
     private void finishProcess() {
         bt_obfuscate.setEnabled(true);
         bt_cancelObfuscation.setEnabled(false);
     }
     
+    //Add the freshly obfuscated VMF to the combo box at the bottom of the panel
+    //so it can be opened in the file system or inside Hammer
     private void addVMFtoComboBox() {
         DefaultComboBoxModel<String> comboBox = new DefaultComboBoxModel<>();
         
@@ -1149,6 +1483,7 @@ private void loadConfig() {
         combo_obfuscatedVmfList.setModel(comboBox);
     }
     
+    //Set everything back to default
     private void clearProgram() {
             obfuscatedVmfList.clear();
             iNumEnts = 0;
@@ -1160,8 +1495,11 @@ private void loadConfig() {
             rebuiltVmf = "";
 
             selectedFile = null;
+            
+            filesToProcess.clear();
+            filesToProcessIndex = 0;
 
-            textArea.setText("Welcome to Uboa VMF Obfuscator. Ensure proper input and output parameters and click the big obfuscate button.");
+            //textArea.setText("Welcome to Uboa VMF Obfuscator. Ensure proper input and output parameters and click the big obfuscate button.");
             lb_info.setText("Hover over objects to see relevant information");
             lb_filelength.setText("length: 0 | lines: 0");
     }
@@ -1252,19 +1590,11 @@ private void loadConfig() {
     }//GEN-LAST:event_bt_randomStringTestActionPerformed
 
     private void bt_obfuscateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_obfuscateActionPerformed
-        clearProgram(); 
-        
-        //Start batch operation if input is folder
-        if (combo_input.getSelectedIndex() == 1) {
-            
-        }
-        
-        bt_obfuscate.setEnabled(false);
-        bt_cancelObfuscation.setEnabled(true);
-
-        openFile();
+        initObfuscation();
     }//GEN-LAST:event_bt_obfuscateActionPerformed
 
+
+    
     private void checkbox_verboseMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_checkbox_verboseMouseEntered
         lb_info.setText("Additional console messages during analysis and obfuscation");
     }//GEN-LAST:event_checkbox_verboseMouseEntered
@@ -1298,7 +1628,12 @@ private void loadConfig() {
                 bw = new BufferedWriter(new FileWriter(file.getAbsolutePath() + ".txt"));
                 bw.write(consoleContent);
             } catch (IOException ioe) {
-                System.out.println("IO Exception");
+                finishProcess();
+                clearProgram();
+                clearLog();
+                addText("Error! IOException while attemting to save log. Weird.");
+                SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
+                return;
             } finally {
                 if (bw != null) {
                     try {
@@ -1335,14 +1670,19 @@ private void loadConfig() {
 
     private void combo_outputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_combo_outputActionPerformed
         XMLManager.setIntegerValue("outputType", combo_output.getSelectedIndex());
+        setupOutput();
+    }//GEN-LAST:event_combo_outputActionPerformed
 
+    private void setupOutput() {
         switch (combo_output.getSelectedIndex()) {
             case 0: //Subfolder
+                tf_output.setEnabled(true);
                 tf_output.setText(XMLManager.getStringValue("outputSubfolder"));
                 bt_browseOutput.setEnabled(false);
                 bt_gotoOutput.setEnabled(false);
                 break;
             case 1: //Work folder
+                tf_output.setEnabled(false);
                 tf_output.setText(XMLManager.getStringValue("outputWorkfolder"));
                 bt_browseOutput.setEnabled(true);
                 bt_gotoOutput.setEnabled(true);
@@ -1354,27 +1694,48 @@ private void loadConfig() {
         
                 break;
             case 2: //Same folder as input
+                tf_output.setEnabled(false);
                 refreshOutputFolder();
                 break;
         }
-    }//GEN-LAST:event_combo_outputActionPerformed
-
+    }
+    
     private void refreshOutputFolder() {
-        String inputFolderNoFilename = "";
         tf_output.setText(tf_input.getText());
-
+        
         if (tf_input.getText().contains(".vm")) {
-            String[] sanitizedInputFolderArray = tf_input.getText().split("\\\\");
-            inputFolderNoFilename = "";
-
-            for (int i = 0; i < sanitizedInputFolderArray.length - 1; i++) {
-                inputFolderNoFilename += sanitizedInputFolderArray[i] + "\\";
-            }
+            tf_output.setText(getSanitizedPath(tf_input.getText()));
         }
-
-        tf_output.setText(inputFolderNoFilename);
+        
         bt_browseOutput.setEnabled(false);
         bt_gotoOutput.setEnabled(false);
+    }
+    
+    //Helper function to remove file names from a path
+    //ex:       Documents/vmf/batchtest/gm_func_vehicle.vmf
+    //becomes:  Documents/vmf/batchtest/
+    private String getSanitizedPath(String fullPath) {
+        String inputFolderNoFilename = "";
+        String[] sanitizedInputFolderArray = fullPath.split("\\\\");
+
+        for (int i = 0; i < sanitizedInputFolderArray.length - 1; i++) {
+            inputFolderNoFilename += sanitizedInputFolderArray[i] + "\\";
+        }
+
+        return inputFolderNoFilename;
+    }
+    
+    private void processNextFileInQueue() {
+        if (filesToProcessIndex >= filesToProcess.size()) {
+            if (combo_input.getSelectedIndex() == 1) {
+                SoundPlayer.initSound(XMLManager.getStringValue("batchOperationSnd"), SoundPlayer.SoundType.SND_BATCH);  
+            }
+            addText("\n\nFinished all operations");
+            finishProcess();
+            return;
+        }
+        
+        openFile(filesToProcess.get(filesToProcessIndex));
     }
     
     private void tf_inputMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tf_inputMouseEntered
@@ -1407,20 +1768,19 @@ private void loadConfig() {
 
         if (fileChooser.showOpenDialog(parent)) {
             String chosenFile = fileChooser.getSelectedFile().getName();
-
+            XMLManager.setStringValue("inputPath", fileChooser.getSelectedFile().getAbsolutePath());
+            
             //If we do not select a vmf file, set input mode to folder and clean up path
             if (chosenFile.contains("[Folder Selection]")) {
                 combo_input.setSelectedIndex(1); //Input set to folder
                 String sanitizedPath = fileChooser.getSelectedFile().getAbsolutePath().replace(chosenFile, "");
                 tf_input.setText(sanitizedPath);
-                XMLManager.setStringValue("inputPath", fileChooser.getSelectedFile().getAbsolutePath());
-                return;
+                XMLManager.setStringValue("inputPath", sanitizedPath);
+            } else {
+                //If a file is chosen, set input mode to file and update path
+                combo_input.setSelectedIndex(0); //Input set to file
+                tf_input.setText(fileChooser.getSelectedFile().getAbsolutePath());
             }
-            
-            //If a file is chosen, set input mode to file and update path
-            combo_input.setSelectedIndex(0); //Input set to file
-            tf_input.setText(fileChooser.getSelectedFile().getAbsolutePath());
-            XMLManager.setStringValue("inputPath", fileChooser.getSelectedFile().getAbsolutePath());
             
             //If output is set to same directory as the input (index 2), refresh it to reflect the new input
             if (combo_output.getSelectedIndex() == 2) {
@@ -1498,6 +1858,11 @@ private void loadConfig() {
             hammerSetupDialog.show();
         }
     }//GEN-LAST:event_bt_openObfuscatedVmfActionPerformed
+
+    private void bt_cancelObfuscationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_cancelObfuscationActionPerformed
+        finishProcess();
+        clearProgram();
+    }//GEN-LAST:event_bt_cancelObfuscationActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
