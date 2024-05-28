@@ -22,17 +22,16 @@
                   <Component id="jScrollPane2" alignment="1" max="32767" attributes="0"/>
                   <Component id="jSeparator1" alignment="0" max="32767" attributes="0"/>
                   <Component id="jSeparator2" alignment="0" max="32767" attributes="0"/>
-                  <Component id="lb_uboaIcon" alignment="0" max="32767" attributes="0"/>
-                  <Component id="jLabel2" alignment="1" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                          <Component id="bt_profile" pref="123" max="32767" attributes="0"/>
-                          <Component id="bt_paypal" max="32767" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="bt_profile" min="-2" pref="147" max="-2" attributes="0"/>
+                          <Component id="bt_paypal" min="-2" pref="147" max="-2" attributes="0"/>
+                          <Component id="jSeparator5" min="-2" pref="147" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
-                              <EmptySpace min="0" pref="632" max="32767" attributes="0"/>
+                              <EmptySpace min="0" pref="595" max="32767" attributes="0"/>
                               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="jScrollPane1" max="32767" attributes="0"/>
@@ -41,6 +40,8 @@
                   <Component id="jSeparator3" alignment="1" max="32767" attributes="0"/>
                   <Component id="jLabel3" alignment="1" max="32767" attributes="0"/>
                   <Component id="jSeparator4" alignment="0" max="32767" attributes="0"/>
+                  <Component id="lb_uboaLogo" max="32767" attributes="0"/>
+                  <Component id="jLabel2" alignment="1" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -50,7 +51,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="lb_uboaIcon" min="-2" pref="72" max="-2" attributes="0"/>
+              <Component id="lb_uboaLogo" min="-2" pref="72" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jLabel2" min="-2" pref="30" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -60,9 +61,11 @@
                   <Group type="102" attributes="0">
                       <Component id="bt_profile" min="-2" pref="147" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jSeparator5" min="-2" pref="10" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Component id="bt_paypal" min="-2" pref="30" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jScrollPane1" min="-2" pref="189" max="-2" attributes="0"/>
+                  <Component id="jScrollPane1" min="-2" pref="201" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jSeparator4" min="-2" pref="9" max="-2" attributes="0"/>
@@ -70,9 +73,9 @@
               <Component id="jLabel3" min="-2" pref="24" max="-2" attributes="0"/>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Component id="jSeparator3" min="-2" pref="9" max="-2" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
-              <Component id="jScrollPane2" pref="140" max="32767" attributes="0"/>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="jScrollPane2" pref="240" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="jSeparator1" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
               <Component id="jLabel1" min="-2" pref="24" max="-2" attributes="0"/>
@@ -91,7 +94,7 @@
         <Property name="text" type="java.lang.String" value="LonelyAndLookin4Fun, 2024"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="lb_uboaIcon">
+    <Component class="javax.swing.JLabel" name="lb_uboaLogo">
       <Properties>
         <Property name="horizontalAlignment" type="int" value="0"/>
         <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
@@ -99,7 +102,7 @@
         </Property>
       </Properties>
       <Events>
-        <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lb_uboaIconMouseReleased"/>
+        <EventHandler event="mouseReleased" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="lb_uboaLogoMouseReleased"/>
       </Events>
     </Component>
     <Component class="javax.swing.JSeparator" name="jSeparator1">
@@ -119,7 +122,7 @@
             <Property name="columns" type="int" value="20"/>
             <Property name="lineWrap" type="boolean" value="true"/>
             <Property name="rows" type="int" value="5"/>
-            <Property name="text" type="java.lang.String" value="An open source VMF obfuscator written in Java using the Swing GUI Library. Let me show you its features: &#xa; -Individual and batch operations&#xa; -Entity origin obfuscation&#xa; -Entity targetname obfuscation (needs more work, wildcards not supported at the moment, among other things)&#xa; -Hammer Editor interfacing for an improved workflow&#xa; -UI customization&#xa; -Entity definitions&#xa; -Ranking and data harvesting feature&#xa; -Inefficient algorithms"/>
+            <Property name="text" type="java.lang.String" value="An open source VMF obfuscator written in Java using the Swing GUI Library. Let me show you its features: &#xa; -Individual and batch operations&#xa; -Entity origin obfuscation&#xa; -Entity targetname obfuscation (needs more work, wildcards not supported at the moment, among other things)&#xa; -Hammer Editor interfacing for an improved workflow&#xa; -UI customization&#xa; -Entity definitions&#xa; -Inefficient algorithms"/>
           </Properties>
         </Component>
       </SubComponents>
@@ -183,6 +186,8 @@
       </SubComponents>
     </Container>
     <Component class="javax.swing.JSeparator" name="jSeparator4">
+    </Component>
+    <Component class="javax.swing.JSeparator" name="jSeparator5">
     </Component>
   </SubComponents>
 </Form>

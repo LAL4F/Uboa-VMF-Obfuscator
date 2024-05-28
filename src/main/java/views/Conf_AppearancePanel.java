@@ -1,6 +1,6 @@
 package views;
 
-import config.XMLManager;
+import config.XMLConfig;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
@@ -26,7 +26,7 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
     }
 
     private void loadConfig() {
-        cb_lookandfeel.setSelectedItem(XMLManager.getStringValue("lookAndFeel"));
+        cb_lookandfeel.setSelectedItem(XMLConfig.getStringValue("lookAndFeel"));
         lb_lafpreview.setIcon(new ImageIcon(MainWindow.class.getResource("/lafPreviews/" + cb_lookandfeel.getSelectedItem().toString() + ".PNG")));
         lafPreviewDesc.setText(lafDescriptionMap.get(cb_lookandfeel.getSelectedItem().toString()));
     }
@@ -134,7 +134,7 @@ public class Conf_AppearancePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_bt_saveActionPerformed
 
     private void saveLaf() {
-        XMLManager.setStringValue("lookAndFeel", cb_lookandfeel.getSelectedItem().toString()); 
+        XMLConfig.setStringValue("lookAndFeel", cb_lookandfeel.getSelectedItem().toString()); 
         if (JOptionPane.showConfirmDialog(this, "You must restart the application to apply these changes.\nWill you restart?", "Uboa - Alert", 0) == 0) {
             parent.restartApp();
         }

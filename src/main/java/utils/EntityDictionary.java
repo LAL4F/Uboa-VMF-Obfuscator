@@ -6,7 +6,7 @@
 
 package utils;
 
-import config.XMLManager;
+import config.XMLConfig;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -47,7 +47,7 @@ public class EntityDictionary {
             
             bw.close();
         } catch (IOException ex) {
-            Logger.getLogger(XMLManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(XMLConfig.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

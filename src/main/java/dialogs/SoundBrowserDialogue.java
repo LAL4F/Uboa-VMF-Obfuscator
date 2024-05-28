@@ -5,7 +5,7 @@
 package dialogs;
 
 import views.Conf_SoundPanel;
-import config.XMLManager;
+import config.XMLConfig;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -74,11 +74,11 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
     }
     
     private void loadConfig() {
-        tf_fileNameFilter.setText(XMLManager.getStringValue("soundChooserFilter"));
-        combo_searchInside.setSelectedIndex(XMLManager.getIntegerValue("soundChooserSearchIn"));
-        checkbox_autoplay.setSelected(XMLManager.getBooleanValue("soundChooserAutoplay"));
-        slider_sndLevel.setValue(XMLManager.getIntegerValue("soundChooserVol"));
-        tf_fileNameFilter.setText(XMLManager.getStringValue("soundChooserFilter"));
+        tf_fileNameFilter.setText(XMLConfig.getStringValue("soundChooserFilter"));
+        combo_searchInside.setSelectedIndex(XMLConfig.getIntegerValue("soundChooserSearchIn"));
+        checkbox_autoplay.setSelected(XMLConfig.getBooleanValue("soundChooserAutoplay"));
+        slider_sndLevel.setValue(XMLConfig.getIntegerValue("soundChooserVol"));
+        tf_fileNameFilter.setText(XMLConfig.getStringValue("soundChooserFilter"));
     }
 
     private Set<String> getInternalSndFiles() {
@@ -391,7 +391,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
     }//GEN-LAST:event_bt_cancelActionPerformed
 
     private void combo_searchInsideItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_combo_searchInsideItemStateChanged
-        XMLManager.setIntegerValue("soundChooserSearchIn", combo_searchInside.getSelectedIndex());
+        XMLConfig.setIntegerValue("soundChooserSearchIn", combo_searchInside.getSelectedIndex());
         refreshSounds();
     }//GEN-LAST:event_combo_searchInsideItemStateChanged
 
@@ -404,16 +404,16 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
     }//GEN-LAST:event_sndListMouseReleased
 
     private void slider_sndLevelMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_slider_sndLevelMouseReleased
-        XMLManager.setIntegerValue("soundChooserVol", slider_sndLevel.getValue());
+        XMLConfig.setIntegerValue("soundChooserVol", slider_sndLevel.getValue());
     }//GEN-LAST:event_slider_sndLevelMouseReleased
 
     private void checkbox_autoplayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_autoplayActionPerformed
-        XMLManager.setBooleanValue("soundChooserAutoplay", checkbox_autoplay.isSelected());
+        XMLConfig.setBooleanValue("soundChooserAutoplay", checkbox_autoplay.isSelected());
     }//GEN-LAST:event_checkbox_autoplayActionPerformed
 
     private void tf_fileNameFilterKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tf_fileNameFilterKeyReleased
         refreshSounds();
-        XMLManager.setStringValue("soundChooserFilter", tf_fileNameFilter.getText());
+        XMLConfig.setStringValue("soundChooserFilter", tf_fileNameFilter.getText());
     }//GEN-LAST:event_tf_fileNameFilterKeyReleased
 
     private void bt_previewSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_previewSndActionPerformed

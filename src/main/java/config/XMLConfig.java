@@ -24,7 +24,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import views.MainWindow;
 
-public class XMLManager {
+public class XMLConfig {
     public static boolean xmlExists() {
         if ((!Files.exists(Path.of("./settings.xml"), LinkOption.NOFOLLOW_LINKS)) || (!Files.exists(Path.of("./settings.xsl"), LinkOption.NOFOLLOW_LINKS))) {
             JOptionPane.showMessageDialog(null, "XML configuration file was not found. It will now be rebuilt.", "Config not found", 2);
@@ -54,7 +54,7 @@ public class XMLManager {
             
             bw.close();
         } catch (IOException ex) {
-            Logger.getLogger(XMLManager.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(XMLConfig.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

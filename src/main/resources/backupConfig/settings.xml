@@ -39,12 +39,10 @@
     <!--Leaderboard-->
     <rankingParticipation value="false"/>
     <!--Username-->
-    <allowUsername value="false"/>
-    <usernameType value="displayName"/>
+    <usernameType value="none"/>
     <displayName value="$USERACCOUNT"/>
     <!--VMF Download-->
-    <allowVmfDownload value="false"/>
-    <vmfDownloadType value="obf"/>
+    <vmfDownloadType value="none"/>
     <!--Other data-->
     <allowFilename value="false"/>
     <allowDate value="false"/>

@@ -4,7 +4,7 @@
  */
 package dialogs;
 
-import config.XMLManager;
+import config.XMLConfig;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -35,8 +35,8 @@ public class SetHammerPathDialogue extends javax.swing.JDialog {
     }
     
     private void loadConfig() {
-        checkbox_preferFileAssociation.setSelected(XMLManager.getBooleanValue("preferFileTypeAssociation"));
-        tf_hammerExePath.setText(XMLManager.getStringValue("hammerPath"));
+        checkbox_preferFileAssociation.setSelected(XMLConfig.getBooleanValue("preferFileTypeAssociation"));
+        tf_hammerExePath.setText(XMLConfig.getStringValue("hammerPath"));
         
         if (checkbox_preferFileAssociation.isSelected()) {
             tf_hammerExePath.setEnabled(false);
@@ -146,14 +146,14 @@ public class SetHammerPathDialogue extends javax.swing.JDialog {
 
     private void checkbox_preferFileAssociationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_preferFileAssociationActionPerformed
         if (checkbox_preferFileAssociation.isSelected()) {
-            XMLManager.setBooleanValue("preferFileTypeAssociation", true);
+            XMLConfig.setBooleanValue("preferFileTypeAssociation", true);
             tf_hammerExePath.setEnabled(false);
             bt_browseExec.setEnabled(false);
             parent.conf_GeneralPanel.loadConfig();
             return;
         }
         
-        XMLManager.setBooleanValue("preferFileTypeAssociation", false);
+        XMLConfig.setBooleanValue("preferFileTypeAssociation", false);
         tf_hammerExePath.setEnabled(true);
         bt_browseExec.setEnabled(true);
         parent.conf_GeneralPanel.loadConfig();
@@ -165,13 +165,13 @@ public class SetHammerPathDialogue extends javax.swing.JDialog {
 
         if (fileChooser.showOpenDialog(this)) {
             tf_hammerExePath.setText(fileChooser.getSelectedFile().getAbsolutePath());
-            XMLManager.setStringValue("hammerPath", fileChooser.getSelectedFile().getAbsolutePath());
+            XMLConfig.setStringValue("hammerPath", fileChooser.getSelectedFile().getAbsolutePath());
             parent.conf_GeneralPanel.loadConfig();
         }
     }//GEN-LAST:event_bt_browseExecActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if (XMLManager.getBooleanValue("preferFileTypeAssociation")) {
+        if (XMLConfig.getBooleanValue("preferFileTypeAssociation")) {
             try {
                 System.out.println("\"" + vmfPath + "\"");
                 Desktop.getDesktop().open(new File(vmfPath));
@@ -184,7 +184,7 @@ public class SetHammerPathDialogue extends javax.swing.JDialog {
         }
         
         try {
-            Runtime.getRuntime().exec(XMLManager.getStringValue("hammerPath") + " \"" + vmfPath + "\"");
+            Runtime.getRuntime().exec(XMLConfig.getStringValue("hammerPath") + " \"" + vmfPath + "\"");
             dispose();
         } catch (IOException ex) {
             System.out.println("Hammer path not configured");
@@ -193,7 +193,7 @@ public class SetHammerPathDialogue extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void tf_hammerExePathKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tf_hammerExePathKeyReleased
-        XMLManager.setStringValue("hammerPath", tf_hammerExePath.getText());
+        XMLConfig.setStringValue("hammerPath", tf_hammerExePath.getText());
         parent.conf_GeneralPanel.loadConfig();
     }//GEN-LAST:event_tf_hammerExePathKeyReleased
 

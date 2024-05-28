@@ -1,6 +1,6 @@
 package views;
 
-import config.XMLManager;
+import config.XMLConfig;
 import dialogs.SoundBrowserDialogue;
 import utils.SoundPlayer;
 
@@ -15,17 +15,17 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
     }
     
     private void loadConfig() {
-        checkbox_allSounds.setSelected(XMLManager.getBooleanValue("enableSnd"));
-        checkbox_obfuscateFile.setSelected(XMLManager.getBooleanValue("enableObfuscateFileSnd"));
-        checkbox_finishBatch.setSelected(XMLManager.getBooleanValue("enableBatchOperationSnd"));
-        checkbox_error.setSelected(XMLManager.getBooleanValue("enableErrorSnd"));
-        checkbox_individualSoundsOnBatch.setSelected(XMLManager.getBooleanValue("playObfuscateSndWhileBatch"));
+        checkbox_allSounds.setSelected(XMLConfig.getBooleanValue("enableSnd"));
+        checkbox_obfuscateFile.setSelected(XMLConfig.getBooleanValue("enableObfuscateFileSnd"));
+        checkbox_finishBatch.setSelected(XMLConfig.getBooleanValue("enableBatchOperationSnd"));
+        checkbox_error.setSelected(XMLConfig.getBooleanValue("enableErrorSnd"));
+        checkbox_individualSoundsOnBatch.setSelected(XMLConfig.getBooleanValue("playObfuscateSndWhileBatch"));
         
-        tf_obfuscateFileSnd.setText(XMLManager.getStringValue("obfuscateFileSnd"));
-        tf_finishBatchSnd.setText(XMLManager.getStringValue("batchOperationSnd"));
-        tf_errorSnd.setText(XMLManager.getStringValue("errorSnd"));
+        tf_obfuscateFileSnd.setText(XMLConfig.getStringValue("obfuscateFileSnd"));
+        tf_finishBatchSnd.setText(XMLConfig.getStringValue("batchOperationSnd"));
+        tf_errorSnd.setText(XMLConfig.getStringValue("errorSnd"));
         
-        masterVolumeSlider.setValue(XMLManager.getIntegerValue("masterVol"));
+        masterVolumeSlider.setValue(XMLConfig.getIntegerValue("masterVol"));
         setElementState(checkbox_allSounds.isSelected());
     }
     
@@ -287,7 +287,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void checkbox_allSoundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_allSoundsActionPerformed
-        XMLManager.setBooleanValue("enableSnd", checkbox_allSounds.isSelected());
+        XMLConfig.setBooleanValue("enableSnd", checkbox_allSounds.isSelected());
         if (checkbox_allSounds.isSelected()) {
             setElementState(true);
         } else {
@@ -296,15 +296,15 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_checkbox_allSoundsActionPerformed
 
     private void masterVolumeSliderMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_masterVolumeSliderMouseReleased
-        XMLManager.setIntegerValue("masterVol", masterVolumeSlider.getValue());
+        XMLConfig.setIntegerValue("masterVol", masterVolumeSlider.getValue());
     }//GEN-LAST:event_masterVolumeSliderMouseReleased
 
     private void checkbox_obfuscateFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_obfuscateFileActionPerformed
-        XMLManager.setBooleanValue("enableObfuscateFileSnd", checkbox_obfuscateFile.isSelected());
+        XMLConfig.setBooleanValue("enableObfuscateFileSnd", checkbox_obfuscateFile.isSelected());
     }//GEN-LAST:event_checkbox_obfuscateFileActionPerformed
 
     private void checkbox_finishBatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_finishBatchActionPerformed
-        XMLManager.setBooleanValue("enableBatchOperationSnd", checkbox_finishBatch.isSelected());
+        XMLConfig.setBooleanValue("enableBatchOperationSnd", checkbox_finishBatch.isSelected());
     }//GEN-LAST:event_checkbox_finishBatchActionPerformed
 
     private void bt_obfuscateFileSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_obfuscateFileSndActionPerformed
@@ -316,15 +316,15 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_bt_batchOperationFileActionPerformed
 
     private void bt_resetAllSoundsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_resetAllSoundsActionPerformed
-       XMLManager.setStringValue("obfuscateFileSnd", "/internalSnd/obfuscate.wav");
+       XMLConfig.setStringValue("obfuscateFileSnd", "/internalSnd/obfuscate.wav");
        tf_obfuscateFileSnd.setText("/internalSnd/obfuscate.wav");
        
-       XMLManager.setStringValue("batchOperationSnd", "/internalSnd/save.wav");
+       XMLConfig.setStringValue("batchOperationSnd", "/internalSnd/save.wav");
        tf_finishBatchSnd.setText("/internalSnd/save.wav");
     }//GEN-LAST:event_bt_resetAllSoundsActionPerformed
 
     private void checkbox_individualSoundsOnBatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_individualSoundsOnBatchActionPerformed
-        XMLManager.setBooleanValue("playObfuscateSndWhileBatch", checkbox_individualSoundsOnBatch.isSelected());
+        XMLConfig.setBooleanValue("playObfuscateSndWhileBatch", checkbox_individualSoundsOnBatch.isSelected());
     }//GEN-LAST:event_checkbox_individualSoundsOnBatchActionPerformed
 
     private void bt_previewObfSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_previewObfSndActionPerformed
@@ -336,7 +336,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_bt_previewBatchSndActionPerformed
 
     private void checkbox_errorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_errorActionPerformed
-        XMLManager.setBooleanValue("enableErrorSnd", checkbox_error.isSelected());
+        XMLConfig.setBooleanValue("enableErrorSnd", checkbox_error.isSelected());
     }//GEN-LAST:event_checkbox_errorActionPerformed
 
     private void bt_errorSndActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_errorSndActionPerformed
@@ -353,7 +353,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
     }
     
     public void setEventSnd(String sndEvent, String soundPath) {
-        XMLManager.setStringValue(sndEvent, soundPath);
+        XMLConfig.setStringValue(sndEvent, soundPath);
         
         switch (sndEvent) {
             case "obfuscateFileSnd":

@@ -15,7 +15,7 @@ public class AboutPanel extends javax.swing.JPanel {
     public AboutPanel() {
         initComponents();
         
-        lb_uboaIcon.setIcon(new ImageIcon(MainWindow.class.getResource("/images/uboaLogo.png")));
+        lb_uboaLogo.setIcon(new ImageIcon(MainWindow.class.getResource("/images/uboaLogo.png")));
         
         bt_profile.setIcon(new ImageIcon(MainWindow.class.getResource("/images/userLogo.png")));
         bt_paypal.setIcon(new ImageIcon(MainWindow.class.getResource("/images/paypal.png")));
@@ -26,7 +26,7 @@ public class AboutPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        lb_uboaIcon = new javax.swing.JLabel();
+        lb_uboaLogo = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -39,16 +39,17 @@ public class AboutPanel extends javax.swing.JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea2 = new javax.swing.JTextArea();
         jSeparator4 = new javax.swing.JSeparator();
+        jSeparator5 = new javax.swing.JSeparator();
 
         jLabel1.setFont(new java.awt.Font("Bahnschrift", 1, 24)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("LonelyAndLookin4Fun, 2024");
 
-        lb_uboaIcon.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lb_uboaIcon.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        lb_uboaIcon.addMouseListener(new java.awt.event.MouseAdapter() {
+        lb_uboaLogo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lb_uboaLogo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lb_uboaLogo.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                lb_uboaIconMouseReleased(evt);
+                lb_uboaLogoMouseReleased(evt);
             }
         });
 
@@ -56,7 +57,7 @@ public class AboutPanel extends javax.swing.JPanel {
         jTextArea1.setColumns(20);
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
-        jTextArea1.setText("An open source VMF obfuscator written in Java using the Swing GUI Library. Let me show you its features: \n -Individual and batch operations\n -Entity origin obfuscation\n -Entity targetname obfuscation (needs more work, wildcards not supported at the moment, among other things)\n -Hammer Editor interfacing for an improved workflow\n -UI customization\n -Entity definitions\n -Ranking and data harvesting feature\n -Inefficient algorithms");
+        jTextArea1.setText("An open source VMF obfuscator written in Java using the Swing GUI Library. Let me show you its features: \n -Individual and batch operations\n -Entity origin obfuscation\n -Entity targetname obfuscation (needs more work, wildcards not supported at the moment, among other things)\n -Hammer Editor interfacing for an improved workflow\n -UI customization\n -Entity definitions\n -Inefficient algorithms");
         jScrollPane1.setViewportView(jTextArea1);
 
         bt_profile.setContentAreaFilled(false);
@@ -98,28 +99,29 @@ public class AboutPanel extends javax.swing.JPanel {
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jSeparator1)
                     .addComponent(jSeparator2)
-                    .addComponent(lb_uboaIcon, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(bt_profile, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
-                            .addComponent(bt_paypal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(bt_profile, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(bt_paypal, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(0, 632, Short.MAX_VALUE)
+                                .addGap(0, 595, Short.MAX_VALUE)
                                 .addComponent(jLabel1))
                             .addComponent(jScrollPane1)))
                     .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jSeparator4))
+                    .addComponent(jSeparator4)
+                    .addComponent(lb_uboaLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lb_uboaIcon, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lb_uboaLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -129,8 +131,10 @@ public class AboutPanel extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(bt_profile, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(bt_paypal, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 9, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -138,7 +142,7 @@ public class AboutPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 9, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -163,18 +167,18 @@ public class AboutPanel extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_bt_profileActionPerformed
 
-    private void lb_uboaIconMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lb_uboaIconMouseReleased
+    private void lb_uboaLogoMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lb_uboaLogoMouseReleased
         if (!logoClicked) {
             SoundPlayer.initSound("/internalSnd/uuwaaah.wav", SoundPlayer.SoundType.SND_OVERRIDE);
-            lb_uboaIcon.setIcon(new ImageIcon(MainWindow.class.getResource("/images/uboaLogo_bw.png")));
+            lb_uboaLogo.setIcon(new ImageIcon(MainWindow.class.getResource("/images/uboaLogo_bw.png")));
             logoClicked = true;
             return;
         }
         
         SoundPlayer.initSound("/internalSnd/open.wav", SoundPlayer.SoundType.SND_OVERRIDE);
-        lb_uboaIcon.setIcon(new ImageIcon(MainWindow.class.getResource("/images/uboaLogo.png")));
+        lb_uboaLogo.setIcon(new ImageIcon(MainWindow.class.getResource("/images/uboaLogo.png")));
         logoClicked = false;
-    }//GEN-LAST:event_lb_uboaIconMouseReleased
+    }//GEN-LAST:event_lb_uboaLogoMouseReleased
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -189,8 +193,9 @@ public class AboutPanel extends javax.swing.JPanel {
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JSeparator jSeparator5;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jTextArea2;
-    private javax.swing.JLabel lb_uboaIcon;
+    private javax.swing.JLabel lb_uboaLogo;
     // End of variables declaration//GEN-END:variables
 }

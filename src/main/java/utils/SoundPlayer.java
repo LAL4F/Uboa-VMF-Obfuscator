@@ -1,6 +1,6 @@
 package utils;
 
-import config.XMLManager;
+import config.XMLConfig;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -37,17 +37,17 @@ public class SoundPlayer  {
     //Otherwise if playing any other sound, check wether the enable sound flag is true, then perform individual checks
     //based on user configuration and sound type
     public static void initSound(String soundFile, SoundType soundType) {
-        if ((soundType != SoundType.SND_OVERRIDE) && (soundType != SoundType.SND_BROWSERDIALOG) && (!XMLManager.getBooleanValue("enableSnd"))) {return;}
+        if ((soundType != SoundType.SND_OVERRIDE) && (soundType != SoundType.SND_BROWSERDIALOG) && (!XMLConfig.getBooleanValue("enableSnd"))) {return;}
         
         switch (soundType) {
             case SND_OBFUSCATE:
-                if (!XMLManager.getBooleanValue("enableObfuscateFileSnd")) { return;}
+                if (!XMLConfig.getBooleanValue("enableObfuscateFileSnd")) { return;}
                 break;
             case SND_BATCH:
-                if (!XMLManager.getBooleanValue("enableBatchOperationSnd")) { return;}
+                if (!XMLConfig.getBooleanValue("enableBatchOperationSnd")) { return;}
                 break;
             case SND_ERROR:
-                if (!XMLManager.getBooleanValue("enableErrorSnd")) { return;}
+                if (!XMLConfig.getBooleanValue("enableErrorSnd")) { return;}
                 break;
         }
         
@@ -103,10 +103,10 @@ public class SoundPlayer  {
     //Returns volume as a float based on user configuration
     //Sounds played from within the sound browser dialog use a different parameter from the XML config
     private static float getVolume(FloatControl control, SoundType soundType) {
-        int volume = XMLManager.getIntegerValue("masterVol");
+        int volume = XMLConfig.getIntegerValue("masterVol");
         
         if (soundType == SoundType.SND_BROWSERDIALOG) {
-            volume = XMLManager.getIntegerValue("soundChooserVol");
+            volume = XMLConfig.getIntegerValue("soundChooserVol");
         }
         
         float range = control.getMinimum();

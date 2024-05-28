@@ -6,7 +6,7 @@ package views;
 
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
-import config.XMLManager;
+import config.XMLConfig;
 import java.awt.CardLayout;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
@@ -42,8 +42,8 @@ public class MainWindow extends javax.swing.JFrame {
     
     //Load configuration according to XML file
     private void loadConfig() {
-        setPreferredSize(new java.awt.Dimension(XMLManager.getIntegerValue("width"), 
-                XMLManager.getIntegerValue("height"))
+        setPreferredSize(new java.awt.Dimension(XMLConfig.getIntegerValue("width"), 
+                XMLConfig.getIntegerValue("height"))
         );
     }
 
@@ -57,7 +57,7 @@ public class MainWindow extends javax.swing.JFrame {
         navigator_conf_SoundPanel = (CardLayout)panelContainer_Options_Sound.getLayout();
         navigator_helpPanel = (CardLayout)panelContainer_Help.getLayout();
         navigator_aboutPanel = (CardLayout)panelContainer_About.getLayout();
-        navigator_rankingPanel = (CardLayout)panelContainer_Leaderboard.getLayout();
+        //navigator_rankingPanel = (CardLayout)panelContainer_Leaderboard.getLayout();
 
         //Instance the panels
         obfuscatePanel = new ObfuscatePanel(this);
@@ -77,7 +77,7 @@ public class MainWindow extends javax.swing.JFrame {
         panelContainer_Options_Sound.add(conf_SoundPanel, "conf_SoundPanel");
         panelContainer_Help.add(helpPanel, "helpPanel");
         panelContainer_About.add(aboutPanel, "aboutPanel");
-        panelContainer_Leaderboard.add(rankingPanel, "rankingPanel");
+        //panelContainer_Leaderboard.add(rankingPanel, "rankingPanel");
     }
     
     @SuppressWarnings("unchecked")
@@ -95,7 +95,6 @@ public class MainWindow extends javax.swing.JFrame {
         panelContainer_Options_Sound = new javax.swing.JPanel();
         panelContainer_Help = new javax.swing.JPanel();
         panelContainer_About = new javax.swing.JPanel();
-        panelContainer_Leaderboard = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Uboa VMF Obfuscator");
@@ -131,9 +130,6 @@ public class MainWindow extends javax.swing.JFrame {
         panelContainer_About.setLayout(new java.awt.CardLayout());
         tabbedPanel.addTab("About", panelContainer_About);
 
-        panelContainer_Leaderboard.setLayout(new java.awt.CardLayout());
-        tabbedPanel.addTab("Leaderboard", panelContainer_Leaderboard);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -156,12 +152,12 @@ public class MainWindow extends javax.swing.JFrame {
 
     
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-        XMLManager.setIntegerValue("width", getWidth());
-        XMLManager.setIntegerValue("height", getHeight());
+        XMLConfig.setIntegerValue("width", getWidth());
+        XMLConfig.setIntegerValue("height", getHeight());
     }//GEN-LAST:event_formComponentResized
 
     private static void setLookAndFeel() {
-        String lookAndFeel = XMLManager.getStringValue("lookAndFeel");
+        String lookAndFeel = XMLConfig.getStringValue("lookAndFeel");
         try {
             switch (lookAndFeel) {
                 case "FlatMacDarkLaf":
@@ -205,7 +201,7 @@ public class MainWindow extends javax.swing.JFrame {
     }
 
     public static void main(String args[]) {
-        if (!XMLManager.xmlExists()) {
+        if (!XMLConfig.xmlExists()) {
             System.out.println("Rebuilding XML");
         }
         
@@ -226,7 +222,6 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JTabbedPane jTabbedPane2;
     private javax.swing.JPanel panelContainer_About;
     private javax.swing.JPanel panelContainer_Help;
-    private javax.swing.JPanel panelContainer_Leaderboard;
     private javax.swing.JPanel panelContainer_Obfuscate;
     private javax.swing.JPanel panelContainer_Options_Appearance;
     private javax.swing.JPanel panelContainer_Options_Edict;

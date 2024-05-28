@@ -1,6 +1,6 @@
 package views;
 
-import config.XMLManager;
+import config.XMLConfig;
 import jnafilechooser.api.JnaFileChooser;
 
 public class Conf_GeneralPanel extends javax.swing.JPanel {
@@ -14,8 +14,8 @@ public class Conf_GeneralPanel extends javax.swing.JPanel {
     }
 
     public void loadConfig() {
-        checkbox_preferFileAssociation.setSelected(XMLManager.getBooleanValue("preferFileTypeAssociation"));
-        tf_hammerExePath.setText(XMLManager.getStringValue("hammerPath"));
+        checkbox_preferFileAssociation.setSelected(XMLConfig.getBooleanValue("preferFileTypeAssociation"));
+        tf_hammerExePath.setText(XMLConfig.getStringValue("hammerPath"));
         
         if (checkbox_preferFileAssociation.isSelected()) {
             tf_hammerExePath.setEnabled(false);
@@ -117,13 +117,13 @@ public class Conf_GeneralPanel extends javax.swing.JPanel {
 
     private void checkbox_preferFileAssociationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_preferFileAssociationActionPerformed
         if (checkbox_preferFileAssociation.isSelected()) {
-            XMLManager.setBooleanValue("preferFileTypeAssociation", true);
+            XMLConfig.setBooleanValue("preferFileTypeAssociation", true);
             tf_hammerExePath.setEnabled(false);
             bt_browseExec.setEnabled(false);
             return;
         }
         
-        XMLManager.setBooleanValue("preferFileTypeAssociation", false);
+        XMLConfig.setBooleanValue("preferFileTypeAssociation", false);
         tf_hammerExePath.setEnabled(true);
         bt_browseExec.setEnabled(true);
     }//GEN-LAST:event_checkbox_preferFileAssociationActionPerformed
@@ -134,12 +134,12 @@ public class Conf_GeneralPanel extends javax.swing.JPanel {
 
         if (fileChooser.showOpenDialog(parent)) {
             tf_hammerExePath.setText(fileChooser.getSelectedFile().getAbsolutePath());
-            XMLManager.setStringValue("hammerPath", fileChooser.getSelectedFile().getAbsolutePath());
+            XMLConfig.setStringValue("hammerPath", fileChooser.getSelectedFile().getAbsolutePath());
         }
     }//GEN-LAST:event_bt_browseExecActionPerformed
 
     private void tf_hammerExePathKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tf_hammerExePathKeyReleased
-        XMLManager.setStringValue("hammerPath", tf_hammerExePath.getText());
+        XMLConfig.setStringValue("hammerPath", tf_hammerExePath.getText());
     }//GEN-LAST:event_tf_hammerExePathKeyReleased
 
 

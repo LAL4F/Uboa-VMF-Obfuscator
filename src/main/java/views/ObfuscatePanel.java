@@ -4,7 +4,7 @@
  */
 package views;
 
-import config.XMLManager;
+import config.XMLConfig;
 import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -15,7 +15,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
 import jnafilechooser.api.JnaFileChooser;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -31,27 +30,23 @@ import javax.swing.filechooser.FileSystemView;
 import utils.EntityDictionary;
 import utils.RandomString;
 import utils.SoundPlayer;
-import dialogs.ProgressDialogue;
 import dialogs.SetHammerPathDialogue;
 import dialogs.SoundBrowserDialogue;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 
-public class ObfuscatePanel extends javax.swing.JPanel {
-    private final ImageIcon APPIMAGE = new ImageIcon(views.MainWindow.class.getResource("/images/appicon.png"));
-    
+public class ObfuscatePanel extends javax.swing.JPanel {    
     //The MainWindow which acts as a parent to this panel
     private MainWindow parent;
     
     private final String CHARSET = "ISO-8859-1";
     private String filePath, fileName, vmfContent, rebuiltVmf;
-    private int iNumEnts;
+    private int iNumEnts = 0;
     private File selectedFile;
+    
+    private double totalElapsedTime, analyzeTime, obfuscateTime, batchOperationTime;
     
     //Stored entity origins and targetnames
     private ArrayList<String> originArray = new ArrayList<>();
@@ -69,18 +64,14 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     //This is what is fed into the obfuscated VMF combobox at the bottom of the panel
     ArrayList<String> obfuscatedVmfList = new ArrayList<>();
     
-    //Swing classes
-    private ProgressDialogue openFileProgressDialogue;
-    
     //This will be useful for both single and batch operations
     private ArrayList<String> filesToProcess = new ArrayList<>();
     private int filesToProcessIndex = 0;
-   
+    
     public ObfuscatePanel(MainWindow parent) {
         initComponents();
         
         this.parent = parent;
-        openFileProgressDialogue = new ProgressDialogue(parent, false);
         setRandomEntNameParametersEditable(false);
 
         originObfuscationKind = 0;
@@ -94,17 +85,17 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     }
 
     private void loadConfig() {
-        setPreferredSize(new java.awt.Dimension(XMLManager.getIntegerValue("width"), 
-                XMLManager.getIntegerValue("height"))
+        setPreferredSize(new java.awt.Dimension(XMLConfig.getIntegerValue("width"), 
+                XMLConfig.getIntegerValue("height"))
         );
         
-        combo_input.setSelectedIndex(XMLManager.getIntegerValue("inputType"));
-        combo_output.setSelectedIndex(XMLManager.getIntegerValue("outputType"));
-        tf_input.setText(XMLManager.getStringValue("inputPath"));
+        combo_input.setSelectedIndex(XMLConfig.getIntegerValue("inputType"));
+        combo_output.setSelectedIndex(XMLConfig.getIntegerValue("outputType"));
+        tf_input.setText(XMLConfig.getStringValue("inputPath"));
         
         setupOutput();
         
-        switch (XMLManager.getStringValue("entityPosObfuscation")) {
+        switch (XMLConfig.getStringValue("entityPosObfuscation")) {
             case "None":
                 rb_ePosObfuscation_none.setSelected(true);
                 break;
@@ -122,7 +113,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                 break;
         }
         
-        switch (XMLManager.getStringValue("entityNameObfuscation")) {
+        switch (XMLConfig.getStringValue("entityNameObfuscation")) {
             case "None":
                 rb_eNameObfuscation_none.setSelected(true);
                 break;
@@ -137,10 +128,10 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                 break;
         }
         
-        comboBox_rndEntNameChoices.setSelectedIndex(XMLManager.getIntegerValue("entityNameObfuscationKind"));
-        comboBox_rndEntNameLength.setValue(XMLManager.getIntegerValue("entityNameObfuscationLength"));
+        comboBox_rndEntNameChoices.setSelectedIndex(XMLConfig.getIntegerValue("entityNameObfuscationKind"));
+        comboBox_rndEntNameLength.setValue(XMLConfig.getIntegerValue("entityNameObfuscationLength"));
         
-        checkbox_verbose.setSelected(XMLManager.getBooleanValue("verbose"));
+        checkbox_verbose.setSelected(XMLConfig.getBooleanValue("verbose"));
     }
 
     private void setRandomEntNameParametersEditable(boolean state) {
@@ -156,7 +147,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
         textArea.setCaretPosition(textArea.getDocument().getLength());
     }
     
-    //Same as above but verbose
+    //Same as above but for verbose text
     private void addVerbose(String string) {
         if (checkbox_verbose.isSelected()) {
             textArea.append(string);
@@ -213,6 +204,9 @@ public class ObfuscatePanel extends javax.swing.JPanel {
         bt_gotoObfuscatedVmf = new javax.swing.JButton();
         bt_openObfuscatedVmf = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
+        lb_progressBarState = new javax.swing.JLabel();
+        progressBar = new javax.swing.JProgressBar();
+        lb_filename = new javax.swing.JLabel();
 
         textAreaScrollPane.setBorder(javax.swing.BorderFactory.createTitledBorder("Log"));
 
@@ -423,6 +417,11 @@ public class ObfuscatePanel extends javax.swing.JPanel {
 
         bt_obfuscate.setText("Obfuscate!");
         bt_obfuscate.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        bt_obfuscate.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                bt_obfuscateMouseEntered(evt);
+            }
+        });
         bt_obfuscate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_obfuscateActionPerformed(evt);
@@ -545,6 +544,11 @@ public class ObfuscatePanel extends javax.swing.JPanel {
 
         bt_browseInput.setText("Browse...");
         bt_browseInput.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        bt_browseInput.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                bt_browseInputMouseEntered(evt);
+            }
+        });
         bt_browseInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_browseInputActionPerformed(evt);
@@ -553,6 +557,11 @@ public class ObfuscatePanel extends javax.swing.JPanel {
 
         bt_browseOutput.setText("Browse...");
         bt_browseOutput.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        bt_browseOutput.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                bt_browseOutputMouseEntered(evt);
+            }
+        });
         bt_browseOutput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_browseOutputActionPerformed(evt);
@@ -561,6 +570,11 @@ public class ObfuscatePanel extends javax.swing.JPanel {
 
         bt_gotoOutput.setText("Goto");
         bt_gotoOutput.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        bt_gotoOutput.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                bt_gotoOutputMouseEntered(evt);
+            }
+        });
         bt_gotoOutput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_gotoOutputActionPerformed(evt);
@@ -569,6 +583,11 @@ public class ObfuscatePanel extends javax.swing.JPanel {
 
         bt_gotoInput.setText("Goto");
         bt_gotoInput.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        bt_gotoInput.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                bt_gotoInputMouseEntered(evt);
+            }
+        });
         bt_gotoInput.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_gotoInputActionPerformed(evt);
@@ -623,6 +642,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
         );
 
         bt_cancelObfuscation.setText("Cancel obfuscation");
+        bt_cancelObfuscation.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_cancelObfuscation.setEnabled(false);
         bt_cancelObfuscation.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -637,6 +657,11 @@ public class ObfuscatePanel extends javax.swing.JPanel {
         bt_gotoObfuscatedVmf.setText("Goto");
         bt_gotoObfuscatedVmf.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_gotoObfuscatedVmf.setEnabled(false);
+        bt_gotoObfuscatedVmf.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                bt_gotoObfuscatedVmfMouseEntered(evt);
+            }
+        });
         bt_gotoObfuscatedVmf.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_gotoObfuscatedVmfActionPerformed(evt);
@@ -646,11 +671,25 @@ public class ObfuscatePanel extends javax.swing.JPanel {
         bt_openObfuscatedVmf.setText("Open in Editor");
         bt_openObfuscatedVmf.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         bt_openObfuscatedVmf.setEnabled(false);
+        bt_openObfuscatedVmf.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                bt_openObfuscatedVmfMouseEntered(evt);
+            }
+        });
         bt_openObfuscatedVmf.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_openObfuscatedVmfActionPerformed(evt);
             }
         });
+
+        lb_progressBarState.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lb_progressBarState.setText("Awaiting Input");
+
+        progressBar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        progressBar.setStringPainted(true);
+
+        lb_filename.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        lb_filename.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -682,7 +721,12 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                         .addComponent(bt_obfuscate, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(bt_cancelObfuscation)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lb_filename, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lb_progressBarState)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 321, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(combo_obfuscatedVmfList, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -701,9 +745,14 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(bt_obfuscate, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
-                    .addComponent(bt_cancelObfuscation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(bt_obfuscate, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                        .addComponent(bt_cancelObfuscation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lb_progressBarState, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lb_filename, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(textAreaScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 329, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -729,8 +778,10 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     //The first method in a long chain of processes
+    //This is only called when pressing the obfuscate button
     private void initObfuscation() {
         clearProgram();
+        clearLog();
         String inputPath = tf_input.getText();
 
         //If input is folder, prepare for a batch operation
@@ -754,12 +805,11 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                     }
                 }
             } catch (IOException ex) {
-                openFileProgressDialogue.dispose();
                 finishProcess();
                 clearLog();
                 clearProgram();
-                addText("Error! IOException. Check input and try again");
-                SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR); 
+                addText("\nError! IOException. Check input and try again");
+                SoundPlayer.initSound(XMLConfig.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR); 
                 return;
             }
         } else {
@@ -775,63 +825,59 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     
     //Load file
     private void openFile(String file) {
-        new Thread(new Runnable() {
-            public void run() {
-                openFileProgressDialogue.show();
-            }
-        }).start();
-        
         selectedFile = new File(file);
 
         filePath = file;
         fileName = selectedFile.getName();
+        lb_filename.setText(fileName + " |");
         
         try {
             asyncReadVMF();
         } catch (ExecutionException ex) {
-            openFileProgressDialogue.dispose();
             finishProcess();
             clearLog();
             clearProgram();
             addText("Error! ExecutionException. Probably related to the VMF read thread.");
-            SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR); 
+            SoundPlayer.initSound(XMLConfig.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR); 
             return;
         }
     }
     
     //Analyze VMF on a separate thread to prevent the GUI thread from
     //becoming unresponsive
+    
+    //TODO: multithreading
     private void asyncReadVMF() throws ExecutionException {
         try {
             Thread vmfReaderThread;
             vmfReaderThread = new Thread(new Runnable() {
                 public void run() {
                     ArrayList<String> eDidct = EntityDictionary.getEdict();
-                    textArea.setText("Opening " + fileName + "\n...");
+                    addText("\nOpening " + fileName + "\n...");
                     long startTime = System.nanoTime();
+                    
                     try {
                         readVmfList = Files.readAllLines(Paths.get(filePath), Charset.forName(CHARSET));
                     } catch (AccessDeniedException e) {
-                        openFileProgressDialogue.dispose();
                         finishProcess();
                         clearLog();
                         clearProgram();
-                        addText("Error! AccessDeniedException. Check input and try again");
-                        SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
+                        addText("\nError! AccessDeniedException. Check input and try again");
+                        SoundPlayer.initSound(XMLConfig.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
                         return;
                     } catch (Exception e) {
-                        openFileProgressDialogue.dispose();
                         finishProcess();
                         clearLog();
                         clearProgram();
-                        addText("Error! Check input and try again");
-                        SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
+                        addText("\nError! Check input and try again");
+                        SoundPlayer.initSound(XMLConfig.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
                         return;
                     }
                     
                     int totalLines = readVmfList.size();
                     String totalLinesPretty = String.format("%,d", totalLines);
                     addText("\n\nFinished opening " + fileName + ".\nTime to open file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
+                    analyzeTime += (double)(System.nanoTime() - startTime);
                     addText("\nTotal lines: " + totalLinesPretty);
                     int beginEntitySection = readVmfList.indexOf("entity");
                     float percentageLinesSkipped = (float)beginEntitySection / totalLines * 100;
@@ -842,18 +888,17 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                     try {
                         solidSection = readVmfList.subList(0, beginEntitySection);
                     } catch (Exception e) {
-                        openFileProgressDialogue.dispose();
                         finishProcess();
                         clearProgram();
                         clearLog();
-                        addText("Something went wrong while analyzing file. Probably no entities");
-                        SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
+                        addText("\nSomething went wrong while analyzing file. Probably no entities");
+                        SoundPlayer.initSound(XMLConfig.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
                         return;
                     }
+                    
                     vmfContent = String.join("\n", solidSection);
-                    openFileProgressDialogue.setFileText("Reading " + fileName);
-                    openFileProgressDialogue.setProgressBarMin(beginEntitySection);
-                    openFileProgressDialogue.setProgressBarMax(totalLines);
+                    progressBar.setMinimum(beginEntitySection);
+                    progressBar.setMaximum(totalLines);
                     boolean isParsingEntity = false;
                     boolean isPointEntity = false;
                     String verboseTextToAppend = "";
@@ -922,9 +967,8 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                         }
                         
                         vmfContent += readVmfList.get(i) + "\n";
-                        openFileProgressDialogue.setStatusText("Line " + String.format("%,d", i) + " of " + totalLinesPretty);
-                        openFileProgressDialogue.setProgressBarValue(i);
-                        openFileProgressDialogue.appendTextArea(readVmfList.get(i));
+                        lb_progressBarState.setText("Line " + String.format("%,d", i) + " of " + totalLinesPretty);
+                        progressBar.setValue(i);
                         
                         if (checkbox_verbose.isSelected()) {
                             addVerbose(verboseTextToAppend);
@@ -933,12 +977,10 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                     }
                     addText("\n\nFinished reading " + fileName + "\n\nTime to read file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
                     addText("\nNumber of entities: " + iNumEnts);
-                    openFileProgressDialogue.setVisible(false);
-                    //openFileProgressDialogue.dispose();
                     lb_filelength.setText("length: " + String.format("%,d", vmfContent.length()) + " | lines: " + totalLinesPretty);
                     
+                    analyzeTime += (double)(System.nanoTime() - startTime);
                     try {
-                        //obfuscateVMF();
                         asyncObfuscateVMF();
                     } catch (ExecutionException ex) {
                         Logger.getLogger(ObfuscatePanel.class.getName()).log(Level.SEVERE, null, ex);
@@ -948,33 +990,28 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     
             vmfReaderThread.start();
         } catch (Exception e) {
-            openFileProgressDialogue.dispose();
             finishProcess();
             clearProgram();
             clearLog();
-            addText("Massive fuckup while initializing VMF reader thread. This is not your fault");
-            SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
+            addText("\nMassive fuckup while initializing VMF reader thread. This is not your fault");
+            SoundPlayer.initSound(XMLConfig.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
             return;
         }
 
     }
     
-    private void asyncObfuscateVMF() throws ExecutionException {
-        //new Thread(new Runnable() {
-        //    public void run() {
-        //        openFileProgressDialogue.show();
-        //    }
-        //}).start();
-                    
+    //TODO: multithreading
+    private void asyncObfuscateVMF() throws ExecutionException {         
         try {
-            Thread vmfReaderThread;
-            vmfReaderThread = new Thread(new Runnable() {
-                public void run() {                    
+            Thread vmfObfuscatorThread;
+            vmfObfuscatorThread = new Thread(new Runnable() {
+                public void run() { 
                     addText("\n\nObfuscating VMF, please wait...");
+                    long startTime = System.nanoTime();
                     rebuiltVmf = vmfContent;
                     
-                    int totalOrigins = originArray.size();
-                    int totalTargetnames = targetnameArray.size();
+                    int totalOrigins = originArray.size(); //Used for progress bar maximum
+                    int totalTargetnames = targetnameArray.size(); //Used for progress bar maximum
                     
                     ArrayList<Integer> spentOriginsIndexes = new ArrayList<>();
                     ArrayList<String> sanitizedOrigins = new ArrayList<>();
@@ -984,12 +1021,11 @@ public class ObfuscatePanel extends javax.swing.JPanel {
 
                     ArrayList<String> spentRandomStrings = new ArrayList<>();
 
-                    Random rnd =  new Random();
+                    Random rnd =  new Random(); //Get a random integer
                     int randomIndex = 0;
-                    String sanitizedString = "";
-                    String regex = "";
-                    String doubleQuoteRegex = ""; //Workaround because this thing likes to add unnecessary quotes, might fix in the future
-                    String randomStringResult = ""; 
+                    String sanitizedString = ""; 
+                    String regex = ""; //Essential for search and replace
+                    String randomStringResult = ""; //Used for random targetnames
 
                     addVerbose("\n\nStored Origins:\n");
                     for (String origin : originArray) {
@@ -997,12 +1033,11 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                     }
                                             
                     if (originObfuscationKind == 2) { //Randomized origins
-                        openFileProgressDialogue.setVisible(true);
-                        openFileProgressDialogue.clearTextArea();
-                        openFileProgressDialogue.setStatusText("Sanitizing Origins");
-                        openFileProgressDialogue.setProgressBarMin(0);
-                        openFileProgressDialogue.setProgressBarValue(0);
-                        openFileProgressDialogue.setProgressBarMax(totalOrigins);
+                        addText("\nSanitizing origins...");
+                        lb_progressBarState.setText("Sanitizing Origins");
+                        progressBar.setMinimum(0);
+                        progressBar.setValue(0);
+                        progressBar.setMaximum(totalOrigins);
                         
                         //We must first sanitize origins stored in the VMF
                         //to prevent horrible things from happening, like two entities
@@ -1023,20 +1058,18 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                             sanitizedOrigins.add(sanitizedString);
                             
                             try {
-                                openFileProgressDialogue.appendTextArea(origin + " = " + sanitizedString);
-                                openFileProgressDialogue.setProgressBarValue(openFileProgressDialogue.getProgressBarValue() + 1);
+                                progressBar.setValue(progressBar.getValue() + 1);
                             } catch (Exception e) {}
                         }
                     }
 
                     int sanitizedOriginsIndex = 0;
                     if (originObfuscationKind != 0) {
-                        openFileProgressDialogue.setVisible(true);
-                        openFileProgressDialogue.clearTextArea();
-                        openFileProgressDialogue.setStatusText("Obfuscating Origins");
-                        openFileProgressDialogue.setProgressBarMin(0);
-                        openFileProgressDialogue.setProgressBarValue(0);
-                        openFileProgressDialogue.setProgressBarMax(totalOrigins);
+                        addText("\nObfuscating origins...");
+                        lb_progressBarState.setText("Obfuscating Origins");
+                        progressBar.setMinimum(0);
+                        progressBar.setValue(0);
+                        progressBar.setMaximum(totalOrigins);
                         
                         for (String origin : originArray) {
                             regex = "(." + origin + "?)";
@@ -1045,12 +1078,9 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                                 case 1: //Overlap
                                     addVerbose("\nObfuscating origin " + origin + " using overlap method");
                                     rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArray.getFirst());
-                                    doubleQuoteRegex = "(. \"\"" + originArray.getFirst() + "?)";
-                                    rebuiltVmf = rebuiltVmf.replaceAll(doubleQuoteRegex, "\" \"" + originArray.getFirst());
                                     
                                     try {
-                                        openFileProgressDialogue.appendTextArea(origin + " = " + originArray.getFirst());
-                                        openFileProgressDialogue.setProgressBarValue(openFileProgressDialogue.getProgressBarValue() + 1);
+                                        progressBar.setValue(progressBar.getValue() + 1);
                                     } catch (Exception e) {}
                                     
                                     break;
@@ -1066,16 +1096,13 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                                     addVerbose("\nReplacing sanitized origin " + sanitizedOrigins.get(sanitizedOriginsIndex) + " with " + originArray.get(randomIndex));
 
                                     rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArray.get(randomIndex));
-
-                                    doubleQuoteRegex = "(. \"\"" + originArray.get(randomIndex) + "?)";
-                                    rebuiltVmf = rebuiltVmf.replaceAll(doubleQuoteRegex, "\" \"" + originArray.get(randomIndex));
+                                    
                                     spentOriginsIndexes.add(randomIndex);
                                     addVerbose("\nAdded " + randomIndex + " to spent origin list\n");
                                     sanitizedOriginsIndex++;
                                     
                                     try {
-                                        openFileProgressDialogue.appendTextArea(sanitizedOrigins.get(sanitizedOriginsIndex) + " = " + originArray.get(randomIndex));
-                                        openFileProgressDialogue.setProgressBarValue(openFileProgressDialogue.getProgressBarValue() + 1);
+                                        progressBar.setValue(progressBar.getValue() + 1);
                                     } catch (Exception e) {}
 
                                     break;
@@ -1084,13 +1111,9 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                                     randomIndex = rnd.nextInt(originArray.size());
                                     addVerbose(", random index " + randomIndex);
                                     rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArray.get(randomIndex));
-
-                                    doubleQuoteRegex = "(. \"\"" + originArray.get(randomIndex) + "?)";
-                                    rebuiltVmf = rebuiltVmf.replaceAll(doubleQuoteRegex, "\" \"" + originArray.get(randomIndex));
                                     
                                     try {
-                                        openFileProgressDialogue.appendTextArea(origin + " = " + originArray.get(randomIndex));
-                                        openFileProgressDialogue.setProgressBarValue(openFileProgressDialogue.getProgressBarValue() + 1);
+                                        progressBar.setValue(progressBar.getValue() + 1);
                                     } catch (Exception e) {}
                                     
                                     break;
@@ -1107,16 +1130,14 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                     }
 
                     if (targetnameObfuscationKind != 0) { //Exchange and randomize targetnames
-                        openFileProgressDialogue.setVisible(true);
-                        openFileProgressDialogue.clearTextArea();
-                        openFileProgressDialogue.setStatusText("Sanitizing Targetnames");
-                        openFileProgressDialogue.setProgressBarMin(0);
-                        openFileProgressDialogue.setProgressBarValue(0);
-                        openFileProgressDialogue.setProgressBarMax(totalTargetnames);
+                        addText("\nSanitizing targetnames...");
+                        lb_progressBarState.setText("Sanitizing Targetnames");
+                        progressBar.setMinimum(0);
+                        progressBar.setValue(0);
+                        progressBar.setMaximum(totalTargetnames);
 
                         //Sanitize targetnames to ensure that there's no repetition unless
-                        //stated so, for example, when two entities share the same 
-                        //targetname 
+                        //stated so, for example, when two entities share the same targetname 
                         addVerbose("\nSanitizing targetnames\n");
                         for (String targetname : targetnameArray) {
                             regex = " \"" + targetname;
@@ -1131,19 +1152,17 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                             rebuiltVmf = rebuiltVmf.replaceAll(regex, " \"" + sanitizedString);
                             sanitizedTargetnames.add(sanitizedString);
                             
-                            openFileProgressDialogue.appendTextArea(targetname + " = " + sanitizedString);
-                            openFileProgressDialogue.setProgressBarValue(openFileProgressDialogue.getProgressBarValue() + 1);
+                            progressBar.setValue(progressBar.getValue() + 1);
                         }
                     }
 
                     int targetnameArrayIndex = 0;
                     if (targetnameObfuscationKind != 0) {
-                        openFileProgressDialogue.setVisible(true);
-                        openFileProgressDialogue.clearTextArea();
-                        openFileProgressDialogue.setStatusText("Obfuscating Targetnames");
-                        openFileProgressDialogue.setProgressBarMin(0);
-                        openFileProgressDialogue.setProgressBarValue(0);
-                        openFileProgressDialogue.setProgressBarMax(totalTargetnames);
+                        addText("\nObfuscating targetnames...");
+                        lb_progressBarState.setText("Obfuscating Targetnames");
+                        progressBar.setMinimum(0);
+                        progressBar.setValue(0);
+                        progressBar.setMaximum(totalTargetnames);
                         
                         for (String targetname : targetnameArray) {
                             switch (targetnameObfuscationKind) {
@@ -1153,7 +1172,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                                     addVerbose("\nObfuscating targetname " + sanitizedTargetnames.get(targetnameArrayIndex) + " using exchange method");
                                     do {
                                         randomIndex = rnd.nextInt(targetnameArray.size());
-                                        if (spentTargetnameIndexes.contains(randomIndex)) addVerbose("\nOrigin index " + randomIndex + " is already in use, rerolling");
+                                        if (spentTargetnameIndexes.contains(randomIndex)) addVerbose("\nTargetname index " + randomIndex + " is already in use, rerolling");
                                     } while (spentTargetnameIndexes.contains(randomIndex));
 
                                     addVerbose("\nFound proper index " + randomIndex);
@@ -1165,8 +1184,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                                     addVerbose("\nAdded " + randomIndex + " to spent targetname list\n");
                                     targetnameArrayIndex++;
                                     
-                                    openFileProgressDialogue.appendTextArea(regex + " = " + targetnameArray.get(randomIndex));
-                                    openFileProgressDialogue.setProgressBarValue(openFileProgressDialogue.getProgressBarValue() + 1);
+                                    progressBar.setValue(progressBar.getValue() + 1);
                                     break;  
                                 case 2: //Randomize
                                     regex = sanitizedTargetnames.get(targetnameArrayIndex);
@@ -1186,8 +1204,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                                     spentTargetnameIndexes.add(randomIndex);
                                     targetnameArrayIndex++;
 
-                                    openFileProgressDialogue.appendTextArea(regex + " = " + randomStringResult);
-                                    openFileProgressDialogue.setProgressBarValue(openFileProgressDialogue.getProgressBarValue() + 1);
+                                    progressBar.setValue(progressBar.getValue() + 1);
                                     break;
                             }
                         }  
@@ -1195,198 +1212,33 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                     } else {
                         addVerbose("\nSkipping targetname obfuscation");
                     }
-
-                    addText("\n\nObfuscated VMF! file is ready to go");
-                    openFileProgressDialogue.dispose();
+                    
+                    if (combo_input.getSelectedIndex() != 1 || XMLConfig.getBooleanValue("playObfuscateSndWhileBatch")) {
+                        SoundPlayer.initSound(XMLConfig.getStringValue("obfuscateFileSnd"), SoundPlayer.SoundType.SND_OBFUSCATE);   
+                    }
+                            
+                    addText("\n\nObfuscated VMF! file is ready to go" + "\nTime to obfuscate: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
+                    obfuscateTime = (double)(System.nanoTime() - startTime);
+                    totalElapsedTime = obfuscateTime + analyzeTime;
+                    batchOperationTime += totalElapsedTime;
+                    
                     originArray.clear();
                     targetnameArray.clear();
                     saveFile();
                 }
             });
     
-            vmfReaderThread.start();
+            vmfObfuscatorThread.start();
         } catch (Exception e) {
-            openFileProgressDialogue.dispose();
             finishProcess();
             clearProgram();
             clearLog();
-            addText("Massive fuckup while initializing VMF obfuscator thread. This is not your fault");
-            SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
+            addText("\nMassive fuckup while initializing VMF obfuscator thread. This is not your fault");
+            SoundPlayer.initSound(XMLConfig.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
             return;
         }
 
     }
-    
-    /*
-    private void obfuscateVMF() {
-        addText("\n\nObfuscating VMF, please wait...");
-        rebuiltVmf = vmfContent;
-        ArrayList<Integer> spentOriginsIndexes = new ArrayList<>();
-        ArrayList<String> sanitizedOrigins = new ArrayList<>();
-        
-        ArrayList<Integer> spentTargetnameIndexes = new ArrayList<>();
-        ArrayList<String> sanitizedTargetnames = new ArrayList<>();
-        
-        ArrayList<String> spentRandomStrings = new ArrayList<>();
-        
-        Random rnd =  new Random();
-        int randomIndex = 0;
-        String sanitizedString = "";
-        String regex = "";
-        String doubleQuoteRegex = ""; //Workaround because this thing likes to add unnecessary quotes
-        String randomStringResult = "";
-        
-        addVerbose("\n\nStored Origins:\n");
-        for (String origin : originArray) {
-            addVerbose(origin + "\n");
-        }
-        
-        if (originObfuscationKind == 2) { //Randomized origins
-            //We must first sanitize origins stored in the VMF
-            //to prevent horrible things from happening, like two entities
-            //having their origins set to the same value, which
-            //this obfuscation method should prevent
-            addVerbose("\nOrigin randomization method: sanitizing origins\n");
-            for (String origin : originArray) {
-                regex = "(." + origin + "?)";
-                RandomString randomString = new RandomString();
-                
-                do {
-                    sanitizedString = randomString.getRandomString(1, 20);
-                    if (sanitizedOrigins.contains(sanitizedString)) addVerbose("\nSanitized origin " + sanitizedString + " is already in use, rerolling");
-                } while (sanitizedOrigins.contains(sanitizedString));
-                
-                addVerbose("Origin " + origin + " sanitized with string " + sanitizedString + "\n");
-                rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + sanitizedString);
-                sanitizedOrigins.add(sanitizedString);
-            }
-        }
-        
-        int sanitizedOriginsIndex = 0;
-        if (originObfuscationKind != 0) {
-            for (String origin : originArray) {
-                regex = "(." + origin + "?)";
-                
-                switch (originObfuscationKind) {
-                    case 1: //Overlap
-                        addVerbose("\nObfuscating origin " + origin + " using overlap method");
-                        rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArray.getFirst());
-                        doubleQuoteRegex = "(. \"\"" + originArray.getFirst() + "?)";
-                        rebuiltVmf = rebuiltVmf.replaceAll(doubleQuoteRegex, "\" \"" + originArray.getFirst());
-                        break;
-                    case 2: //Randomized
-                        regex = "(." + sanitizedOrigins.get(sanitizedOriginsIndex) + "?)";
-                        addVerbose("\nObfuscating origin " + sanitizedOrigins.get(sanitizedOriginsIndex) + "  using random method");
-                        do {
-                            randomIndex = rnd.nextInt(originArray.size());
-                            if (spentOriginsIndexes.contains(randomIndex)) addVerbose("\nOrigin index " + randomIndex + " is already in use, rerolling");
-                        } while (spentOriginsIndexes.contains(randomIndex));
-                        
-                        addVerbose("\nFound proper index " + randomIndex);
-                        addVerbose("\nReplacing sanitized origin " + sanitizedOrigins.get(sanitizedOriginsIndex) + " with " + originArray.get(randomIndex));
-                        
-                        rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArray.get(randomIndex));
-                        
-                        doubleQuoteRegex = "(. \"\"" + originArray.get(randomIndex) + "?)";
-                        rebuiltVmf = rebuiltVmf.replaceAll(doubleQuoteRegex, "\" \"" + originArray.get(randomIndex));
-                        spentOriginsIndexes.add(randomIndex);
-                        addVerbose("\nAdded " + randomIndex + " to spent origin list\n");
-                        sanitizedOriginsIndex++;
-                        break;
-                    case 3: //Randomize w/ Overlap
-                        addVerbose("\nObfuscating origin " + origin + " using random w/ overlap method");
-                        randomIndex = rnd.nextInt(originArray.size());
-                        addVerbose(", random index " + randomIndex);
-                        rebuiltVmf = rebuiltVmf.replaceAll(regex, "\"" + originArray.get(randomIndex));
-                        
-                        doubleQuoteRegex = "(. \"\"" + originArray.get(randomIndex) + "?)";
-                        rebuiltVmf = rebuiltVmf.replaceAll(doubleQuoteRegex, "\" \"" + originArray.get(randomIndex));
-                        break;
-                }
-            }  
-            addVerbose("\nFinished obfuscating origins");
-        } else {
-            addVerbose("\nSkipping origin obfuscation");
-        }
-
-        addVerbose("\n\nStored targetnames:\n");
-        for (String targetname : targetnameArray) {
-            addVerbose(targetname + "\n");
-        }
-        
-        if (targetnameObfuscationKind != 0) { //Exchange and randomize targetnames
-            //Sanitize targetnames to ensure that there's no repetition unless
-            //stated so, for example, when two entities share the same 
-            //targetname 
-            addVerbose("\nSanitizing targetnames\n");
-            for (String targetname : targetnameArray) {
-                regex = " \"" + targetname;
-                RandomString randomString = new RandomString();
-                
-                do {
-                    sanitizedString = randomString.getRandomString(1, 20);
-                    if (sanitizedTargetnames.contains(sanitizedString)) addVerbose("\nSanitized targetname " + sanitizedString + " is already in use, rerolling");
-                } while (sanitizedTargetnames.contains(sanitizedString));
-                
-                addVerbose("Targetname " + targetname + " sanitized with string " + sanitizedString + "\n");
-                rebuiltVmf = rebuiltVmf.replaceAll(regex, " \"" + sanitizedString);
-                sanitizedTargetnames.add(sanitizedString);
-            }
-        }
-        
-        int targetnameArrayIndex = 0;
-        if (targetnameObfuscationKind != 0) {
-            for (String targetname : targetnameArray) {
-                switch (targetnameObfuscationKind) {
-                    case 1: //Exchange
-                        regex = sanitizedTargetnames.get(targetnameArrayIndex);
-                        
-                        addVerbose("\nObfuscating targetname " + sanitizedTargetnames.get(targetnameArrayIndex) + " using exchange method");
-                        do {
-                            randomIndex = rnd.nextInt(targetnameArray.size());
-                            if (spentTargetnameIndexes.contains(randomIndex)) addVerbose("\nOrigin index " + randomIndex + " is already in use, rerolling");
-                        } while (spentTargetnameIndexes.contains(randomIndex));
-                        
-                        addVerbose("\nFound proper index " + randomIndex);
-                        addVerbose("\nReplacing sanitized targetname " + sanitizedTargetnames.get(targetnameArrayIndex) + " with " + targetnameArray.get(randomIndex));
-                        
-                        rebuiltVmf = rebuiltVmf.replaceAll(regex, targetnameArray.get(randomIndex));
-                        
-                        spentTargetnameIndexes.add(randomIndex);
-                        addVerbose("\nAdded " + randomIndex + " to spent targetname list\n");
-                        targetnameArrayIndex++;
-                        break;  
-                    case 2: //Randomize
-                        regex = sanitizedTargetnames.get(targetnameArrayIndex);
-                        
-                        addVerbose("\nObfuscating targetname " + sanitizedTargetnames.get(targetnameArrayIndex) + " using random string method");
-                        
-                        do {
-                            RandomString randomString = new RandomString();
-                            randomStringResult = randomString.getRandomString(comboBox_rndEntNameChoices.getSelectedIndex(), (int)comboBox_rndEntNameLength.getValue());  
-                            if (spentRandomStrings.contains(randomStringResult)) addVerbose("\nRandom targetname " + randomStringResult + " is already in use, rerolling (this is super rare)");
-                        } while (spentRandomStrings.contains(randomStringResult));
-
-                        addVerbose("\nReplacing sanitized targetname " + sanitizedTargetnames.get(targetnameArrayIndex) + " with " + randomStringResult + "\n");
-                        
-                        rebuiltVmf = rebuiltVmf.replaceAll(regex, randomStringResult);
-                        
-                        spentTargetnameIndexes.add(randomIndex);
-                        targetnameArrayIndex++;
-                        break;
-                }
-            }  
-            addVerbose("\nFinished obfuscating targetnames\n");
-        } else {
-            addVerbose("\nSkipping targetname obfuscation");
-        }
-        
-        addText("\n\nObfuscated VMF! file is ready to go");
-        originArray.clear();
-        targetnameArray.clear();
-        saveFile();
-    }
-    */
     
     private void saveFile() {
         //I need more sleep
@@ -1409,8 +1261,6 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                 for (int i = 0; i < sanitizedInputFolderArray.length - limiter; i++) {
                     inputFolderNoFilename += sanitizedInputFolderArray[i] + "\\";
                 }
-                
-                addVerbose("\nInput folder is " + fileNameNoExtension);
                 
                 fileToWrite = new File(inputFolderNoFilename + "\\" + tf_output.getText() + "\\" + fileNameNoExtension + "_obf.vmf");
                 
@@ -1437,16 +1287,17 @@ public class ObfuscatePanel extends javax.swing.JPanel {
         
         try {
             BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(fileToWrite));
-            
             bufferedWriter.write(rebuiltVmf);
             bufferedWriter.close();
-            addText("\nSaved file to " + fileToWrite);
+            addText("\n\nSaved file to " + fileToWrite);
+            addText("\nTotal time elapsed: " + String.format("%.2f", totalElapsedTime / 1_000_000_000. ) + " seconds.");
+            addText("\n-----------------------------------------------------------------------------------------------------------");
         } catch (IOException ex) {
             finishProcess();
             clearProgram();
             clearLog();
-            addText("Error! IOException while attemting to save file. Weird.");
-            SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
+            addText("\nError! IOException while attempting to save file. Weird.");
+            SoundPlayer.initSound(XMLConfig.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
             return;
         }
         
@@ -1454,27 +1305,45 @@ public class ObfuscatePanel extends javax.swing.JPanel {
         bt_openObfuscatedVmf.setEnabled(true);
         bt_gotoObfuscatedVmf.setEnabled(true);
         
-        obfuscatedVmfList.add(fileToWrite.getAbsolutePath());
+        totalElapsedTime = 0;
+        analyzeTime = 0;
+        obfuscateTime = 0;
         
-        if (combo_input.getSelectedIndex() != 1 || XMLManager.getBooleanValue("playObfuscateSndWhileBatch")) {
-            SoundPlayer.initSound(XMLManager.getStringValue("obfuscateFileSnd"), SoundPlayer.SoundType.SND_OBFUSCATE);   
-        }
+        obfuscatedVmfList.add(fileToWrite.getAbsolutePath());
 
         addVMFtoComboBox();
         filesToProcessIndex++;
         processNextFileInQueue();
     }  
     
-    //Enable some buttons
+    private void processNextFileInQueue() {
+        if (filesToProcessIndex >= filesToProcess.size()) {
+            addText("\n\nFinished all operations");
+            if (combo_input.getSelectedIndex() == 1) {
+                SoundPlayer.initSound(XMLConfig.getStringValue("batchOperationSnd"), SoundPlayer.SoundType.SND_BATCH);  
+                addText("\nTotal time elapsed: " + String.format("%.2f", batchOperationTime / 1_000_000_000. ) + " seconds.");
+            }
+            finishProcess();
+            return;
+        }
+        
+        openFile(filesToProcess.get(filesToProcessIndex));
+    }
+    
+    //Enable some buttons and reset progress bar state
     private void finishProcess() {
         bt_obfuscate.setEnabled(true);
         bt_cancelObfuscation.setEnabled(false);
+        
+        lb_progressBarState.setText("Awaiting Input");
+        progressBar.setValue(0);
+        lb_filename.setText("");
     }
     
     //Add the freshly obfuscated VMF to the combo box at the bottom of the panel
     //so it can be opened in the file system or inside Hammer
     private void addVMFtoComboBox() {
-        DefaultComboBoxModel<String> comboBox = new DefaultComboBoxModel<>();
+        DefaultComboBoxModel<String> comboBox = new DefaultComboBoxModel<>();   
         
         for (String fileToWrite : obfuscatedVmfList) {
             comboBox.addElement(fileToWrite);
@@ -1485,8 +1354,15 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     
     //Set everything back to default
     private void clearProgram() {
+            analyzeTime = 0;
+            obfuscateTime = 0;
+            totalElapsedTime = 0;
+            batchOperationTime = 0;
+        
+            lb_filename.setText("");
             obfuscatedVmfList.clear();
             iNumEnts = 0;
+            totalElapsedTime = 0;
             originArray.clear();
             targetnameArray.clear();
             filePath = "";
@@ -1499,9 +1375,11 @@ public class ObfuscatePanel extends javax.swing.JPanel {
             filesToProcess.clear();
             filesToProcessIndex = 0;
 
-            //textArea.setText("Welcome to Uboa VMF Obfuscator. Ensure proper input and output parameters and click the big obfuscate button.");
+            textArea.setText("");
             lb_info.setText("Hover over objects to see relevant information");
             lb_filelength.setText("length: 0 | lines: 0");
+            
+            finishProcess();
     }
 
     private void rb_ePosObfuscation_noneMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_noneMouseEntered
@@ -1509,7 +1387,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_rb_ePosObfuscation_noneMouseEntered
 
     private void rb_ePosObfuscation_noneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_noneActionPerformed
-        XMLManager.setStringValue("entityPosObfuscation", "None");
+        XMLConfig.setStringValue("entityPosObfuscation", "None");
         originObfuscationKind = 0;
     }//GEN-LAST:event_rb_ePosObfuscation_noneActionPerformed
 
@@ -1518,7 +1396,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_rb_ePosObfuscation_overlapMouseEntered
 
     private void rb_ePosObfuscation_overlapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_overlapActionPerformed
-        XMLManager.setStringValue("entityPosObfuscation", "Overlap");
+        XMLConfig.setStringValue("entityPosObfuscation", "Overlap");
         originObfuscationKind = 1;
     }//GEN-LAST:event_rb_ePosObfuscation_overlapActionPerformed
 
@@ -1527,7 +1405,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_rb_ePosObfuscation_randomizeMouseEntered
 
     private void rb_ePosObfuscation_randomizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_randomizeActionPerformed
-        XMLManager.setStringValue("entityPosObfuscation", "Random");
+        XMLConfig.setStringValue("entityPosObfuscation", "Random");
         originObfuscationKind = 2;
     }//GEN-LAST:event_rb_ePosObfuscation_randomizeActionPerformed
 
@@ -1536,7 +1414,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_rb_ePosObfuscation_randomizeOverlapMouseEntered
 
     private void rb_ePosObfuscation_randomizeOverlapActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_ePosObfuscation_randomizeOverlapActionPerformed
-        XMLManager.setStringValue("entityPosObfuscation", "RandomOverlap");
+        XMLConfig.setStringValue("entityPosObfuscation", "RandomOverlap");
         originObfuscationKind = 3;
     }//GEN-LAST:event_rb_ePosObfuscation_randomizeOverlapActionPerformed
 
@@ -1546,7 +1424,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
 
     private void rb_eNameObfuscation_noneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_eNameObfuscation_noneActionPerformed
         setRandomEntNameParametersEditable(false);
-        XMLManager.setStringValue("entityNameObfuscation", "None");
+        XMLConfig.setStringValue("entityNameObfuscation", "None");
         targetnameObfuscationKind = 0;
     }//GEN-LAST:event_rb_eNameObfuscation_noneActionPerformed
 
@@ -1556,7 +1434,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
 
     private void rb_eNameObfuscation_exchangeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_eNameObfuscation_exchangeActionPerformed
         setRandomEntNameParametersEditable(false);
-        XMLManager.setStringValue("entityNameObfuscation", "Exchange");
+        XMLConfig.setStringValue("entityNameObfuscation", "Exchange");
         targetnameObfuscationKind = 1;
     }//GEN-LAST:event_rb_eNameObfuscation_exchangeActionPerformed
 
@@ -1566,16 +1444,16 @@ public class ObfuscatePanel extends javax.swing.JPanel {
 
     private void rb_eNameObfuscation_randomizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rb_eNameObfuscation_randomizeActionPerformed
         setRandomEntNameParametersEditable(true);
-        XMLManager.setStringValue("entityNameObfuscation", "Random");
+        XMLConfig.setStringValue("entityNameObfuscation", "Random");
         targetnameObfuscationKind = 2;
     }//GEN-LAST:event_rb_eNameObfuscation_randomizeActionPerformed
 
     private void comboBox_rndEntNameChoicesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboBox_rndEntNameChoicesActionPerformed
-        XMLManager.setIntegerValue("entityNameObfuscationKind", comboBox_rndEntNameChoices.getSelectedIndex());
+        XMLConfig.setIntegerValue("entityNameObfuscationKind", comboBox_rndEntNameChoices.getSelectedIndex());
     }//GEN-LAST:event_comboBox_rndEntNameChoicesActionPerformed
 
     private void comboBox_rndEntNameLengthStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_comboBox_rndEntNameLengthStateChanged
-        XMLManager.setIntegerValue("entityNameObfuscationLength", (int)comboBox_rndEntNameLength.getValue());
+        XMLConfig.setIntegerValue("entityNameObfuscationLength", (int)comboBox_rndEntNameLength.getValue());
     }//GEN-LAST:event_comboBox_rndEntNameLengthStateChanged
 
     private void bt_randomStringTestMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bt_randomStringTestMouseEntered
@@ -1600,7 +1478,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_checkbox_verboseMouseEntered
 
     private void checkbox_verboseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_verboseActionPerformed
-        XMLManager.setBooleanValue("verbose", checkbox_verbose.isSelected());
+        XMLConfig.setBooleanValue("verbose", checkbox_verbose.isSelected());
     }//GEN-LAST:event_checkbox_verboseActionPerformed
 
     private void bt_clearConsoleMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bt_clearConsoleMouseEntered
@@ -1608,7 +1486,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_bt_clearConsoleMouseEntered
 
     private void bt_clearConsoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_clearConsoleActionPerformed
-        textArea.setText("");
+        clearLog();
     }//GEN-LAST:event_bt_clearConsoleActionPerformed
 
     private void bt_exportLogMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bt_exportLogMouseEntered
@@ -1631,8 +1509,8 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                 finishProcess();
                 clearProgram();
                 clearLog();
-                addText("Error! IOException while attemting to save log. Weird.");
-                SoundPlayer.initSound(XMLManager.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
+                addText("Error! IOException while attempting to save log. Weird.");
+                SoundPlayer.initSound(XMLConfig.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR);
                 return;
             } finally {
                 if (bw != null) {
@@ -1661,7 +1539,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_combo_inputMouseEntered
 
     private void combo_inputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_combo_inputActionPerformed
-        XMLManager.setIntegerValue("inputType", combo_input.getSelectedIndex());
+        XMLConfig.setIntegerValue("inputType", combo_input.getSelectedIndex());
     }//GEN-LAST:event_combo_inputActionPerformed
 
     private void combo_outputMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_combo_outputMouseEntered
@@ -1669,7 +1547,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_combo_outputMouseEntered
 
     private void combo_outputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_combo_outputActionPerformed
-        XMLManager.setIntegerValue("outputType", combo_output.getSelectedIndex());
+        XMLConfig.setIntegerValue("outputType", combo_output.getSelectedIndex());
         setupOutput();
     }//GEN-LAST:event_combo_outputActionPerformed
 
@@ -1677,17 +1555,17 @@ public class ObfuscatePanel extends javax.swing.JPanel {
         switch (combo_output.getSelectedIndex()) {
             case 0: //Subfolder
                 tf_output.setEnabled(true);
-                tf_output.setText(XMLManager.getStringValue("outputSubfolder"));
+                tf_output.setText(XMLConfig.getStringValue("outputSubfolder"));
                 bt_browseOutput.setEnabled(false);
-                bt_gotoOutput.setEnabled(false);
+                bt_gotoOutput.setEnabled(true);
                 break;
             case 1: //Work folder
                 tf_output.setEnabled(false);
-                tf_output.setText(XMLManager.getStringValue("outputWorkfolder"));
+                tf_output.setText(XMLConfig.getStringValue("outputWorkfolder"));
                 bt_browseOutput.setEnabled(true);
-                bt_gotoOutput.setEnabled(true);
+                bt_gotoOutput.setEnabled(false);
 
-                if (XMLManager.getStringValue("outputWorkfolder").equals("$DOCUMENTS")) {
+                if (XMLConfig.getStringValue("outputWorkfolder").equals("$DOCUMENTS")) {
                     tf_output.setText(FileSystemView.getFileSystemView().getDefaultDirectory().getPath());
                     return;
                 }
@@ -1708,7 +1586,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
         }
         
         bt_browseOutput.setEnabled(false);
-        bt_gotoOutput.setEnabled(false);
+        bt_gotoOutput.setEnabled(true);
     }
     
     //Helper function to remove file names from a path
@@ -1725,25 +1603,14 @@ public class ObfuscatePanel extends javax.swing.JPanel {
         return inputFolderNoFilename;
     }
     
-    private void processNextFileInQueue() {
-        if (filesToProcessIndex >= filesToProcess.size()) {
-            if (combo_input.getSelectedIndex() == 1) {
-                SoundPlayer.initSound(XMLManager.getStringValue("batchOperationSnd"), SoundPlayer.SoundType.SND_BATCH);  
-            }
-            addText("\n\nFinished all operations");
-            finishProcess();
-            return;
-        }
-        
-        openFile(filesToProcess.get(filesToProcessIndex));
-    }
+
     
     private void tf_inputMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tf_inputMouseEntered
         lb_info.setText("Path to the input VMF. For batch operations, select folder from the combo box");
     }//GEN-LAST:event_tf_inputMouseEntered
 
     private void tf_inputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tf_inputKeyReleased
-        XMLManager.setStringValue("inputPath", tf_input.getText());
+        XMLConfig.setStringValue("inputPath", tf_input.getText());
     }//GEN-LAST:event_tf_inputKeyReleased
 
     private void tf_outputMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tf_outputMouseEntered
@@ -1752,11 +1619,11 @@ public class ObfuscatePanel extends javax.swing.JPanel {
 
     private void tf_outputKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tf_outputKeyReleased
         if (combo_output.getSelectedIndex() == 0) {
-            XMLManager.setStringValue("outputSubfolder", tf_output.getText());
+            XMLConfig.setStringValue("outputSubfolder", tf_output.getText());
             return;
         }
 
-        XMLManager.setStringValue("outputWorkfolder", tf_input.getText());
+        XMLConfig.setStringValue("outputWorkfolder", tf_input.getText());
     }//GEN-LAST:event_tf_outputKeyReleased
 
     private void bt_browseInputActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_browseInputActionPerformed
@@ -1768,14 +1635,14 @@ public class ObfuscatePanel extends javax.swing.JPanel {
 
         if (fileChooser.showOpenDialog(parent)) {
             String chosenFile = fileChooser.getSelectedFile().getName();
-            XMLManager.setStringValue("inputPath", fileChooser.getSelectedFile().getAbsolutePath());
+            XMLConfig.setStringValue("inputPath", fileChooser.getSelectedFile().getAbsolutePath());
             
             //If we do not select a vmf file, set input mode to folder and clean up path
             if (chosenFile.contains("[Folder Selection]")) {
                 combo_input.setSelectedIndex(1); //Input set to folder
                 String sanitizedPath = fileChooser.getSelectedFile().getAbsolutePath().replace(chosenFile, "");
                 tf_input.setText(sanitizedPath);
-                XMLManager.setStringValue("inputPath", sanitizedPath);
+                XMLConfig.setStringValue("inputPath", sanitizedPath);
             } else {
                 //If a file is chosen, set input mode to file and update path
                 combo_input.setSelectedIndex(0); //Input set to file
@@ -1805,7 +1672,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
 
             String sanitizedPath = fileChooser.getSelectedFile().getAbsolutePath().replace(regex, "");
             tf_output.setText(sanitizedPath);
-            XMLManager.setStringValue("outputWorkfolder", sanitizedPath);
+            XMLConfig.setStringValue("outputWorkfolder", sanitizedPath);
         }
     }//GEN-LAST:event_bt_browseOutputActionPerformed
 
@@ -1836,7 +1703,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     private void bt_openObfuscatedVmfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_openObfuscatedVmfActionPerformed
         SetHammerPathDialogue hammerSetupDialog = new SetHammerPathDialogue(parent, true, combo_obfuscatedVmfList.getSelectedItem().toString());
 
-        if (XMLManager.getBooleanValue("preferFileTypeAssociation")) {
+        if (XMLConfig.getBooleanValue("preferFileTypeAssociation")) {
             try {
                 System.out.println("\"" + combo_obfuscatedVmfList.getSelectedItem().toString() + "\"");
                 Desktop.getDesktop().open(new File(combo_obfuscatedVmfList.getSelectedItem().toString()));
@@ -1847,12 +1714,12 @@ public class ObfuscatePanel extends javax.swing.JPanel {
             return;
         }
 
-        if (XMLManager.getStringValue("hammerPath").equals("Path to executable (ex: hammerplusplus.exe)")) {
+        if (XMLConfig.getStringValue("hammerPath").equals("Path to executable (ex: hammerplusplus.exe)")) {
             hammerSetupDialog.show();
         }
 
         try {
-            Runtime.getRuntime().exec(XMLManager.getStringValue("hammerPath") + " \"" + combo_obfuscatedVmfList.getSelectedItem().toString() + "\"");
+            Runtime.getRuntime().exec(XMLConfig.getStringValue("hammerPath") + " \"" + combo_obfuscatedVmfList.getSelectedItem().toString() + "\"");
         } catch (IOException ex) {
             System.out.println("Hammer path not configured");
             hammerSetupDialog.show();
@@ -1860,9 +1727,37 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     }//GEN-LAST:event_bt_openObfuscatedVmfActionPerformed
 
     private void bt_cancelObfuscationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_cancelObfuscationActionPerformed
-        finishProcess();
         clearProgram();
+        //parent.restartApp();
     }//GEN-LAST:event_bt_cancelObfuscationActionPerformed
+
+    private void bt_openObfuscatedVmfMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bt_openObfuscatedVmfMouseEntered
+        lb_info.setText("Open VMF file in Hammer Editor");
+    }//GEN-LAST:event_bt_openObfuscatedVmfMouseEntered
+
+    private void bt_gotoObfuscatedVmfMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bt_gotoObfuscatedVmfMouseEntered
+        lb_info.setText("Open VMF file in explorer");
+    }//GEN-LAST:event_bt_gotoObfuscatedVmfMouseEntered
+
+    private void bt_obfuscateMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bt_obfuscateMouseEntered
+        lb_info.setText("Begin obfuscation");
+    }//GEN-LAST:event_bt_obfuscateMouseEntered
+
+    private void bt_browseInputMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bt_browseInputMouseEntered
+        lb_info.setText("Open file browser");
+    }//GEN-LAST:event_bt_browseInputMouseEntered
+
+    private void bt_browseOutputMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bt_browseOutputMouseEntered
+        lb_info.setText("Open file browser");
+    }//GEN-LAST:event_bt_browseOutputMouseEntered
+
+    private void bt_gotoInputMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bt_gotoInputMouseEntered
+        lb_info.setText("Open in file system");
+    }//GEN-LAST:event_bt_gotoInputMouseEntered
+
+    private void bt_gotoOutputMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bt_gotoOutputMouseEntered
+        lb_info.setText("Open in file system");
+    }//GEN-LAST:event_bt_gotoOutputMouseEntered
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1893,7 +1788,10 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel lb_charset;
     private javax.swing.JLabel lb_filelength;
+    private javax.swing.JLabel lb_filename;
     private javax.swing.JLabel lb_info;
+    private javax.swing.JLabel lb_progressBarState;
+    private javax.swing.JProgressBar progressBar;
     private javax.swing.JRadioButton rb_eNameObfuscation_exchange;
     private javax.swing.JRadioButton rb_eNameObfuscation_none;
     private javax.swing.JRadioButton rb_eNameObfuscation_randomize;
