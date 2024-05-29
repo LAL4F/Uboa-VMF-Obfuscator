@@ -10,6 +10,7 @@ A GUI obfuscator for VMF (Valve Map Format) files. A robust and configurable pro
 ### Features
 <ul>
     <li>UI personalization</li>
+    <li>Responsive, adaptable UI made for all screen resolutions</li>
     <li>Support for individual and batch operations</li>
     <li>Entity targetname and origin obfuscation</li>
     <li>Hammer Editor integration (allows you to quickly open newly obfuscated maps in the Editor)</li>
@@ -27,4 +28,6 @@ TODO: write me
 ## Screenshots
 <p align="center">
     <img src="https://i.imgur.com/OKckIZa.jpeg" style="width:70%">
+    <p align="center"><img src="https://i.imgur.com/rvbH1uO.jpeg" style="width:40%">
+    <img src="https://i.imgur.com/Zz0q0hG.jpeg" style="width:40%">
 </p>
