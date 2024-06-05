@@ -18,7 +18,7 @@ public class HelpPanel extends javax.swing.JPanel {
         
         bt_vdc.setIcon(new ImageIcon(MainWindow.class.getResource("/images/vdcLogo.png")));
         bt_github.setIcon(new ImageIcon(MainWindow.class.getResource("/images/github.png")));
-        bt_manual.setIcon(new ImageIcon(MainWindow.class.getResource("/images/manualicon.png")));
+        //bt_manual.setIcon(new ImageIcon(MainWindow.class.getResource("/images/manualicon.png")));
     }
 
     @SuppressWarnings("unchecked")
@@ -27,7 +27,6 @@ public class HelpPanel extends javax.swing.JPanel {
 
         jPanel1 = new javax.swing.JPanel();
         bt_vdc = new javax.swing.JButton();
-        bt_manual = new javax.swing.JButton();
         bt_github = new javax.swing.JButton();
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Links"));
@@ -41,16 +40,6 @@ public class HelpPanel extends javax.swing.JPanel {
         bt_vdc.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bt_vdcActionPerformed(evt);
-            }
-        });
-
-        bt_manual.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        bt_manual.setBorder(null);
-        bt_manual.setContentAreaFilled(false);
-        bt_manual.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        bt_manual.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bt_manualActionPerformed(evt);
             }
         });
 
@@ -71,24 +60,17 @@ public class HelpPanel extends javax.swing.JPanel {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(bt_vdc, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(bt_manual, javax.swing.GroupLayout.PREFERRED_SIZE, 590, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(bt_github, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(bt_vdc, javax.swing.GroupLayout.PREFERRED_SIZE, 816, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(bt_github, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(bt_manual, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(bt_github, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(bt_vdc, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(bt_github, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -105,7 +87,7 @@ public class HelpPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(357, Short.MAX_VALUE))
+                .addContainerGap(369, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -116,22 +98,6 @@ public class HelpPanel extends javax.swing.JPanel {
             Logger.getLogger(HelpPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_bt_githubActionPerformed
-
-    private void bt_manualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_manualActionPerformed
-        //the manual pdf must be read into an input stream of bytes, then a temp file
-        //is rebuilt using the stream and opened by the OS
-
-        //as for the path of the temp file, it must be the same folder as the jar file
-        InputStream inputStream = MainWindow.class.getResourceAsStream("/pdf/manual.pdf");
-        File file = new File("manual.pdf");
-
-        try {
-            Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            Desktop.getDesktop().open(file);
-        } catch (IOException ex) {
-            Logger.getLogger(HelpPanel.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_bt_manualActionPerformed
 
     private void bt_vdcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_vdcActionPerformed
         try {
@@ -144,7 +110,6 @@ public class HelpPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bt_github;
-    private javax.swing.JButton bt_manual;
     private javax.swing.JButton bt_vdc;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
