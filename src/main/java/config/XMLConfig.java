@@ -1,3 +1,7 @@
+//
+// TODO: write my own JSON parser so I can skip the stupid xsl file
+//
+
 package config;
 
 import java.io.BufferedWriter;

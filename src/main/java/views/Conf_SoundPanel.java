@@ -99,10 +99,8 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         });
 
         tf_obfuscateFileSnd.setText("jTextField3");
-        tf_obfuscateFileSnd.setEnabled(false);
 
         tf_finishBatchSnd.setText("jTextField4");
-        tf_finishBatchSnd.setEnabled(false);
 
         bt_resetAllSounds.setText("Reset");
         bt_resetAllSounds.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -143,7 +141,6 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         });
 
         tf_errorSnd.setText("jTextField4");
-        tf_errorSnd.setEnabled(false);
 
         bt_errorSnd.setText("...");
         bt_errorSnd.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -321,6 +318,9 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
        
        XMLConfig.setStringValue("batchOperationSnd", "/internalSnd/save.wav");
        tf_finishBatchSnd.setText("/internalSnd/save.wav");
+       
+       XMLConfig.setStringValue("errorSnd", "/internalSnd/uuwaaah.wav");
+       tf_finishBatchSnd.setText("/internalSnd/uuwaaah.wav");
     }//GEN-LAST:event_bt_resetAllSoundsActionPerformed
 
     private void checkbox_individualSoundsOnBatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkbox_individualSoundsOnBatchActionPerformed
@@ -352,7 +352,7 @@ public class Conf_SoundPanel extends javax.swing.JPanel {
         soundBrowserDialogue.show();
     }
     
-    public void setEventSnd(String sndEvent, String soundPath) {
+    public void associateSoundWithEvent(String sndEvent, String soundPath) {
         XMLConfig.setStringValue(sndEvent, soundPath);
         
         switch (sndEvent) {

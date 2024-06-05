@@ -12,8 +12,6 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
-import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import views.MainWindow;
@@ -29,8 +27,6 @@ public class SoundPlayer  {
         SND_OVERRIDE, //Bypasses rules, master volume
         SND_BROWSERDIALOG; //Bypasses rules, sound browser preview volume
     }
-    
-
     
     //Initial check to figure out if sound should be played in the first place
     //Sounds with the SND_OVERRIDE and SND_BROWSERDIALOG flags should always play no matter what

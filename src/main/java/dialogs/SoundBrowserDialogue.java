@@ -53,17 +53,11 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
     
     private void setupWindowTitle() {
         switch (sndEvent) {
-            case "openFileSnd":
-                setTitle("Open File - Sound Browser");
-                break;
-            case "analyzeFileSnd":
-                setTitle("Analyze File - Sound Browser");
-                break;
             case "obfuscateFileSnd":
                 setTitle("Obfuscate File - Sound Browser");
                 break;
-            case "saveFileSnd":
-                setTitle("Save File - Sound Browser");
+            case "batchOperationSnd":
+                setTitle("Finish Batch Operation - Sound Browser");
                 break;
             case "errorSnd":
                 setTitle("Error - Sound Browser");
@@ -81,6 +75,8 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
         tf_fileNameFilter.setText(XMLConfig.getStringValue("soundChooserFilter"));
     }
 
+    //Get every single file stored inside /internalSnd and return it as a set
+    //Honestly I'm not entirely sure how this works but it doesn't crash the application
     private Set<String> getInternalSndFiles() {
         Set<String> fileSet = new HashSet<>();
         try {
@@ -89,12 +85,11 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
             Map<String, String> env = new HashMap<>();
             String[] array = uri.toString().split("!");
             FileSystem fs = FileSystems.newFileSystem(URI.create(array[0]), env);
-            Path path = fs.getPath(array[1]);
             
             DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(uri));
             
             for (Path streamPath : stream) {
-                if ((!Files.isDirectory(streamPath)) && (streamPath.getFileName().toString().contains(".wav"))) {
+                if ((!Files.isDirectory(streamPath)) && (streamPath.getFileName().toString().toUpperCase().contains(".WAV"))) {
                     fileSet.add(streamPath.toString());
                 }
             }
@@ -108,6 +103,9 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
         return fileSet;
     }
     
+    //Get every single file located inside of an specific directory
+    //usually this will be ./sound
+    //We are only interested in .wav files, so discard any other format
     private Set<String> getExternalSndFiles(String dir) {
         Set<String> fileSet = new HashSet<>();
         try {
@@ -123,7 +121,9 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
         return fileSet;
     }
     
+    //This will reload the sound list
     private void refreshSounds() {
+        //Check if the sound folder exists, if not, create one
         if (!Files.exists(Path.of("./sound"), LinkOption.NOFOLLOW_LINKS)) {
             System.err.println("Could not find sound directory, creating one...");
             try {
@@ -133,14 +133,21 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
             }
         }
         
+        //Get all files as a set
+        //Like ArrayList but worse
         Set<String> externalSndSet = getExternalSndFiles("./sound");
         Set<String> internalSndSet = getInternalSndFiles();
+        
+        //A set of sets??? a combination of both sets
         Set<Set<String>> allSndFileSet = Set.of(externalSndSet, internalSndSet);
 
         DefaultListModel<String> listModel = new DefaultListModel<>(); 
 
+        //Add all files inside a set to the list model
+        //You will notice there's an if statement inside every for-each loop, this is because
+        //we must apply the filename filter at all times, even when it's empty and nothing is being filtered
         switch (combo_searchInside.getSelectedIndex()) {
-            case 0: //All
+            case 0: //All sounds
                 for (Set<String> set : allSndFileSet) {
                     for (String string : set) {
                         if (string.toUpperCase().contains(tf_fileNameFilter.getText().toUpperCase())) {
@@ -151,7 +158,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
 
                 sndList.setModel(listModel);
                 break;
-            case 1: //Internal
+            case 1: //Internal sounds
                 for (String string : internalSndSet) {
                     if (string.toUpperCase().contains(tf_fileNameFilter.getText().toUpperCase())) {
                         listModel.addElement(string);
@@ -160,7 +167,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
                 
                 sndList.setModel(listModel);
                 break;
-            case 2: //External
+            case 2: //External sounds
                 for (String string : externalSndSet) {
                     if (string.toUpperCase().contains(tf_fileNameFilter.getText().toUpperCase())) {
                         listModel.addElement(string);
@@ -380,7 +387,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
         if (evt.getClickCount() == 2 && evt.getButton() == evt.BUTTON1) {
             System.out.println("double clicked " + sndList.getSelectedValue());
             SoundPlayer.killAllSound();
-            soundPanel.setEventSnd(sndEvent, sndList.getSelectedValue());
+            soundPanel.associateSoundWithEvent(sndEvent, sndList.getSelectedValue());
             dispose();
         }
     }//GEN-LAST:event_sndListMouseClicked
@@ -431,7 +438,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
 
     private void bt_confirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_confirmActionPerformed
         SoundPlayer.killAllSound();
-        soundPanel.setEventSnd(sndEvent, sndList.getSelectedValue());
+        soundPanel.associateSoundWithEvent(sndEvent, sndList.getSelectedValue());
         dispose();
     }//GEN-LAST:event_bt_confirmActionPerformed
 

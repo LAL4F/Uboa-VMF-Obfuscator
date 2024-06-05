@@ -25,7 +25,7 @@ public class MainWindow extends javax.swing.JFrame {
     private Conf_SoundPanel conf_SoundPanel;
     private HelpPanel helpPanel;
     private AboutPanel aboutPanel;
-    private RankingPanel rankingPanel;
+    //private RankingPanel rankingPanel;
     
     private CardLayout navigator_obfuscatePanel, navigator_conf_GeneralPanel, navigator_conf_AppearancePanel,
             navigator_conf_EntDictionaryPanel, navigator_conf_SoundPanel, navigator_helpPanel,
@@ -67,7 +67,7 @@ public class MainWindow extends javax.swing.JFrame {
         conf_SoundPanel = new Conf_SoundPanel(this);
         helpPanel = new HelpPanel();
         aboutPanel = new AboutPanel();
-        rankingPanel = new RankingPanel();
+        //rankingPanel = new RankingPanel();
         
         //Add panels to container
         panelContainer_Obfuscate.add(obfuscatePanel, "obfuscatePanel");

@@ -15,7 +15,7 @@ public class AboutPanel extends javax.swing.JPanel {
     public AboutPanel() {
         initComponents();
         
-        lb_uboaLogo.setIcon(new ImageIcon(MainWindow.class.getResource("/images/uboaLogo.png")));
+        lb_uboaLogo.setIcon(new ImageIcon(MainWindow.class.getResource("/images/uboaTitle.png")));
         
         bt_profile.setIcon(new ImageIcon(MainWindow.class.getResource("/images/userLogo.png")));
         bt_paypal.setIcon(new ImageIcon(MainWindow.class.getResource("/images/paypal.png")));
@@ -32,7 +32,6 @@ public class AboutPanel extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         bt_profile = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         bt_paypal = new javax.swing.JButton();
         jSeparator3 = new javax.swing.JSeparator();
@@ -67,10 +66,6 @@ public class AboutPanel extends javax.swing.JPanel {
                 bt_profileActionPerformed(evt);
             }
         });
-
-        jLabel2.setFont(new java.awt.Font("Bahnschrift", 1, 24)); // NOI18N
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setText("Uboa VMF Obfuscator - ver 1.0");
 
         jLabel3.setFont(new java.awt.Font("Bahnschrift", 1, 24)); // NOI18N
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -113,17 +108,14 @@ public class AboutPanel extends javax.swing.JPanel {
                     .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jSeparator4)
-                    .addComponent(lb_uboaLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(lb_uboaLogo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lb_uboaLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lb_uboaLogo, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 9, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -170,13 +162,13 @@ public class AboutPanel extends javax.swing.JPanel {
     private void lb_uboaLogoMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lb_uboaLogoMouseReleased
         if (!logoClicked) {
             SoundPlayer.initSound("/internalSnd/uuwaaah.wav", SoundPlayer.SoundType.SND_OVERRIDE);
-            lb_uboaLogo.setIcon(new ImageIcon(MainWindow.class.getResource("/images/uboaLogo_bw.png")));
+            lb_uboaLogo.setIcon(new ImageIcon(MainWindow.class.getResource("/images/uboaTitle_pressed.png")));
             logoClicked = true;
             return;
         }
         
         SoundPlayer.initSound("/internalSnd/open.wav", SoundPlayer.SoundType.SND_OVERRIDE);
-        lb_uboaLogo.setIcon(new ImageIcon(MainWindow.class.getResource("/images/uboaLogo.png")));
+        lb_uboaLogo.setIcon(new ImageIcon(MainWindow.class.getResource("/images/uboaTitle.png")));
         logoClicked = false;
     }//GEN-LAST:event_lb_uboaLogoMouseReleased
 
@@ -185,7 +177,6 @@ public class AboutPanel extends javax.swing.JPanel {
     private javax.swing.JButton bt_paypal;
     private javax.swing.JButton bt_profile;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;

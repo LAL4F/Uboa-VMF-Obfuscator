@@ -36,6 +36,7 @@ import java.nio.file.AccessDeniedException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import javax.swing.JFileChooser;
 
 public class ObfuscatePanel extends javax.swing.JPanel {    
     //The MainWindow which acts as a parent to this panel
@@ -714,7 +715,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(lb_info, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lb_filelength, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lb_filelength, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lb_charset, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
@@ -786,7 +787,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
 
         //If input is folder, prepare for a batch operation
         //otherwise, just add the VMF input to the file processing array
-        if (combo_input.getSelectedIndex() == 1) {
+        if (combo_input.getSelectedIndex() == 1) { //If input is folder
             
             //If input points to a file, sanitize path so it points to the directory of the file instead
             if (inputPath.contains(".vm")) {
@@ -812,7 +813,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                 SoundPlayer.initSound(XMLConfig.getStringValue("errorSnd"), SoundPlayer.SoundType.SND_ERROR); 
                 return;
             }
-        } else {
+        } else { //If input is file
             filesToProcess.add(tf_input.getText());
             addVerbose("\nAdded " + tf_input.getText() + " to batch list");
         }
@@ -823,7 +824,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
         processNextFileInQueue();
     }
     
-    //Load file
+    //Load file and prepare it for reading
     private void openFile(String file) {
         selectedFile = new File(file);
 
@@ -845,7 +846,6 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     
     //Analyze VMF on a separate thread to prevent the GUI thread from
     //becoming unresponsive
-    
     //TODO: multithreading
     private void asyncReadVMF() throws ExecutionException {
         try {
@@ -896,7 +896,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                         return;
                     }
                     
-                    vmfContent = String.join("\n", solidSection);
+                    //vmfContent = String.join("\n", solidSection);
                     progressBar.setMinimum(beginEntitySection);
                     progressBar.setMaximum(totalLines);
                     boolean isParsingEntity = false;
@@ -913,11 +913,14 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                         if (isParsingEntity) {
                             //Figure out class of entity
                             if (readVmfList.get(i).contains("classname")) {
-                                Pattern pattern = Pattern.compile("\"([^\"]*)\"");
-                                Matcher matcher = pattern.matcher(readVmfList.get(i));
+                                Pattern pattern = Pattern.compile("\"([^\"]*)\""); //Look for strings within quotation marks
+                                Matcher matcher = pattern.matcher(readVmfList.get(i)); //The line to apply the matcher to
                                 
                                 while( matcher.find() ) {
-                                    if (!matcher.group(1).equals("classname")) {
+                                    //A minimum of two matches will be found, this will ensure only one goes through
+                                    if (!matcher.group(1).equals("classname")) { 
+                                        //If the classname is found inside the entity dictionary, mark it as a logical entity and 
+                                        //allow its origin to be parsed
                                         if (eDidct.contains(matcher.group(1))) {
                                             verboseTextToAppend += "\n\nFound logic entity " + matcher.group(1) + ", obtaining origins";
                                         } else {
@@ -957,16 +960,15 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                         
                         //Close entity
                         try {
-                            if ((isParsingEntity) && (readVmfList.get(i).equals("}")) && (readVmfList.get(i + 1).equals("entity")) || (readVmfList.get(i + 1).equals("cameras")) ) {
+                            if ((isParsingEntity) && (readVmfList.get(i).equals("}")) && (readVmfList.get(i + 1).equals("entity")) || (readVmfList.get(i + 1).equals("cameras") ) ) {
                                 isParsingEntity = false;
                                 isPointEntity = false;
                                 verboseTextToAppend += "\nFinished parsing entity";
                             }
                         } catch (IndexOutOfBoundsException e) {
-                            //This is intentional
                         }
                         
-                        vmfContent += readVmfList.get(i) + "\n";
+                        //vmfContent += readVmfList.get(i) + "\n";
                         lb_progressBarState.setText("Line " + String.format("%,d", i) + " of " + totalLinesPretty);
                         progressBar.setValue(i);
                         
@@ -975,6 +977,9 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                             verboseTextToAppend = "";
                         }
                     }
+                    
+                    vmfContent = String.join("\n", readVmfList);
+                    
                     addText("\n\nFinished reading " + fileName + "\n\nTime to read file: " + String.format("%.2f", (double)(System.nanoTime() - startTime) / 1_000_000_000. ) + " seconds");
                     addText("\nNumber of entities: " + iNumEnts);
                     lb_filelength.setText("length: " + String.format("%,d", vmfContent.length()) + " | lines: " + totalLinesPretty);
@@ -1154,16 +1159,15 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                             
                             progressBar.setValue(progressBar.getValue() + 1);
                         }
-                    }
 
-                    int targetnameArrayIndex = 0;
-                    if (targetnameObfuscationKind != 0) {
+                        int targetnameArrayIndex = 0;
+
                         addText("\nObfuscating targetnames...");
                         lb_progressBarState.setText("Obfuscating Targetnames");
                         progressBar.setMinimum(0);
                         progressBar.setValue(0);
                         progressBar.setMaximum(totalTargetnames);
-                        
+
                         for (String targetname : targetnameArray) {
                             switch (targetnameObfuscationKind) {
                                 case 1: //Exchange
@@ -1183,7 +1187,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                                     spentTargetnameIndexes.add(randomIndex);
                                     addVerbose("\nAdded " + randomIndex + " to spent targetname list\n");
                                     targetnameArrayIndex++;
-                                    
+
                                     progressBar.setValue(progressBar.getValue() + 1);
                                     break;  
                                 case 2: //Randomize
@@ -1208,7 +1212,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
                                     break;
                             }
                         }  
-                        addVerbose("\nFinished obfuscating targetnames\n");
+                    addVerbose("\nFinished obfuscating targetnames\n");
                     } else {
                         addVerbose("\nSkipping targetname obfuscation");
                     }
@@ -1241,7 +1245,6 @@ public class ObfuscatePanel extends javax.swing.JPanel {
     }
     
     private void saveFile() {
-        //I need more sleep
         String fileNameNoExtension = fileName.split("\\.vmf")[0];
         String filePathNoExtension = filePath.split("\\.vmf")[0];
         
@@ -1250,18 +1253,26 @@ public class ObfuscatePanel extends javax.swing.JPanel {
         switch (combo_output.getSelectedIndex()) {
             case 0: //Save to subfolder
                 addVerbose("\nSaving to subfolder");
+                
+                //The file path must be sanitized first
+                //First, the input path must be split into an array of strings
+                //"C:\Users\User\Documents\vmf" will be transformed into "C:", "Users", "User", "Documents", "vmf"
                 String[] sanitizedInputFolderArray = tf_input.getText().split("\\\\");
                 String inputFolderNoFilename = "";
                 int limiter = 0;
 
+                //If the input path contains .vmf, implying it points to an individual file, set limiter to 1 in order
+                //to cut off the file name. This doesn't apply if the input points towards a folder
                 if (tf_input.getText().contains(".vmf")) {
                     limiter = 1;
                 }
                 
+                //Rebuild path from the array taking into account the limiter
                 for (int i = 0; i < sanitizedInputFolderArray.length - limiter; i++) {
                     inputFolderNoFilename += sanitizedInputFolderArray[i] + "\\";
                 }
                 
+                //The final path where the file will be written to, after all necessary transformations
                 fileToWrite = new File(inputFolderNoFilename + "\\" + tf_output.getText() + "\\" + fileNameNoExtension + "_obf.vmf");
                 
                 //Making sure the sub directory exists
@@ -1316,6 +1327,9 @@ public class ObfuscatePanel extends javax.swing.JPanel {
         processNextFileInQueue();
     }  
     
+    //If all files in the array have been processed, finish process
+    //Otherwise, keep ofuscating these sons of bitches until it's done
+    //This function is called at the very beginning (initObfuscation) and on each file saved
     private void processNextFileInQueue() {
         if (filesToProcessIndex >= filesToProcess.size()) {
             addText("\n\nFinished all operations");
@@ -1632,7 +1646,7 @@ public class ObfuscatePanel extends javax.swing.JPanel {
         
         //This allows for folder selection in any case
         fileChooser.setDefaultFileName("[Folder Selection]");
-
+        
         if (fileChooser.showOpenDialog(parent)) {
             String chosenFile = fileChooser.getSelectedFile().getName();
             XMLConfig.setStringValue("inputPath", fileChooser.getSelectedFile().getAbsolutePath());

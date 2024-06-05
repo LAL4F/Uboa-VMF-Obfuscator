@@ -9,7 +9,6 @@ package utils;
 import config.XMLConfig;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -17,7 +16,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -51,6 +49,7 @@ public class EntityDictionary {
         }
     }
 
+    //Get contents of the external edict file as an ArrayList
     public static ArrayList<String> getEdict() {
         if (!edictExists()) {
             return null;
@@ -74,6 +73,7 @@ public class EntityDictionary {
         return edict;
     }
     
+    //Save an ArrayList to external file 
     public static void saveEdict(ArrayList<String> edict) {
         try {
             BufferedWriter bw = new BufferedWriter(new FileWriter("./entityDictionary.txt"));
