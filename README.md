@@ -20,6 +20,13 @@ A GUI obfuscator for VMF (Valve Map Format) files. A robust and configurable pro
 
 ## User Guide
 ### Basic Operation
+
+
+
+https://github.com/LAL4F/Uboa-VMF-Obfuscator/assets/168286052/73e3e3ba-dfdd-45b0-9d5f-eb99a79337cf
+
+
+
 <ol>
     <li>Open Uboa through the .exe or .jar executable</li>
     <li>Set input path to either an individual file or a directory for batch operations</li>
