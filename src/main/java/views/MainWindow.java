@@ -7,13 +7,21 @@ package views;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import config.XMLConfig;
+import dialogs.SoundBrowserDialogue;
 import java.awt.CardLayout;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import utils.EntityDictionary;
+import utils.SoundPlayer;
 
 public class MainWindow extends javax.swing.JFrame {
     private final ImageIcon APPIMAGE = new ImageIcon(MainWindow.class.getResource("/images/appicon.png"));
@@ -200,14 +208,11 @@ public class MainWindow extends javax.swing.JFrame {
         setLookAndFeel();
     }
 
-    public static void main(String args[]) {
-        if (!XMLConfig.xmlExists()) {
-            System.out.println("Rebuilding XML");
-        }
-        
-        if (!EntityDictionary.edictExists()) {
-            System.out.println("Rebuilding edict");
-        }
+    public static void main(String args[]) {        
+        //Check if the sound folder exists, if not, create one
+        SoundPlayer.soundFolderExists();
+        XMLConfig.xmlExists();
+        EntityDictionary.edictExists();
         
         setLookAndFeel();
 

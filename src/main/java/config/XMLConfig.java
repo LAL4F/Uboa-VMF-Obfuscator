@@ -31,6 +31,7 @@ import views.MainWindow;
 public class XMLConfig {
     public static boolean xmlExists() {
         if ((!Files.exists(Path.of("./settings.xml"), LinkOption.NOFOLLOW_LINKS)) || (!Files.exists(Path.of("./settings.xsl"), LinkOption.NOFOLLOW_LINKS))) {
+            System.out.println("Rebuilding XML");
             JOptionPane.showMessageDialog(null, "XML configuration file was not found. It will now be rebuilt.", "Config not found", 2);
             rebuildXML();
             return false;

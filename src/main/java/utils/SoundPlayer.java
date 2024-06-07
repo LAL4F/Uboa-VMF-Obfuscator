@@ -1,11 +1,15 @@
 package utils;
 
 import config.XMLConfig;
+import dialogs.SoundBrowserDialogue;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.AudioInputStream;
@@ -26,6 +30,17 @@ public class SoundPlayer  {
         SND_ERROR,
         SND_OVERRIDE, //Bypasses rules, master volume
         SND_BROWSERDIALOG; //Bypasses rules, sound browser preview volume
+    }
+    
+    public static void soundFolderExists() {
+        if (!Files.exists(Path.of("./sound"), LinkOption.NOFOLLOW_LINKS)) {
+            System.err.println("Could not find sound directory, creating one...");
+            try {
+                Files.createDirectories(Path.of("./sound"));
+            } catch (IOException ex) {
+                Logger.getLogger(SoundBrowserDialogue.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
     
     //Initial check to figure out if sound should be played in the first place

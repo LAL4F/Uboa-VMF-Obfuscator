@@ -27,6 +27,7 @@ public class EntityDictionary {
     public static boolean edictExists() {
         if (!Files.exists(Path.of("./entityDictionary.txt"), LinkOption.NOFOLLOW_LINKS)) {
             JOptionPane.showMessageDialog(null, "Entity dictionary was not found. It will now be rebuilt.", "Edict not found", 2);
+            System.out.println("Rebuilding edict");
             rebuildEdict();
             return false;
         }

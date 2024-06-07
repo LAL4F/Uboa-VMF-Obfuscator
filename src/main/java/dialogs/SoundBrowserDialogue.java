@@ -124,14 +124,7 @@ public class SoundBrowserDialogue extends javax.swing.JDialog {
     //This will reload the sound list
     private void refreshSounds() {
         //Check if the sound folder exists, if not, create one
-        if (!Files.exists(Path.of("./sound"), LinkOption.NOFOLLOW_LINKS)) {
-            System.err.println("Could not find sound directory, creating one...");
-            try {
-                Files.createDirectories(Path.of("./sound"));
-            } catch (IOException ex) {
-                Logger.getLogger(SoundBrowserDialogue.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
+        SoundPlayer.soundFolderExists();
         
         //Get all files as a set
         //Like ArrayList but worse
