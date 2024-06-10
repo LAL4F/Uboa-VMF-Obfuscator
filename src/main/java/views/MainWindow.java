@@ -7,14 +7,7 @@ package views;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import config.XMLConfig;
-import dialogs.SoundBrowserDialogue;
 import java.awt.CardLayout;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 import javax.swing.SwingUtilities;
@@ -24,7 +17,7 @@ import utils.EntityDictionary;
 import utils.SoundPlayer;
 
 public class MainWindow extends javax.swing.JFrame {
-    private final ImageIcon APPIMAGE = new ImageIcon(MainWindow.class.getResource("/images/appicon.png"));
+    private final ImageIcon APPIMAGE = new ImageIcon(MainWindow.class.getResource("/images/appicon_hr_color.png"));
     
     private ObfuscatePanel obfuscatePanel;
     public Conf_GeneralPanel conf_GeneralPanel;
